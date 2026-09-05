@@ -1,30 +1,13 @@
 # Right Typer
 
-Right Typer is a planned open-source typing tutor that uses a laptop camera to check whether each key was pressed with the intended finger.
+A planned open-source typing tutor that uses a laptop camera to help you practise correct finger placement. Everything runs on your device.
 
-This repository is intentionally at the specification stage. It contains a minimal React and TypeScript scaffold, but the product has not been implemented yet.
+**Status: specification only.** Read [SPEC.md](SPEC.md) before starting implementation. It defines the first exercise, manual calibration, word-level grading, privacy, proposed stack, and acceptance checks.
 
-Read [SPEC.md](SPEC.md) for the agreed first prototype, technical approach, and acceptance criteria.
+The intended setup is Chrome on a MacBook Air or MacBook Pro with an Apple British ISO keyboard. The application will be a static React/TypeScript/Vite site, with MediaPipe hand tracking and browser-local settings.
 
-## Intended stack
+The unfinished first attempt is preserved on the [codex/sol-work branch](https://github.com/al-beton/right-typer/tree/codex/sol-work). It is archived reference material and has not passed hardware acceptance. Start the new implementation from this specification branch.
 
-- React, TypeScript, and Vite
-- MediaPipe Hand Landmarker in the browser
-- A Web Worker for hand-landmark inference
-- Browser storage for calibration and preferences
-- Static hosting, with no application backend
+No application code or runnable scaffold is included in this revision. Development and deployment commands will be documented when implementation starts.
 
-## Local setup
-
-```sh
-npm install
-npm run dev
-```
-
-## Status
-
-The project is specced and ready for implementation. The generated starter screen is not the Right Typer prototype.
-
-## License
-
-Apache License 2.0. See [LICENSE](LICENSE).
+Licensed under [Apache 2.0](LICENSE).

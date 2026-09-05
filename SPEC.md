@@ -1,180 +1,136 @@
-# Right Typer: first prototype specification
+# Right Typer: first prototype
 
-## Objective
+Status: specification only. This replaces the first specification and is the starting point for a new implementation. The previous attempt is preserved on `codex/sol-work`; it is not an implementation dependency.
 
-Prove that a browser can combine keyboard events with laptop-camera hand tracking closely enough to teach conventional touch-typing finger placement.
+## The product
 
-The first prototype should let someone calibrate their keyboard, type one short lesson, retry any word typed with the wrong finger, and receive words-per-minute and mistake totals at the end. It must run entirely client-side.
+A free, open-source typing exercise that teaches the user to press keys with the correct fingers. Set up the camera and keyboard, type one playful passage, retry words with finger mistakes, then see typing speed and mistakes.
 
-## Supported setup
+The entire application runs in the browser. No account or application backend. The first deliverable is one polished, usable exercise, not a course or a computer-vision dashboard.
 
-- Chrome on a MacBook Air or MacBook Pro
-- Built-in laptop camera
-- Apple British ISO keyboard
-- Laptop screen angled so the camera can see both hands and the keyboard
-- Desktop only
+## Requirements carried forward
 
-Other browsers, external keyboards, keyboard layouts, and phones are not part of the first prototype.
+- Chrome on a MacBook Air or MacBook Pro, with an Apple British ISO keyboard.
+- Use the laptop camera and the physical arrangement the user has already tested successfully with TypingTA. The setup guide should demonstrate that arrangement.
+- Manually calibrate the keyboard key by key initially. Faster calibration can come later.
+- One passage of about 50 words covering all 26 letters. Lowercase, spaces, commas and full stops; no numbers or Shift required.
+- Let the user finish a word before rejecting its finger use. Tune the brief boundary delay through actual typing tests.
+- Keep the live camera view visible below the passage throughout the exercise.
+- End with WPM and understandable mistake counts.
+- Clean branding, taking cues from the directness of 10FastFingers and the restraint of Monkeytype.
+- Store settings and calibration on the user's device. Easy local development and static deployment to GitHub Pages.
+- Apache 2.0 project license; preserve the licenses and attribution for dependencies and model assets.
 
-## User journey
+Desktop only. No phones, accounts, cloud sync, leaderboards, curriculum, or custom model training in this first version.
 
-The product is a single-page state machine:
+## What the tracking system must do
 
-1. **Introduction:** Explain the exercise, local processing, and required camera angle.
-2. **Camera setup:** Ask for permission and show a live preview. The user adjusts the screen until both hands and the supported keys are visible.
-3. **Calibration:** Prompt every supported key once. The user presses each highlighted key with its expected finger. Invalid or low-confidence samples must be repeated.
-4. **Lesson:** Show the text prominently, with the current word and character clear. Keep the camera preview visible beneath the typing area throughout.
-5. **Word result:** Let the user finish the current word. Grade it when they press space, or when they complete the final word.
-6. **Completion:** Show words per minute and mistakes, with a restart action.
+A browser keyboard event tells us which physical key was pressed. A hand-landmark model estimates the positions of the fingers. Calibration places the keyboard in the camera image. Our own classifier combines those observations to infer which finger pressed the known key.
 
-Calibration may be saved on the device and reused. A later version can add a faster calibration path.
+MediaPipe Hand Landmarker is the proposed starting point, not evidence that finger grading will work automatically. It reports hands and landmarks, not key contacts. The difficult part is reliable attribution during real typing, particularly adjacent fingers, occlusion, and the interval between video frames.
 
-## First lesson
+TypingTA is the reference for camera framing and manual key registration. Its public help explicitly describes uncertain classifications and possible false accusations. Our word gate therefore needs an honest "could not tell" outcome and an easy route back to calibration.
 
-Use this 50-word lesson. It contains every letter of the alphabet and uses only lowercase letters, spaces, commas, and full stops:
+## Camera and calibration
 
-> quick foxes jump over lazy dogs, while bright wizards pack five quirky boxes. calm typists breathe, place each finger gently, and watch small mistakes become smooth rhythm. every careful word builds speed without rushing, until the keyboard feels familiar and your hands know exactly where to go next with confidence.
+1. Explain the exercise and local processing, then request camera permission on user action. Handle permission refusal, missing camera, and an unavailable camera with useful instructions.
+2. Show framing guidance and a live image. Both hands and the main typing block should be visible, including the number row and spacebar. Follow the tested TypingTA setup without inventing hardware requirements.
+3. Show an Apple British ISO keyboard diagram. Prompt the user to click the centre of each key in the camera image, one at a time, with undo and correction.
+4. Calibrate the full main typing block, including keys the first passage does not exercise. This means the number row, letter and punctuation rows, ISO Enter, modifiers around those rows, and spacebar. The function row, Touch ID, trackpad, and navigation cluster are not needed. Keep the exact layout in data.
+5. Show all calibrated centres over the image and require a visual confirmation. Do not silently infer unregistered centres or substitute a US ANSI layout.
+6. Run a short check with representative keys on both hands before the lesson. This validates framing and attribution; it is not a mandatory training sample for every key.
+7. Save the map locally and offer reuse next visit, subject to a framing check.
 
-## Finger mapping
+Keep inference coordinates independent of the mirrored preview. Store points normalized to the source frame, plus schema/layout version, camera choice, dimensions, and orientation. Changing the camera or incompatible geometry requires recalibration. Moving the screen can invalidate a map even on the same device: show the overlay on reuse and make recalibration readily available.
+
+The Apple British ISO layout is the constraint. Do not arbitrarily exclude an external Apple keyboard if it is the user's tested arrangement; other layouts and general camera setups are outside scope.
+
+## Finger map
+
+This is the mapping carried forward from the earlier discussion:
 
 | Finger | Keys |
 | --- | --- |
-| Left little | `q a z` |
-| Left ring | `w s x` |
-| Left middle | `e d c` |
-| Left index | `r f v t g b` |
-| Right index | `y h n u j m` |
-| Right middle | `i k ,` |
-| Right ring | `o l .` |
-| Right little | `p ; /` |
-| Either thumb | `space` |
+| Left little | q a z |
+| Left ring | w s x |
+| Left middle | e d c |
+| Left index | r f v t g b |
+| Right index | y h n u j m |
+| Right middle | i k comma |
+| Right ring | o l full stop |
+| Right little | p semicolon slash |
+| Either thumb | space |
 
-The first lesson grades only the letters, comma, full stop, and space. Semicolon and slash are calibrated to preserve the agreed mapping, but are not used in the lesson. Numbers, uppercase letters, and other punctuation are out of scope.
+Only letters, comma, full stop, and space are graded in this lesson. Registering other keys does not add them to the exercise or require inventing their finger rules.
 
-## Grading rules
+## Lesson and word gate
 
-For each physical keydown, record the expected character, actual character, expected finger, observed finger, confidence, and timestamps.
+The passage is the main element. Clearly distinguish accepted words, the active word, and the current character. Literal text errors appear immediately. Finger results appear at the word boundary.
 
-- Typing continues until the end of the current word, even if an earlier key was wrong.
-- A word passes only when its text is correct and every graded character was pressed with the expected finger.
-- A failed word does not advance the lesson. Show character-level feedback, clear the attempt, and let the user type the same word again.
-- A confident wrong-finger result counts as one mistake for that attempt.
-- Incorrect text counts as one mistake for that attempt.
-- Tracking uncertainty or a temporarily hidden hand triggers a free retry and does not count as a mistake.
-- Backspace may repair text within an attempt, but it does not erase an already observed wrong-finger press. The word will still fail at its boundary.
-- Space accepts either thumb and completes the word. It is tracked, but either thumb is correct.
-- Words per minute is calculated from accepted characters divided by five and divided by elapsed minutes, starting with the first lesson keypress and ending when the final word passes.
+Default behaviour for the first implementation:
 
-If text and tracking failures occur in the same attempt, they still count as one failed attempt in the headline mistake total. Detailed diagnostics may retain both reasons.
+- Collect each physical keydown with `KeyboardEvent.code`, resulting text with `key`, and a timestamp. Match it to a bounded buffer of timestamped hand observations, accounting for camera and inference delay.
+- Space submits a non-final word; Enter submits the final word. Enter and Backspace are controls, not finger-graded lesson characters. The instruction for final submission must be visible.
+- The word advances exactly once only after its final text is correct and all required finger observations pass.
+- Backspace edits the current attempt. Erasing a character removes it from the candidate word, but does not erase its recorded mistakes or confidently wrong-finger press. A finger mistake requires a fresh word attempt.
+- A rejected attempt shows which key and expected finger caused the problem, then lets the user retry that same word. A new attempt has fresh grading evidence.
+- Ambiguous, missing, or stale observations yield "could not tell." They cannot pass a word or count as a finger mistake. If an attempt also contains a confirmed mistake, that mistake still counts; uncertainty must not hide it.
+- While a boundary is being resolved, show a brief pending state and never attribute subsequent keys to the previous word. Start with a bounded pause; buffer subsequent typing only if testing demonstrates that this is necessary for a fluid experience.
+- Repeated tracking failures lead to framing/calibration guidance. Do not create an endless unexplained retry loop.
+- Holding a key, pasting, autofill, and composition must not bypass physical-key grading. Browser and system shortcuts should continue to work.
 
-## Tracking approach
+These details are first-pass defaults. Boundary delay, retry animation, and buffering are to be tuned with the user on the actual keyboard. Do not claim a fixed latency target was agreed.
 
-Use MediaPipe Hand Landmarker as the first landmark model. It returns handedness plus 21 landmarks for each detected hand. It does not know which keyboard key was pressed, so Right Typer must add calibration and temporal classification.
+## Results
 
-Proposed pipeline:
+Keep the first results screen simple:
 
-1. Capture camera video with `getUserMedia`.
-2. Run two-hand landmark inference in `VIDEO` mode inside a Web Worker.
-3. Keep a short timestamped ring buffer of fingertip landmarks and confidence values.
-4. During calibration, associate each browser key event with the corresponding fingertip position and motion around that timestamp.
-5. During the lesson, use the keydown timestamp plus the calibrated signatures to classify the finger that moved into the pressed key.
-6. Return `correct`, `wrong finger`, or `uncertain`. Never guess when confidence is below the calibrated threshold.
+- **WPM:** accepted passage characters, including punctuation and inter-word spaces, divided by five and elapsed minutes. Count each passage character once, regardless of retries.
+- **Text mistakes:** incorrect character keydowns compared with the expected position when pressed.
+- **Finger mistakes:** confidently incorrect finger events. An event may contribute to both text and finger totals; label them separately rather than adding them into a misleading accuracy percentage.
+- **Word retries:** failed submissions, with tracking-only retries shown separately and excluded from the mistake total.
 
-The first classifier should compare fingertip proximity and downward motion in a small window around keydown. The implementation should keep this logic behind a narrow interface so it can be replaced by a learned classifier later without changing the lesson or grading code.
+Start the timer on the first lesson character and stop when the final word passes. Include correction and retry time. If camera access is lost or the tab loses focus, pause the exercise explicitly and discard incomplete timing evidence before resuming with a fresh current-word attempt. Exclude only those explicit pause intervals.
 
-MediaPipe's web inference calls are synchronous, so they must not run on the UI thread. Camera frames should not be copied into React state.
+A combined accuracy percentage is optional and should only be added with a documented denominator. WPM and mistakes are the required outcome.
 
-## Technical shape
+## Proposed stack and local state
 
-- **UI:** React and TypeScript
-- **Build:** Vite, producing static files
-- **Tracking:** `@mediapipe/tasks-vision`, with model and WebAssembly assets served from the same site
-- **Concurrency:** Web Worker for video inference
-- **Persistence:** browser storage for calibration, camera preference, and settings
-- **Testing:** unit tests for mapping, grading, calibration transforms, and statistics; manual camera validation on both target MacBook types
-- **Hosting:** GitHub Pages or another static host
+- React + TypeScript + Vite, producing ordinary static files.
+- MediaPipe `@mediapipe/tasks-vision` and its compatible hand model, with exact versions selected and pinned during implementation.
+- Run inference in a Web Worker. Keep video and frame-rate landmark updates outside React state; React manages the exercise and low-frequency feedback.
+- Separate tracking, calibration, finger classification, word grading, statistics, and persistence. Grading and statistics should be plain testable TypeScript.
+- Start with fingertip distance to the known key, handedness, and evidence across nearby frames. Keep the classifier replaceable. Add motion/depth heuristics only when measured examples justify them.
+- Use versioned `localStorage` for the small calibration/settings document. Handle unavailable or cleared storage by offering calibration again; do not require persistence to use the app. IndexedDB is only needed if larger local datasets are later justified.
+- No app backend, database service, auth, analytics, remote inference, or API keys. A static host serves the app and model files.
+- Self-host JavaScript, WASM, models, and fonts. Audit the chosen MediaPipe distribution for metrics/network behaviour and verify actual requests before making privacy claims.
+- Do not upload or persist video. Retain only the short in-memory landmark window necessary for grading; store calibration coordinates rather than raw video or motion history.
+- Serve locally through localhost and remotely over HTTPS. Offline/PWA installation and cross-device sync are not first-version requirements.
 
-Suggested module boundaries:
+## Build order and evidence
 
-- `tracking`: camera access, MediaPipe adapter, worker, landmark ring buffer
-- `calibration`: key samples, quality checks, transform and invalidation
-- `typing`: lesson state, finger map, word grading, statistics
-- `storage`: versioned device-local settings
-- `ui`: setup, calibration, lesson, feedback, and results screens
+1. **Prove the core interaction:** camera, manual key centres, hand landmarks, and attribution of a real keypress. Check deliberate correct and wrong fingers on the supported MacBook. Establish a believable path to word gating before polishing the full interface.
+2. **Complete one exercise:** onboarding, calibration reuse, passage, boundary grading, retries, and results.
+3. **Finish and verify:** visual polish, unit tests, browser flow tests, privacy inspection, local instructions, and static build/deployment documentation.
 
-No application server, database, account, cloud sync, analytics, or remote inference is required.
+Test pure grading with correct, wrong, mixed, uncertain, corrected, and repeated events. Test calibration coordinate transforms and invalidation. Browser tests may use synthetic observations to exercise flow, but cannot establish hand-tracking accuracy.
 
-## Local data and privacy
+Record real-hardware observations for both hands and different rows: false acceptance, false rejection, uncertain results, and boundary delay. Do not invent universal accuracy or latency guarantees. The hands-on acceptance check is that normal correct typing can complete the passage, intentional wrong fingers are caught, and retries feel helpful rather than arbitrary.
 
-- Camera frames must never be uploaded or persisted.
-- Derived landmarks should remain in memory and be discarded after their short classification window.
-- Calibration and settings may be persisted locally using a versioned schema.
-- Typed lesson content and results remain on the device.
-- Runtime code, model files, and WebAssembly should be same-origin assets. The app should not depend on a third-party CDN after deployment.
-- Before release, verify browser network traffic and document any telemetry from dependencies. Local inference is not by itself proof of zero outbound requests.
+A complete first prototype also needs:
 
-The static host will receive normal requests for the app's files. That does not constitute an application backend.
+- A fresh Chrome user can understand setup, register the keyboard, and complete the exercise.
+- Reloading offers a valid saved map with a visual framing check; recalibration and local reset work.
+- Incorrect or unknown finger events never silently advance a word.
+- Camera loss, permission errors, focus changes, and a slow model produce recoverable states.
+- The camera view stays below the passage and the exercise is usable at common MacBook viewport sizes.
+- Statistics agree with recorded events, including retries and pauses.
+- A fresh clone has documented install, run, test, build, and GitHub Pages deployment steps.
+- Network inspection confirms no camera, typing, landmark, or calibration uploads and no analytics.
+- The user completes the physical setup and typing test. Until then, report the result as an unvalidated prototype.
 
-## Calibration requirements
+## References
 
-- Cover all 31 mapped inputs: 26 letters, comma, full stop, semicolon, slash, and space.
-- Record the camera device, video dimensions, calibration version, and sample quality.
-- Require both hands to be visible before starting.
-- Reject a sample when the expected hand is missing, handedness is ambiguous, landmarks are stale, or motion confidence is too low.
-- Offer a complete recalibration from the lesson screen.
-- Invalidate saved calibration when its schema changes or the selected camera changes.
-
-## Interface direction
-
-- Clean, quiet typing surface influenced by Monkeytype and the clarity of 10FastFingers, without copying either product.
-- The text to type is the main visual element.
-- Current word and current character are unmistakable.
-- Wrong text and wrong-finger feedback are visually distinct.
-- The live camera preview is always visible below the typing element during calibration and the lesson.
-- The preview may overlay landmarks and the currently inferred fingertip, but should not become the main interface.
-- The experience must fit comfortably in a MacBook browser viewport without scrolling during the lesson.
-
-## Prototype acceptance criteria
-
-- A first-time user can grant camera permission, position the laptop, calibrate all supported keys, and begin the lesson without developer help.
-- Refreshing the page can reuse a valid calibration stored on that device.
-- The lesson never advances past a failed word.
-- The lesson advances after a word whose text and finger use are correct.
-- Tracking uncertainty produces a free retry rather than a false pass or counted mistake.
-- On representative deliberate wrong-finger presses for `a`, `f`, `j`, `p`, `c`, and `m`, at least 8 of 10 trials are rejected on each target MacBook.
-- At least 9 of 10 correctly typed representative words are accepted on each target MacBook.
-- Word-boundary feedback appears within 150 ms at the 95th percentile on each target MacBook.
-- The camera preview remains responsive while typing.
-- Completion shows words per minute and failed-attempt count.
-- A production build is static and deployable to GitHub Pages.
-- A network audit finds no camera, landmark, calibration, or typed-content uploads.
-
-## Explicit non-goals
-
-- Mobile or tablet support
-- Safari or Firefox support
-- Windows or non-Apple keyboards
-- External keyboard calibration
-- Accounts, leaderboards, cloud history, or multiplayer
-- Multiple lessons, adaptive curricula, or typing courses
-- Numbers, uppercase letters, symbols beyond comma and full stop
-- A custom hand-landmark model
-- Production-grade accuracy across arbitrary lighting and camera positions
-
-## Decisions left to the prototype
-
-These are implementation experiments, not blockers to starting:
-
-- The exact temporal window and confidence thresholds for classifying a press
-- Whether proximity alone is sufficient or finger-velocity features are required
-- How much landmark overlay is useful during typing
-- The best visual treatment and duration for failed-word feedback
-
-## Definition of done for the first implementation issue
-
-The prototype is done only when the complete journey works from a fresh Chrome profile on a supported MacBook, the manual accuracy and latency checks above are recorded, the static build is deployed, and the README accurately describes the tested limitations.
-
-## Primary references
-
-- [MediaPipe Hand Landmarker for Web](https://developers.google.com/edge/mediapipe/solutions/vision/hand_landmarker/web_js)
-- [MediaPipe source and license](https://github.com/google-ai-edge/mediapipe)
+- [TypingTA](https://typingta.com/): tested physical setup, framing and manual key registration.
+- [MediaPipe Hand Landmarker for Web](https://developers.google.com/edge/mediapipe/solutions/vision/hand_landmarker/web_js): landmarks, video inference, and worker guidance.
+- [MediaPipe repository](https://github.com/google-ai-edge/mediapipe): source license and privacy notice.
