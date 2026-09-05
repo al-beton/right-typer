@@ -1,0 +1,20 @@
+Right Typer uses MediaPipe Tasks Vision 0.10.32 and the MediaPipe Hand
+Landmarker float16 model, version 1, from Google.
+Copyright Google LLC / The MediaPipe Authors. Licensed under Apache 2.0.
+The license is included at licenses/Apache-2.0.txt.
+
+Source: https://github.com/google-ai-edge/mediapipe
+Runtime: https://www.npmjs.com/package/@mediapipe/tasks-vision/v/0.10.32
+Model: https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task
+Model documentation: https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker
+
+The model is distributed unmodified. The pinned runtime's JS/WASM files
+are copied locally; its JavaScript is bundled into the tracking worker.
+No CDN is contacted by the running app. Model checksum: models/SHA256SUMS.
+
+Build/test tools (Vite, Vitest, TypeScript, Playwright, Prettier and
+agent-browser) are development dependencies, not services used by this app.
+Their licenses remain in their installed packages.
+
+Right Typer is not affiliated with Google or TypingTA. No TypingTA code,
+branding, or assets are included.

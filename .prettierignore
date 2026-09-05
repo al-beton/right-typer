@@ -1,0 +1,7 @@
+pnpm-lock.yaml
+public/
+dist/
+node_modules/
+SPEC.md
+AGENTS.md
+test-results/
