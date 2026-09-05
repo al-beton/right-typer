@@ -1,13 +1,15 @@
 # Right Typer
 
-A planned open-source typing tutor that uses a laptop camera to help you practise correct finger placement. Everything runs on your device.
+An open-source typing exercise that observes your actual finger use and requires each word to be typed correctly before you can advance.
 
-**Status: specification only.** Read [SPEC.md](SPEC.md) before starting implementation. It defines the first exercise, manual calibration, word-level grading, privacy, proposed stack, and acceptance checks.
+**Status: specification ready; implementation has not restarted.**
 
-The intended setup is Chrome on a MacBook Air or MacBook Pro with an Apple British ISO keyboard. The application will be a static React/TypeScript/Vite site, with MediaPipe hand tracking and browser-local settings.
+Read [Linear issue ALO-180](https://linear.app/advantagegroup/issue/ALO-180) for the current requirements and acceptance criteria. [AGENTS.md](AGENTS.md) explains how to work on the project and record discoveries.
 
-The unfinished first attempt is preserved on the [codex/sol-work branch](https://github.com/al-beton/right-typer/tree/codex/sol-work). It is archived reference material and has not passed hardware acceptance. Start the new implementation from this specification branch.
+The first version is for Chrome on a MacBook Air or MacBook Pro with an Apple British ISO keyboard. It will run entirely in the browser, with device-local settings and no application backend. Implementation choices follow the Linear spec, not the abandoned scaffold.
 
-No application code or runnable scaffold is included in this revision. Development and deployment commands will be documented when implementation starts.
+The unfinished first attempt is preserved on [codex/sol-work](https://github.com/al-beton/right-typer/tree/codex/sol-work). It has not passed hardware acceptance.
+
+The handoff branch is `codex/right-typer-respec` until [PR #1](https://github.com/al-beton/right-typer/pull/1) is merged into main. This branch contains documentation only. Development and deployment commands will be added with the implementation.
 
 Licensed under [Apache 2.0](LICENSE).
