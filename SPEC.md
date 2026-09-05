@@ -22,7 +22,7 @@ The product is a single-page state machine:
 
 1. **Introduction:** Explain the exercise, local processing, and required camera angle.
 2. **Camera setup:** Ask for permission and show a live preview. The user adjusts the screen until both hands and the supported keys are visible.
-3. **Calibration:** Prompt every supported key once. The user presses each highlighted key with its expected finger. Invalid or low-confidence samples must be repeated.
+3. **Calibration:** Prompt every supported key once. For each key, the user first clicks its centre in the mirrored camera preview, following TypingTA's proven manual key-registration geometry, then presses the highlighted physical key with its expected finger. This combines an explicit keyboard map with a motion sample. Invalid or low-confidence samples must be repeated.
 4. **Lesson:** Show the text prominently, with the current word and character clear. Keep the camera preview visible beneath the typing area throughout.
 5. **Word result:** Let the user finish the current word. Grade it when they press space, or when they complete the final word.
 6. **Completion:** Show words per minute and mistakes, with a restart action.
@@ -118,6 +118,7 @@ The static host will receive normal requests for the app's files. That does not 
 ## Calibration requirements
 
 - Cover all 31 mapped inputs: 26 letters, comma, full stop, semicolon, slash, and space.
+- Register each key centre in camera coordinates before capturing its expected-finger press. Mirror only the displayed preview; persist centres in the camera's unmirrored coordinates.
 - Record the camera device, video dimensions, calibration version, and sample quality.
 - Require both hands to be visible before starting.
 - Reject a sample when the expected hand is missing, handedness is ambiguous, landmarks are stale, or motion confidence is too low.
