@@ -37,7 +37,7 @@ Linux CI installs the browser with `pnpm exec playwright install --with-deps chr
 
 The output is entirely static. `pnpm build` puts HTML, scripts, styles, model, WASM and notices in `dist/`. Paths are relative, so the app supports the repository subdirectory `/right-typer/`. The model is checked into this repository and verified by SHA-256; WASM is copied from the pinned package during build. Builds do not download model assets.
 
-After the implementation is reviewed and merged, choose **Settings → Pages → Source: GitHub Actions**, then run **Actions → Deploy static app to Pages → Run workflow** on `main`. The manual workflow builds and publishes `dist/`; it does not publish on a push or PR. The expected URL is `https://al-beton.github.io/right-typer/`. Confirm the successful deployment and open that URL before treating it as live. No deployment has been performed as part of this PR.
+Every push to `main` runs **Deploy static app to Pages**, which checks, builds and publishes `dist/` to `https://al-beton.github.io/right-typer/`. Pages is configured with GitHub Actions as its source. The workflow can also be run manually from the Actions tab for a redeploy without a new commit. Pull requests run the Verify workflow only and never deploy.
 
 Any static HTTPS host can serve the same folder. Do not use `file://`: camera access needs HTTPS or localhost. Serve `.wasm` as `application/wasm`. No API server, environment secrets, account or database is needed.
 
