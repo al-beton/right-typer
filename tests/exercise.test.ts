@@ -1,17 +1,23 @@
 import { describe, expect, it } from 'vitest';
-import { Exercise, grade } from '../src/core/exercise';
+import { Exercise, feedback, grade } from '../src/core/exercise';
 import { EXPECTED } from '../src/core/keyboard';
 import { PASSAGE, WORDS } from '../src/passage';
-import { attribute } from '../src/core/observation';
+import { attribute, DEADLINE_MS, EvidenceBuffer } from '../src/core/observation';
 import { calibration, frame } from './fixtures';
 import { load, save, reset } from '../src/core/storage';
 import type { Finger } from '../src/core/types';
 const seen = (finger: Finger) => ({
   kind: 'finger' as const,
   finger,
-  frameIds: [1, 2],
+  frameIds: [1],
   distance: 0,
+  offsetMs: 0,
 });
+function unknown(e: Exercise, key: string, at: number) {
+  const p = e.press(key, at)!;
+  e.observe(p.id, p.attemptId, { kind: 'uncertain', reason: 'No hands' });
+  return p;
+}
 function enter(e: Exercise, key: string, at: number, finger?: Finger) {
   const p = e.press(key, at)!;
   e.observe(p.id, p.attemptId, seen(finger ?? (key === ' ' ? 'right-thumb' : EXPECTED[key]!)));
@@ -46,16 +52,17 @@ describe('word practice', () => {
     expect(e.settle()?.pass).toBe(false);
     expect(e.stats(700).wrongFingers).toBe(1);
   });
-  it('keeps uncertainty separate from learner mistakes and blocks unchecked progress', () => {
+  it('advances mixed correct and unknown presses without counting a retry', () => {
     const e = new Exercise(['a']);
     const p = e.press('a', 100)!;
     e.observe(p.id, p.attemptId, { kind: 'uncertain', reason: 'No hands' });
     enter(e, ' ', 300);
-    expect(e.settle()).toMatchObject({ pass: false, wrong: [], textWrong: false });
+    expect(e.settle()).toMatchObject({ pass: true, wrong: [], textWrong: false });
     expect(e.stats(500)).toMatchObject({
       wrongFingers: 0,
       textMistakes: 0,
-      uncertaintyRetries: 1,
+      retries: 0,
+      passedWords: 1,
       uncertainPresses: 1,
     });
   });
@@ -136,7 +143,6 @@ describe('word practice', () => {
     expect(e.stats(at)).toMatchObject({
       wrongFingers: 0,
       retries: 0,
-      uncertaintyRetries: 0,
       passedWords: WORDS.length,
     });
   });
@@ -146,13 +152,114 @@ describe('word practice', () => {
     expect(WORDS.length).toBeLessThanOrEqual(55);
     for (const letter of 'abcdefghijklmnopqrstuvwxyz') expect(PASSAGE).toContain(letter);
   });
-  it('grade never passes unobserved or text-mismatched attempts', () => {
+  it('grades unknowns honestly, but a text mismatch still fails', () => {
+    const attempt = {
+      id: 1,
+      wordIndex: 0,
+      text: 'a',
+      presses: [{ id: 1, attemptId: 1, key: 'a', at: 0 }],
+    };
+    expect(grade(attempt, 'a')).toMatchObject({ pass: true, uncertain: attempt.presses });
+    expect(grade(attempt, 'b')).toMatchObject({ pass: false, textWrong: true });
+  });
+  it('accepts a full all-unknown passage, including spaces, without inventing fingers', () => {
+    const e = new Exercise(WORDS);
+    let at = 0;
+    for (const word of WORDS) {
+      for (const key of word + ' ') unknown(e, key, (at += 200));
+      const verdict = e.settle()!;
+      expect(verdict.pass).toBe(true);
+      expect(feedback(verdict, word)).toContain(`I could not verify ${word.length + 1} presses`);
+    }
+    expect(e.state).toBe('complete');
     expect(
-      grade(
-        { id: 1, wordIndex: 0, text: 'a', presses: [{ id: 1, attemptId: 1, key: 'a', at: 0 }] },
-        'a',
-      ).pass,
-    ).toBe(false);
+      e.history.flatMap((h) => h.attempt.presses).every((p) => p.observation?.kind === 'uncertain'),
+    ).toBe(true);
+    expect(e.stats(at)).toMatchObject({
+      attempts: WORDS.length,
+      passedWords: WORDS.length,
+      retries: 0,
+      textMistakes: 0,
+      wrongFingers: 0,
+      uncertainPresses: WORDS.join(' ').length + 1,
+    });
+  });
+  it('accepts an unknown space alongside correct letters and counts erased unknowns', () => {
+    const e = new Exercise(['a']);
+    unknown(e, 'b', 0);
+    e.backspace();
+    enter(e, 'a', 200);
+    unknown(e, ' ', 400);
+    expect(e.settle()?.pass).toBe(true);
+    expect(e.stats(400)).toMatchObject({
+      uncertainPresses: 2,
+      retries: 0,
+      textMistakes: 0,
+      wpm: 60,
+    });
+  });
+  it('unknown presses cannot excuse an erased wrong finger or a text mismatch', () => {
+    const e = new Exercise(['a']);
+    enter(e, 'a', 0, 'left-index');
+    e.backspace();
+    unknown(e, 'a', 200);
+    unknown(e, ' ', 400);
+    expect(e.settle()).toMatchObject({ pass: false, textWrong: false, wrong: [{ key: 'a' }] });
+    expect(e.state).toBe('retry');
+    e.retry();
+    unknown(e, 'b', 600);
+    unknown(e, ' ', 800);
+    expect(e.settle()).toMatchObject({ pass: false, textWrong: true, wrong: [] });
+    e.retry();
+    unknown(e, 'a', 1000);
+    unknown(e, ' ', 1200);
+    expect(e.settle()?.pass).toBe(true);
+    expect(e.stats(1200)).toMatchObject({
+      attempts: 3,
+      passedWords: 1,
+      retries: 2,
+      wrongFingers: 1,
+      textMistakes: 1,
+      uncertainPresses: 6,
+      wpm: 20,
+    });
+  });
+  it('a confidently wrong space still vetoes an otherwise unknown word', () => {
+    const e = new Exercise(['a']);
+    unknown(e, 'a', 100);
+    enter(e, ' ', 300, 'right-index');
+    expect(e.settle()).toMatchObject({
+      pass: false,
+      wrong: [{ key: ' ' }],
+      uncertain: [{ key: 'a' }],
+    });
+  });
+  it('waits until the deadline, then advances unknowns once; late wrong evidence cannot regrade or leak', async () => {
+    const e = new Exercise(['a', 'a']);
+    const buffer = new EvidenceBuffer();
+    const first = e.press('a', 100)!;
+    const space = e.press(' ', 300)!;
+    const observations = [first, space].map((p) =>
+      buffer.request(p, calibration()).then((o) => e.observe(p.id, p.attemptId, o)),
+    );
+    buffer.startFrame(1, 80);
+    buffer.tick(300 + DEADLINE_MS - 1);
+    await Promise.resolve();
+    expect(e.settle()).toBeNull();
+    expect(e.press('x', 1700)).toBeNull();
+    buffer.tick(300 + DEADLINE_MS);
+    await Promise.all(observations);
+    expect(e.settle()?.pass).toBe(true);
+    const next = e.press('a', 2000)!;
+    buffer.add(frame(1, 80, 'a', 'left-index', 2100));
+    buffer.add(frame(2, 120, 'a', 'left-index', 2200));
+    buffer.tick(2300);
+    expect(e.observe(first.id, first.attemptId, seen('left-index'))).toBe(false);
+    expect(next.observation).toBeUndefined();
+    expect(e.history[0]!.verdict.uncertain).toHaveLength(2);
+    expect(e.history).toHaveLength(1);
+    expect(e.index).toBe(1);
+    expect(e.settle()).toBeNull();
   });
 });
 describe('local persistence', () => {
@@ -172,6 +279,51 @@ describe('local persistence', () => {
     expect(reset(storage)).toBe(true);
     expect(map.get('other')).toBe('untouched');
     expect(load(storage)).toEqual({ results: [], calibration: undefined });
+  });
+  it('loads legacy counts without relabeling retries as presses and preserves calibration on resave', () => {
+    const legacy = {
+      ...new Exercise(['a']).stats(0),
+      date: '2026-09-05',
+      uncertainPresses: 7,
+      uncertaintyRetries: 3,
+      retries: 4,
+    };
+    let raw = JSON.stringify({ calibration: calibration(), results: [legacy] });
+    const storage = {
+      getItem: () => raw,
+      setItem: (_: string, value: string) => {
+        raw = value;
+      },
+    };
+    const saved = load(storage);
+    expect(saved.results[0]).toMatchObject({
+      gradingPolicy: 'verified-only',
+      uncertainPresses: 7,
+      retries: 4,
+    });
+    saved.results.push({
+      ...new Exercise(['a']).stats(0),
+      date: '2026-09-06',
+      gradingPolicy: 'wrong-finger-veto',
+    });
+    expect(save(saved, storage)).toBe(true);
+    expect(load(storage)).toEqual(saved);
+    expect(load(storage).calibration).toEqual(calibration());
+  });
+  it('validates new results and still caps history at ten', () => {
+    const result = {
+      ...new Exercise(['a']).stats(0),
+      date: '2026-09-06',
+      gradingPolicy: 'wrong-finger-veto' as const,
+    };
+    const raw = JSON.stringify({
+      results: [
+        ...Array.from({ length: 12 }, () => result),
+        { ...result, uncertainPresses: -1 },
+        { ...result, gradingPolicy: 'unsupported' },
+      ],
+    });
+    expect(load({ getItem: () => raw }).results).toEqual(Array(10).fill(result));
   });
   it('survives broken JSON, null data, and blocked or full storage', () => {
     expect(load({ getItem: () => '{broken' })).toEqual({ results: [] });
