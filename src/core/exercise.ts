@@ -14,7 +14,6 @@ export type Stats = {
   textMistakes: number;
   wrongFingers: number;
   uncertainPresses: number;
-  uncertaintyRetries: number;
   retries: number;
   elapsedMs: number;
   wpm: number;
@@ -27,10 +26,11 @@ export function grade(attempt: Attempt, word: string): Verdict {
     (p) => !p.observation || p.observation.kind === 'uncertain',
   );
   const textWrong = attempt.text !== word;
-  return { pass: !textWrong && !wrong.length && !uncertain.length, textWrong, wrong, uncertain };
+  return { pass: !textWrong && !wrong.length, textWrong, wrong, uncertain };
 }
 export function feedback(verdict: Verdict, word: string): string {
   const parts: string[] = [];
+  if (verdict.pass) parts.push('Word accepted.');
   if (verdict.textWrong) parts.push(`The text did not match “${word}”.`);
   if (verdict.wrong.length) {
     const p = verdict.wrong[0]!;
@@ -114,7 +114,6 @@ export class Exercise {
       textMistakes: this.history.filter((h) => h.verdict.textWrong).length,
       wrongFingers: this.history.reduce((n, h) => n + h.verdict.wrong.length, 0),
       uncertainPresses: this.history.reduce((n, h) => n + h.verdict.uncertain.length, 0),
-      uncertaintyRetries: this.history.filter((h) => h.verdict.uncertain.length).length,
       retries: this.history.filter((h) => !h.verdict.pass).length,
       elapsedMs,
       wpm: elapsedMs > 0 ? characters / 5 / (elapsedMs / 60000) : 0,

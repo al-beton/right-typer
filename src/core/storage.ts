@@ -2,7 +2,10 @@ import { validCalibration } from './calibration';
 import type { Calibration } from './types';
 import type { Stats } from './exercise';
 const KEY = 'right-typer.v1';
-export type SavedResult = Stats & { date: string };
+export type SavedResult = Stats & {
+  date: string;
+  gradingPolicy: 'verified-only' | 'wrong-finger-veto';
+};
 export type Saved = { calibration?: Calibration; results: SavedResult[] };
 export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
   try {
@@ -13,13 +16,15 @@ export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
             (r: SavedResult) =>
               r &&
               typeof r.date === 'string' &&
+              (r.gradingPolicy === undefined ||
+                r.gradingPolicy === 'verified-only' ||
+                r.gradingPolicy === 'wrong-finger-veto') &&
               [
                 'attempts',
                 'passedWords',
                 'textMistakes',
                 'wrongFingers',
                 'uncertainPresses',
-                'uncertaintyRetries',
                 'retries',
                 'elapsedMs',
                 'wpm',
@@ -30,6 +35,9 @@ export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
                   r[k as keyof Stats] >= 0,
               ),
           )
+          // Results without a policy predate ALO-181. Keep their original counts
+          // and label the old rule; do not reinterpret uncertainty retries as presses.
+          .map((r: SavedResult) => ({ ...r, gradingPolicy: r.gradingPolicy ?? 'verified-only' }))
           .slice(-10)
       : [];
     return {

@@ -1,6 +1,6 @@
 # Implementation notes
 
-[ALO-180](https://linear.app/advantagegroup/issue/ALO-180) remains the product specification. This document explains the implementation rather than adding requirements.
+[ALO-180](https://linear.app/advantagegroup/issue/ALO-180) remains the product specification, with the approved uncertainty policy override in [ALO-181](https://linear.app/advantagegroup/issue/ALO-181). This document explains the implementation rather than adding requirements.
 
 ## Boundaries
 
@@ -21,7 +21,7 @@ A `VideoFrame` is created synchronously inside the callback to freeze the pixels
 
 Each keypress has its own ID and attempt ID. Evidence settles continuously so long words do not depend on retaining their first video frames until the boundary. The buffer accepts out-of-order results, waits for known in-flight nearby frames, and never changes a settled observation. Camera generations, attempt IDs and exercise object identity prevent late work affecting a new stream, retry or restart.
 
-The current attribution window is ±100 ms. The closest reliable frame before and after the press must agree on the same finger. The buffer waits until it has crossed the window and nearby in-flight work finishes, with a 1500 ms deadline for missing evidence. These are implementation tuning values, not acceptance targets. A result arriving too late produces uncertainty rather than a stale guess.
+The current attribution window is ±100 ms. The closest captured frame before and after the press must agree on the same finger. The buffer waits until it has crossed the window and nearby in-flight work finishes, with a 1500 ms deadline for missing evidence. These are implementation tuning values, not acceptance targets. A result arriving too late produces uncertainty rather than a stale guess.
 
 ## Geometry and confidence
 
@@ -29,7 +29,7 @@ Calibration records the 28 exercised character-key centers plus the left/right e
 
 For each frame, all ten fingertip landmarks compete by distance to the pressed key. The winner must be within 0.8 key-spacing units and ahead of the runner-up by at least 0.28. Both hands must exist, have distinct handedness labels and handedness scores ≥0.8. The user verifies labels and can swap their interpretation. Two bracketing frames must agree. No intended finger enters this calculation; exercise grading compares the returned finger with the map afterwards.
 
-These rules are **unvalidated geometric hypotheses**. MediaPipe does not supply ground truth for occluded fingertips or physical contact. A finger hovering close to a key can be mistaken for the finger pressing it. Real-camera tests must measure both false rejections and missed deliberate errors. Do not relax rules to count unknown input as correct. [MediaPipe task documentation](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker/web_js).
+These rules are **unvalidated geometric hypotheses**. MediaPipe does not supply ground truth for occluded fingertips or physical contact. A finger hovering close to a key can be mistaken for the finger pressing it. Real-camera tests must measure both false rejections and missed deliberate errors. Unknown observations stay unknown; ALO-181 permits word progression without claiming those fingers were correct. [MediaPipe task documentation](https://ai.google.dev/edge/mediapipe/solutions/vision/hand_landmarker/web_js).
 
 Saved calibration is tied to camera ID and image dimensions, and never enables practice without fresh alignment/hand-label confirmation. Changing devices, restarting the stream, tab hiding or fixing setup requires a new check. Lid motion during practice cannot be reliably auto-detected; the learner must pause and remap. This is an explicit limitation.
 
@@ -37,9 +37,9 @@ Saved calibration is tied to camera ID and image dimensions, and never enables p
 
 Space submits, including after the final word, and is graded against either thumb. Input remains responsive within a word. During boundary analysis the entry is read-only; attempted boundary input is counted and explained, and never becomes input for another word. Retry requires Enter/button, so a pending key cannot accidentally start the next attempt.
 
-Backspace edits visible text but preserves all observed character presses in the attempt. A confirmed wrong finger requires a fresh word attempt. Unsupported keys, held-key repeats, paste and IME input do not create graded characters. A submitted mismatch counts as one text mistake. An uncertain press blocks progress but is not classified as a learner mistake. Attempts with both wrong fingers and uncertainty are included in both counts.
+Backspace edits visible text but preserves all observed character presses in the attempt. A confirmed wrong finger requires a fresh word attempt. Unsupported keys, held-key repeats, paste and IME input do not create graded characters. A submitted mismatch counts as one text mistake. At the word boundary, matching text advances if there are no confidently wrong-finger observations, even when all presses (including space) are unknown. Pending evidence still receives the same bounded wait before becoming unknown; settled words are never regraded. A wrong finger vetoes the attempt even alongside unknown presses or after backspace. Uncertainty alone never requires a retry or setup repair. Unverified press counts include unknowns in all submitted attempts, including erased presses, spaces, accepted words and failed attempts; they are separate from learner mistakes. Unknowns are never assigned an intended finger.
 
-Effective WPM = accepted passage characters (plus one space per accepted word) / 5 / elapsed minutes. Timing starts at the first character and ends at the final accepted submitting space. Retries, feedback-reading and pauses remain in elapsed time; processing after the final space does not. Wrong-finger count includes erased presses; retry count counts failed submitted attempts, not abandoned partial words. Completed results persist; live passages do not survive reloads.
+Effective WPM = accepted passage characters (plus one space per accepted word) / 5 / elapsed minutes. Timing starts at the first character and ends at the final accepted submitting space. Retries, feedback-reading and pauses remain in elapsed time; processing after the final space does not. Wrong-finger count includes erased presses; retry count counts failed submitted attempts, not abandoned partial words. Completed results persist; live passages do not survive reloads. New results use `gradingPolicy: "wrong-finger-veto"` and `uncertainPresses`; the misleading `uncertaintyRetries` metric is no longer generated or displayed. Existing `right-typer.v1` results without a policy load as `verified-only`, retain their original counts and are labeled with the earlier rule in recent history. Their legacy retry counter is not converted to a press count. Calibration, ten-result history and reset remain compatible.
 
 ## Static assets and privacy
 

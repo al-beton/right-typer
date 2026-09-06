@@ -79,7 +79,7 @@ function render() {
   $('#camera-section').classList.toggle('practice-view', phase === 'practice');
   canvas.classList.toggle('calibrating', phase === 'calibrate');
   if (phase === 'intro') {
-    content.innerHTML = `<section class="intro"><div class="intro-copy"><span class="eyebrow">MAKE THE RIGHT MOVES</span><h1>One word.<br/><em>Well typed.</em></h1><p class="lede">Your fingers have habits.<br/>Give them a little guidance.</p><p class="intro-detail">Right Typer watches your fingers as you type. Finish a word, get useful feedback, and try again until the right movements stick.</p><button class="primary" id="begin">Set up your camera <span>↗</span></button><div class="intro-meta">About 5 minutes to set up <span>·</span> Everything stays here</div></div><div class="intro-art" aria-label="Illustration of word practice"><div class="art-top"><span class="tiny-dot"></span> A LITTLE MORE INTENTION</div><div class="sample-word">q<span>u</span>iet<span class="sample-caret"></span></div><div class="sample-note"><span>↳</span> right index, a little closer.</div>${keyboard()}<div class="art-bottom"><span>01 / ${WORDS.length} words</span><span>take your time ↵</span></div></div></section><section class="principles"><div><span>01</span><h3>See your fingers</h3><p>Tilt your MacBook screen toward the keys. Keep this page on your external display.</p></div><div><span>02</span><h3>Go word by word</h3><p>Finish each word, then press space. The next word waits for correct fingers.</p></div><div><span>03</span><h3>Build the habit</h3><p>Start slowly. Clear movements matter more than a high score.</p></div></section>${saved.results.length ? `<section class="recent"><span class="eyebrow">LAST PRACTICE</span><p>${new Date(saved.results.at(-1)!.date).toLocaleDateString()} <b>${saved.results.at(-1)!.wpm.toFixed(1)} WPM</b> · ${saved.results.at(-1)!.retries} retries</p></section>` : ''}`;
+    content.innerHTML = `<section class="intro"><div class="intro-copy"><span class="eyebrow">MAKE THE RIGHT MOVES</span><h1>One word.<br/><em>Well typed.</em></h1><p class="lede">Your fingers have habits.<br/>Give them a little guidance.</p><p class="intro-detail">Right Typer watches your fingers as you type. Finish a word, get useful feedback, and try again until the right movements stick.</p><button class="primary" id="begin">Set up your camera <span>↗</span></button><div class="intro-meta">About 5 minutes to set up <span>·</span> Everything stays here</div></div><div class="intro-art" aria-label="Illustration of word practice"><div class="art-top"><span class="tiny-dot"></span> A LITTLE MORE INTENTION</div><div class="sample-word">q<span>u</span>iet<span class="sample-caret"></span></div><div class="sample-note"><span>↳</span> right index, a little closer.</div>${keyboard()}<div class="art-bottom"><span>01 / ${WORDS.length} words</span><span>take your time ↵</span></div></div></section><section class="principles"><div><span>01</span><h3>See your fingers</h3><p>Tilt your MacBook screen toward the keys. Keep this page on your external display.</p></div><div><span>02</span><h3>Go word by word</h3><p>Finish each word, then press space. Correct text advances unless a wrong finger is detected. Unknown presses stay unverified.</p></div><div><span>03</span><h3>Build the habit</h3><p>Start slowly. Clear movements matter more than a high score.</p></div></section>${saved.results.length ? `<section class="recent"><span class="eyebrow">LAST PRACTICE</span><p>${new Date(saved.results.at(-1)!.date).toLocaleDateString()} <b>${saved.results.at(-1)!.wpm.toFixed(1)} WPM</b> · ${saved.results.at(-1)!.retries} retries${saved.results.at(-1)!.gradingPolicy === 'verified-only' ? ' · Earlier rule: unknown presses required retries' : ''}</p></section>` : ''}`;
     $('#begin').onclick = () => {
       resuming = false;
       setPhase('setup');
@@ -155,7 +155,7 @@ function render() {
       checking = exercise.state === 'checking';
     const stats = exercise.stats(performance.now());
     const word = WORDS[exercise.index]!;
-    content.innerHTML = `<section class="practice"><div class="practice-top"><span class="eyebrow">THE PICNIC / A LITTLE ADVENTURE</span><div class="practice-metrics"><span><b>${exercise.index}</b> / ${WORDS.length} words</span><span><b>${stats.retries}</b> retries</span><button class="text-button" id="pause">Pause</button></div></div><div class="progress-track"><div style="width:${(exercise.index / WORDS.length) * 100}%"></div></div><div class="passage" aria-label="Practice passage">${WORDS.map((w, i) => `<span class="${i < exercise.index ? 'passed' : i === exercise.index ? 'active' : ''}" ${i === exercise.index ? 'aria-current="step"' : ''}>${w}</span>`).join(' ')}</div><div class="entry-heading"><label class="eyebrow" for="typing">${retry ? 'SAME WORD. FRESH START.' : checking ? 'CHECKING THIS WORD' : 'YOUR WORD'}</label><span id="word-hint">${exercise.index === 0 ? 'Include punctuation. Space finishes the word.' : 'Finish the word, then press space.'}</span></div><div class="word-entry ${retry ? 'needs-retry' : ''}"><div class="target-word" aria-label="Current word">${word}</div><input id="typing" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type the current word" placeholder="type here" ${retry || checking ? 'readonly' : ''}/><span class="entry-indicator">${checking ? '<span class="spinner"></span>' : retry ? '↺' : '↵'}</span></div><div id="feedback" class="feedback ${retry ? (exercise.lastVerdict?.wrong.length || exercise.lastVerdict?.textWrong ? 'mistake' : 'uncertain') : ''}" role="status">${retry ? `<div><strong>${exercise.lastVerdict?.wrong.length || exercise.lastVerdict?.textWrong ? 'Let’s give that word another go.' : 'I need a clearer look.'}</strong><p>${escapeHtml(feedback(exercise.lastVerdict!, word))}</p></div><button class="primary" id="retry">Try this word again <span>↵</span></button>` : checking ? '<span class="spinner"></span> Matching camera evidence to your presses. Wait for the next word before typing.' : escapeHtml(message || 'Take your time. I’ll check your fingers when the word is finished.')}</div>${retry ? attemptDetails() : ''}<p id="input-message" class="input-message" role="status"></p></section>`;
+    content.innerHTML = `<section class="practice"><div class="practice-top"><span class="eyebrow">THE PICNIC / A LITTLE ADVENTURE</span><div class="practice-metrics"><span><b>${exercise.index}</b> / ${WORDS.length} words</span><span><b>${stats.retries}</b> retries</span><button class="text-button" id="pause">Pause</button></div></div><div class="progress-track"><div style="width:${(exercise.index / WORDS.length) * 100}%"></div></div><div class="passage" aria-label="Practice passage">${WORDS.map((w, i) => `<span class="${i < exercise.index ? 'passed' : i === exercise.index ? 'active' : ''}" ${i === exercise.index ? 'aria-current="step"' : ''}>${w}</span>`).join(' ')}</div><div class="entry-heading"><label class="eyebrow" for="typing">${retry ? 'SAME WORD. FRESH START.' : checking ? 'CHECKING THIS WORD' : 'YOUR WORD'}</label><span id="word-hint">${exercise.index === 0 ? 'Include punctuation. Space finishes the word.' : 'Finish the word, then press space.'}</span></div><div class="word-entry ${retry ? 'needs-retry' : ''}"><div class="target-word" aria-label="Current word">${word}</div><input id="typing" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type the current word" placeholder="type here" ${retry || checking ? 'readonly' : ''}/><span class="entry-indicator">${checking ? '<span class="spinner"></span>' : retry ? '↺' : '↵'}</span></div><div id="feedback" class="feedback ${retry ? 'mistake' : ''}" role="status">${retry ? `<div><strong>Let’s give that word another go.</strong><p>${escapeHtml(feedback(exercise.lastVerdict!, word))}</p></div><button class="primary" id="retry">Try this word again <span>↵</span></button>` : checking ? '<span class="spinner"></span> Matching camera evidence to your presses. Wait for the next word before typing.' : escapeHtml(message || 'Take your time. I’ll check your fingers when the word is finished.')}</div>${retry ? attemptDetails() : ''}<p id="input-message" class="input-message" role="status"></p></section>`;
     const input = $<HTMLInputElement>('#typing');
     input.value = exercise.attempt.text;
     input.onkeydown = typing;
@@ -174,7 +174,7 @@ function render() {
     if (retry) $('#retry').onclick = retryWord;
   } else {
     const stats = exercise.stats(performance.now());
-    content.innerHTML = `<section class="results"><div class="finish-seal">✓</div><span class="eyebrow">PASSAGE COMPLETE</span><h1>Good words.<br/><em>Better movements.</em></h1><p class="lede">Every word made it through a checked attempt.</p><div class="result-grid"><div class="primary-stat"><strong>${stats.wpm.toFixed(1)}</strong><span>effective WPM</span></div><div><strong>${stats.wrongFingers}</strong><span>wrong-finger presses</span></div><div><strong>${stats.textMistakes}</strong><span>text-mismatch attempts</span></div><div><strong>${stats.uncertaintyRetries}</strong><span>uncertainty retries</span></div></div><p class="result-note">${WORDS.length} words · ${stats.attempts} submitted attempts · ${stats.retries} retries · ${formatTime(stats.elapsedMs)} elapsed<br/>Uncertainty is counted separately from learner mistakes.</p><details><summary>How these numbers work</summary><p>Effective WPM is the accepted passage characters, including one submitting space per word, divided by five and by elapsed minutes. Timing runs from your first character to the final submitting space and includes retries, reading feedback and pauses. Wrong-finger presses include erased characters. A text mistake is one submitted attempt with mismatched text. An attempt can contain both mistakes and uncertainty.</p></details><div class="result-actions"><button class="primary" id="restart">Practise again <span>↻</span></button><button class="text-button" id="home">Back to the beginning</button></div><p class="result-limit">Camera judgements can be wrong. Clear feedback is useful; it is not ground truth.</p></section>`;
+    content.innerHTML = `<section class="results"><div class="finish-seal">✓</div><span class="eyebrow">PASSAGE COMPLETE</span><h1>Good words.<br/><em>Better movements.</em></h1><p class="lede">Every word’s text matched with no wrong finger detected in its accepted attempt.</p><div class="result-grid"><div class="primary-stat"><strong>${stats.wpm.toFixed(1)}</strong><span>effective WPM</span></div><div><strong>${stats.wrongFingers}</strong><span>wrong-finger presses</span></div><div><strong>${stats.textMistakes}</strong><span>text-mismatch attempts</span></div><div><strong>${stats.uncertainPresses}</strong><span>unverified presses</span></div></div><p class="result-note">${WORDS.length} words · ${stats.attempts} submitted attempts · ${stats.retries} retries · ${formatTime(stats.elapsedMs)} elapsed<br/>Unverified presses remain unknown, including in accepted words. They do not cause retries.</p><details><summary>How these numbers work</summary><p>Effective WPM is the accepted passage characters, including one submitting space per word, divided by five and by elapsed minutes. Timing runs from your first character to the final submitting space and includes retries, reading feedback and pauses. Wrong-finger presses include erased characters. A text mistake is one submitted attempt with mismatched text. Unverified presses count all unknown observations in submitted attempts, including submitting spaces, erased characters and failed attempts. They are not verified correct fingers. An attempt can contain both mistakes and uncertainty.</p></details><div class="result-actions"><button class="primary" id="restart">Practise again <span>↻</span></button><button class="text-button" id="home">Back to the beginning</button></div><p class="result-limit">Camera judgements can be wrong. Clear feedback is useful; it is not ground truth.</p></section>`;
     $('#restart').onclick = () => {
       resuming = false;
       message = 'Start the camera again, then confirm that the saved dots still align.';
@@ -551,15 +551,21 @@ function typing(event: KeyboardEvent) {
     const verdict = exercise.settle();
     if (!verdict) return;
     if (exercise.state === 'complete') {
-      saved.results.push({ ...exercise.stats(performance.now()), date: new Date().toISOString() });
+      saved.results.push({
+        ...exercise.stats(performance.now()),
+        date: new Date().toISOString(),
+        gradingPolicy: 'wrong-finger-veto',
+      });
       store();
       camera.stop();
       setPhase('results');
     } else {
       message = verdict.pass
-        ? boundaryKeys
-          ? `Word checked. ${boundaryKeys} keys were not entered during checking; start this word from the beginning.`
-          : 'That word is checked. On to the next.'
+        ? `${feedback(verdict, owner.words[owner.index - 1]!)} ${
+            boundaryKeys
+              ? `${boundaryKeys} keys were not entered during checking; start this word from the beginning.`
+              : 'On to the next.'
+          }`
         : '';
       boundaryKeys = 0;
       render();
@@ -591,14 +597,11 @@ function pause() {
 }
 function attemptDetails() {
   const a = exercise.attempt;
-  const uncertainStreak = exercise.history
-    .slice(-2)
-    .filter((h) => h.verdict.uncertain.length).length;
   return `<div class="attempt-details">${a.presses
     .map((p) => {
       const o = p.observation;
       const cls =
-        o?.kind === 'uncertain'
+        !o || o.kind === 'uncertain'
           ? 'unseen'
           : o?.kind === 'finger' &&
               (p.key === ' ' ? o.finger.endsWith('-thumb') : EXPECTED[p.key] === o.finger)
@@ -606,9 +609,7 @@ function attemptDetails() {
             : 'wrong';
       return `<span class="press-result ${cls}" title="${escapeHtml(o?.kind === 'finger' ? `Saw ${fingerName(o.finger)}; use ${intended(p.key)}` : (o?.reason ?? 'No evidence'))}">${p.key === ' ' ? 'space' : p.key} <small>${cls === 'ok' ? '✓' : cls === 'wrong' ? '×' : '?'}</small></span>`;
     })
-    .join(
-      '',
-    )}</div>${exercise.lastVerdict?.uncertain.length ? `<p class="recovery">${escapeHtml(exercise.lastVerdict.uncertain[0]?.observation?.kind === 'uncertain' ? exercise.lastVerdict.uncertain[0].observation.reason : '')} ${uncertainStreak >= 2 ? '<strong>Uncertainty is repeating. Use “Fix camera setup” below to check the dots, lighting and hand labels before another attempt.</strong>' : ''}</p>` : ''}`;
+    .join('')}</div>`;
 }
 function diagnostic(event: KeyboardEvent) {
   if (event.key === 'Tab') return;
