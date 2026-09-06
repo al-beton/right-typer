@@ -1,78 +1,69 @@
-import type { Calibration, Finger, Frame, Observation, Press } from './types';
+import type { Calibration, Finger, Frame, Hand, Observation, Press, SeenHand } from './types';
 import { DIGITS, LANDMARK_TIPS } from './keyboard';
 import { keyDistance } from './calibration';
-export const WINDOW_MS = 100;
-export const DEADLINE_MS = 1500;
-function candidate(
-  frame: Frame,
-  key: string,
-  calibration: Calibration,
-): { finger: Finger; distance: number } | null {
-  // Missing/duplicated hands are not evidence of absence of a competing finger.
-  if (
-    frame.hands.length !== 2 ||
-    new Set(frame.hands.map((h) => h.side)).size !== 2 ||
-    frame.hands.some((h) => h.score < 0.8 || h.points.length !== 21)
-  )
-    return null;
-  const ranked = frame.hands
-    .flatMap((hand) =>
-      LANDMARK_TIPS.map((tip, i) => {
-        const side = calibration.swapHands ? (hand.side === 'left' ? 'right' : 'left') : hand.side;
-        return {
-          finger: `${side}-${DIGITS[i]}` as Finger,
-          distance: keyDistance(calibration, key, hand.points[tip]!),
-        };
-      }),
-    )
-    .sort((a, b) => a.distance - b.distance);
-  const first = ranked[0]!,
-    second = ranked[1]!;
-  // Geometric hypotheses, intentionally isolated for tuning on the actual camera.
-  if (
-    !Number.isFinite(first.distance) ||
-    first.distance > 0.8 ||
-    second.distance - first.distance < 0.28
-  )
-    return null;
-  return first;
+// A press is certain; the finger is the best available estimate. One rule, no vetoes:
+// the frame nearest the press that shows any hand, then the fingertip nearest the key.
+export const SEARCH_MS = 500;
+export const DEADLINE_MS = 1000;
+export function nearestFrame(at: number, frames: Frame[]): Frame | undefined {
+  return frames
+    .filter((f) => Number.isFinite(f.at) && f.hands.length > 0 && Math.abs(f.at - at) <= SEARCH_MS)
+    .sort((a, b) => Math.abs(a.at - at) - Math.abs(b.at - at))[0];
+}
+// Model handedness with the user's swap applied. Two hands with the same label are told
+// apart by position along the calibrated q→p axis, which is independent of camera mirroring.
+export function handSides(hands: SeenHand[], c: Calibration): Hand[] {
+  const flip = (s: Hand): Hand => (s === 'left' ? 'right' : 'left');
+  const labelled = hands.map((h) => (c.swapHands ? flip(h.side) : h.side));
+  const q = c.points.q,
+    p = c.points.p;
+  if (hands.length !== 2 || labelled[0] !== labelled[1] || !q || !p) return labelled;
+  const along = (h: SeenHand) => {
+    const n = h.points.length || 1;
+    const cx = h.points.reduce((s, pt) => s + pt.x, 0) / n;
+    const cy = h.points.reduce((s, pt) => s + pt.y, 0) / n;
+    return (cx - q.x) * (p.x - q.x) + (cy - q.y) * (p.y - q.y);
+  };
+  return along(hands[0]!) <= along(hands[1]!) ? ['left', 'right'] : ['right', 'left'];
 }
 export function attribute(
   press: Pick<Press, 'at' | 'key'>,
   frames: Frame[],
   calibration: Calibration,
 ): Observation {
-  const nearby = frames.filter(
-    (f) => f.clock === 'capture' && Number.isFinite(f.at) && Math.abs(f.at - press.at) <= WINDOW_MS,
-  );
-  // Two frames straddling the press, never "last completed inference".
-  const before = nearby.filter((f) => f.at <= press.at).sort((a, b) => b.at - a.at)[0];
-  const after = nearby.filter((f) => f.at > press.at).sort((a, b) => a.at - b.at)[0];
-  if (!before || !after)
+  const frame = nearestFrame(press.at, frames);
+  if (!frame)
     return {
       kind: 'uncertain',
-      reason:
-        'No fresh camera frames on both sides of this press. Slow down slightly and check the camera timing.',
+      reason: `No hands were seen within ${SEARCH_MS} ms of this press. Keep your hands in the picture.`,
     };
-  const a = candidate(before, press.key, calibration),
-    b = candidate(after, press.key, calibration);
-  if (!a || !b)
+  const sides = handSides(frame.hands, calibration);
+  const best = frame.hands
+    .flatMap((hand, h) =>
+      LANDMARK_TIPS.flatMap((tip, i) => {
+        const point = hand.points[tip];
+        if (!point) return [];
+        return [
+          {
+            finger: `${sides[h]!}-${DIGITS[i]!}` as Finger,
+            distance: keyDistance(calibration, press.key, point),
+          },
+        ];
+      }),
+    )
+    .filter((c) => Number.isFinite(c.distance))
+    .sort((a, b) => a.distance - b.distance)[0];
+  if (!best)
     return {
       kind: 'uncertain',
-      reason:
-        'The pressing finger was hidden, between keys, or too close to another fingertip. Keep both hands visible and check the key dots.',
-    };
-  if (a.finger !== b.finger)
-    return {
-      kind: 'uncertain',
-      reason:
-        'Nearby frames disagree about the pressing finger. Try a more deliberate press with both hands in view.',
+      reason: 'The nearby frame had hands without fingertip landmarks for this key.',
     };
   return {
     kind: 'finger',
-    finger: a.finger,
-    frameIds: [before.id, after.id],
-    distance: Math.max(a.distance, b.distance),
+    finger: best.finger,
+    frameIds: [frame.id],
+    distance: best.distance,
+    offsetMs: frame.at - press.at,
   };
 }
 // Owns evidence by immutable press/attempt identity. Late results cannot re-grade settled presses.
@@ -97,22 +88,15 @@ export class EvidenceBuffer {
   request(press: Press, calibration: Calibration): Promise<Observation> {
     return new Promise((resolve) => this.pending.set(press.id, { press, calibration, resolve }));
   }
+  // Settle once a frame after the press has landed and no in-flight frame could be nearer,
+  // or at the deadline with whatever evidence exists. Either way the press gets an answer.
   tick(now: number) {
     for (const [id, p] of this.pending) {
-      const due = p.press.at + WINDOW_MS;
-      const waiting = [...this.inFlight.values()].some(
-        (at) => Math.abs(at - p.press.at) <= WINDOW_MS,
-      );
-      if (now >= p.press.at + DEADLINE_MS || (now >= due && this.watermark > due && !waiting)) {
-        p.resolve(
-          waiting
-            ? {
-                kind: 'uncertain',
-                reason:
-                  'Tracking did not finish the nearby frames in time. Try a slower press or restart the camera.',
-              }
-            : attribute(p.press, this.frames, p.calibration),
-        );
+      const best = nearestFrame(p.press.at, this.frames);
+      const gap = best ? Math.abs(best.at - p.press.at) : SEARCH_MS;
+      const waiting = [...this.inFlight.values()].some((at) => Math.abs(at - p.press.at) < gap);
+      if (now >= p.press.at + DEADLINE_MS || (this.watermark > p.press.at && !waiting)) {
+        p.resolve(attribute(p.press, this.frames, p.calibration));
         this.pending.delete(id);
       }
     }

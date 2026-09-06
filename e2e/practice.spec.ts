@@ -79,7 +79,7 @@ test('wrong and erased fingers still retry alongside unknowns; text errors retry
   for (const key of 'quick') await press(page, key);
   await press(page, ' ', undefined, true);
   await expect(page.locator('.target-word')).toHaveText(WORDS[2]!);
-  await expect(page.locator('#feedback')).toContainText('could not verify 1 press.');
+  await expect(page.locator('#feedback')).toContainText('could not verify 1 press:');
   await expect(page.locator('.practice-metrics')).toContainText('3 retries');
   await expect(page.getByRole('button', { name: 'Try this word again' })).toHaveCount(0);
   await expect(page.locator('.recovery')).toHaveCount(0);
@@ -100,10 +100,10 @@ test('wrong and erased fingers still retry alongside unknowns; text errors retry
   await expect(page.locator('.target-word')).toHaveText(WORDS[2]!);
 });
 
-test('complete all-unknown passage reports accurate unverified counts, saves and reloads results', async ({
+test('a passage with unknown words reports accurate unverified counts, saves and reloads results', async ({
   page,
 }) => {
-  test.setTimeout(150000);
+  test.setTimeout(180000);
   const errors: string[] = [];
   page.on('pageerror', (e) => errors.push(e.message));
   await syntheticCamera(page);
@@ -113,20 +113,24 @@ test('complete all-unknown passage reports accurate unverified counts, saves and
   await press(page, ' ', undefined, true);
   await expect(page.locator('#feedback')).toContainText('text did not match');
   await page.locator('#typing').press('Enter');
+  const unknownWords = 2;
   for (let i = 0; i < WORDS.length; i++) {
     await expect(page.locator('.target-word')).toHaveText(WORDS[i]!);
-    for (const key of WORDS[i]! + ' ') await press(page, key, undefined, true);
+    if (i < unknownWords)
+      for (const key of WORDS[i]! + ' ') await press(page, key, undefined, true);
+    else await word(page, WORDS[i]!);
     if (i < WORDS.length - 1) {
       await expect(page.locator('.target-word')).toHaveText(WORDS[i + 1]!);
-      await expect(page.locator('#feedback')).toContainText('Word accepted. I could not verify');
+      if (i < unknownWords)
+        await expect(page.locator('#feedback')).toContainText('Word accepted. I could not verify');
     }
-    if (i === 7)
+    if (i === 1)
       await page.screenshot({
         path: 'test-results/unknown-practice-synthetic.png',
         fullPage: true,
       });
   }
-  const unknownCount = WORDS.join(' ').length + 1 + 2;
+  const unknownCount = WORDS.slice(0, unknownWords).join(' ').length + 1 + 2;
   await expect(page.getByText('PASSAGE COMPLETE', { exact: true })).toBeVisible();
   await expect(page.locator('.result-grid')).toContainText(`${unknownCount}unverified presses`);
   await expect(page.locator('.result-grid')).toContainText('0wrong-finger presses');
@@ -194,19 +198,30 @@ test('boundary wait owns input; pause resumes the same word and pasted text cann
   await syntheticCamera(page);
   await setup(page);
   await press(page, 'a');
+  const { handsAt } = await import('../tests/fixtures');
+  // Completed frames already show a thumb on space; the frame nearest the press is stalled.
+  await page.evaluate(
+    (h) => {
+      window.__hands = h;
+    },
+    handsAt(' ', 'right-thumb'),
+  );
+  await page.waitForTimeout(300);
   await page.evaluate(() => {
     window.__inferenceDelay = 2500;
   });
-  await press(page, ' ');
+  await page.waitForTimeout(50);
+  await page.locator('#typing').press('Space');
   await expect(page.locator('#feedback')).toContainText('Matching camera evidence');
   await page.locator('#typing').press('x');
   await expect(page.locator('#input-message')).toContainText('not entered while checking');
-  // The bounded wait expires as unknown; late results must not revise the accepted word.
+  // The bounded wait expires and answers from the nearest completed frame; the late result must
+  // not revise the accepted word.
   await expect(page.locator('#feedback')).not.toContainText('Matching camera evidence', {
     timeout: 5000,
   });
   await expect(page.locator('.target-word')).toHaveText('quick');
-  await expect(page.locator('#feedback')).toContainText('could not verify');
+  await expect(page.locator('#feedback')).toContainText('Word accepted.');
   await expect(page.locator('#typing')).toHaveValue('');
   await page.waitForTimeout(2700);
   await expect(page.locator('.target-word')).toHaveText('quick');

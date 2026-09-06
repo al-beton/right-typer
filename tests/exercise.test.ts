@@ -9,8 +9,9 @@ import type { Finger } from '../src/core/types';
 const seen = (finger: Finger) => ({
   kind: 'finger' as const,
   finger,
-  frameIds: [1, 2],
+  frameIds: [1],
   distance: 0,
+  offsetMs: 0,
 });
 function unknown(e: Exercise, key: string, at: number) {
   const p = e.press(key, at)!;

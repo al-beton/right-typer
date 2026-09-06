@@ -104,10 +104,12 @@ export async function press(page: Page, key: string, finger?: Finger, missing = 
     },
     missing ? [] : handsAt(key, finger ?? (key === ' ' ? 'right-thumb' : EXPECTED[key]!)),
   );
-  // Hold the synthetic pose around the actual event, providing independent before/after camera samples.
-  await page.waitForTimeout(100);
+  // Hold the synthetic pose around the actual event so the nearest frame carries it. A missing
+  // pose must cover the whole ±500 ms search window, otherwise an earlier pose is used instead.
+  const hold = missing ? 550 : 100;
+  await page.waitForTimeout(hold);
   await page.locator('#typing').press(key === ' ' ? 'Space' : key);
-  await page.waitForTimeout(100);
+  await page.waitForTimeout(hold);
 }
 export async function word(page: Page, value: string) {
   for (const key of value + ' ') await press(page, key);

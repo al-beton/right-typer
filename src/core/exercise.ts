@@ -39,7 +39,7 @@ export function feedback(verdict: Verdict, word: string): string {
   }
   if (verdict.uncertain.length)
     parts.push(
-      `I could not verify ${verdict.uncertain.length} ${verdict.uncertain.length === 1 ? 'press' : 'presses'}. This is a camera uncertainty, not a finger mistake.`,
+      `I could not verify ${verdict.uncertain.length} ${verdict.uncertain.length === 1 ? 'press' : 'presses'}: no hands were in view. That is not a finger mistake.`,
     );
   return parts.join(' ');
 }

@@ -20,7 +20,7 @@ export type Calibration = {
   savedAt: number;
 };
 export type Observation =
-  | { kind: 'finger'; finger: Finger; frameIds: number[]; distance: number }
+  | { kind: 'finger'; finger: Finger; frameIds: number[]; distance: number; offsetMs: number }
   | { kind: 'uncertain'; reason: string };
 export type Press = {
   id: number;
