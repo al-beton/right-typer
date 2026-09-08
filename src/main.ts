@@ -259,10 +259,10 @@ function renderSetup() {
   const complete = ready();
   const locked = phase === 'practice' || phase === 'results';
   $('#setup-panel').innerHTML = `
-    <p id="setup-message" role="status">${escapeHtml(message || 'Keep the camera and keyboard still after mapping.')}</p>
+    <p id="setup-message" role="status">${escapeHtml(locked ? 'Keep the camera and keyboard still.' : message || 'Keep the camera and keyboard still after mapping.')}</p>
     <div class="mapping-heading"><strong id="requested-key">${editing ? `Mark ${CALIBRATION_KEYS[selectedKey]!.replace('-', ' ')} in the image` : complete ? 'Key positions configured' : 'Configure the key positions'}</strong><span>${count} / ${CALIBRATION_KEYS.length}</span></div>
     <div class="cal-keys" aria-label="Choose a key to edit">${CALIBRATION_KEYS.map((k, i) => `<button class="cal-key ${points[k] ? 'mapped' : ''} ${editing && i === selectedKey ? 'selected' : ''}" data-cal="${i}" aria-label="Map ${k}" aria-pressed="${editing && i === selectedKey}" ${camera.status !== 'ready' || locked ? 'disabled' : ''}>${k.startsWith('space') ? (k.endsWith('left') ? 'space ◂' : 'space ▸') : k}<span aria-hidden="true" style="visibility:${points[k] ? 'visible' : 'hidden'}"> ✓</span></button>`).join('')}</div>
-    <p id="cal-message">${editing ? 'Click key centres and both ends of space. Select a key to adjust it. Arrows nudge; Enter selects the next.' : 'Camera moved? Adjust a key or remap.'}</p>
+    <p id="cal-message">${editing ? 'Click key centres and both ends of space. Select a key to adjust it. Arrows nudge; Enter selects the next.' : count ? 'Camera moved? Adjust a key or remap.' : 'Connect the camera to map key positions.'}</p>
     <button id="remap" ${camera.status !== 'ready' || locked ? 'disabled' : ''}>Remap key positions</button>
     <p id="diagnostic-result" role="status">${complete && !locked ? 'Press a practice key to check the observed finger.' : ''}</p>
     <div class="setup-actions"><button class="primary" id="practice" ${!complete || locked ? 'disabled' : ''}>Go</button><span id="ready-message" role="status">${locked ? (phase === 'practice' ? 'Practising' : 'Complete') : complete ? 'Ready' : camera.status !== 'ready' ? 'Connect the camera to begin.' : count === CALIBRATION_KEYS.length ? 'Adjust overlapping dots or flat rows.' : 'Mark all key positions to begin.'}</span><button id="fix-setup" ${!locked ? 'disabled' : ''}>Edit setup</button></div>`;
