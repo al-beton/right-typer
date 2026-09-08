@@ -90,3 +90,24 @@ test('stops before mode or geometry changes; discard allows a new sample', async
   await expect(page.locator('#sample-status')).toContainText('camera-view-changed');
   await page.locator('#sample-discard').click();
 });
+
+test('disconnect finalizes recording and reconnect permits a new sample', async ({ page }) => {
+  await syntheticCamera(page);
+  await setup(page);
+  await page.goto('/?record=1');
+  await expect(page.locator('#sample-start')).toBeEnabled();
+  await page.locator('#sample-start').click();
+  await press(page, 'f');
+  await page.locator('#disconnect-camera').click();
+  await expect(page.locator('#sample-download')).toBeEnabled();
+  await expect(page.locator('#sample-status')).toContainText('camera-disconnected');
+  expect(await page.locator('#camera').evaluate((v: HTMLVideoElement) => v.srcObject)).toBeNull();
+  await page.locator('#sample-discard').click();
+  await expect(page.locator('#sample-start')).toBeDisabled();
+  await page.locator('#start-camera').click();
+  await expect(page.locator('#sample-start')).toBeEnabled();
+  await page.locator('#sample-start').click();
+  await press(page, 'f');
+  await recordedSample(page);
+  await page.locator('#sample-discard').click();
+});

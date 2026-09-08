@@ -44,6 +44,7 @@ export class SampleRecorder {
   private metadata: Promise<Manifest['app']>;
   private warnings: string[] = [];
   private calibration: Calibration;
+  private frameRate?: number;
   constructor(
     private camera: Camera,
     private options: RecordingOptions,
@@ -65,6 +66,7 @@ export class SampleRecorder {
       deviceId: 'sample-camera',
       savedAt: 0,
     };
+    this.frameRate = camera.settings()?.frameRate;
     this.media = new MediaRecorder(new MediaStream(camera.stream.getVideoTracks()), { mimeType });
     this.media.ondataavailable = ({ data }) => {
       if (this.state === 'discarded') return;
@@ -110,6 +112,10 @@ export class SampleRecorder {
     };
     camera.recordInput = (bitmap, metadata) => {
       if (this.state !== 'recording') return;
+      if (bitmap.width !== this.calibration.width || bitmap.height !== this.calibration.height) {
+        void this.stop('camera-dimensions-changed');
+        return;
+      }
       const at = performance.now();
       const input: InputFrame = {
         ...metadata,
@@ -247,7 +253,7 @@ export class SampleRecorder {
       camera: {
         width: this.calibration.width,
         height: this.calibration.height,
-        frameRate: this.camera.settings()?.frameRate,
+        frameRate: this.frameRate,
         rotation: this.options.rotation,
         mirrored: false,
         coordinates: 'native-normalized',
