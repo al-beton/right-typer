@@ -1,3 +1,4 @@
+import { LEGACY_CODES } from '../src/core/profile';
 import { test, expect } from '@playwright/test';
 import { syntheticCamera, setup } from './helpers';
 import { allowedFingers, type FingeringMode } from '../src/core/keyboard';
@@ -54,7 +55,7 @@ test('camera dots match keyboard policy, retain sizes and keep halves upright at
                       JSON.stringify(rgb(args.fingers[i === 0 ? 0 : args.fingers.length - 1]!)),
                   );
                 },
-                { point: points[key], angle, fingers },
+                { point: points[LEGACY_CODES[key] ?? key], angle, fingers },
               ),
             )
             .toBe(true);
@@ -75,7 +76,7 @@ test('camera dots match keyboard policy, retain sizes and keep halves upright at
                     1,
                   ).data[3];
               },
-              { point: points.w, angle },
+              { point: points.KeyW, angle },
             );
             return (alpha ?? 0) > 0;
           })

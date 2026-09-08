@@ -226,11 +226,19 @@ test('German and French physical presses use the calibrated position and resolve
       { finger, x: 0.1 + key.x * 0.07, y: 0.2 + key.y * 0.2 },
     );
     await page.waitForTimeout(100);
-    await page
-      .locator('#diagnostic-input')
-      .dispatchEvent('keydown', { key: text, code, shiftKey: shift });
+    await page.locator('#overlay').dispatchEvent('keydown', { key: text, code, shiftKey: shift });
     await expect(page.locator('#diagnostic-result')).toContainText(
       `saw ${finger.replace('-', ' ')}. Intended: ${finger.replace('-', ' ')}.`,
     );
+    await page.locator('#custom-layout').click();
+    await page.locator('#edit-key').selectOption(code);
+    const before = await page.locator('#diagnostic-result').textContent();
+    await page
+      .locator('#capture-key')
+      .dispatchEvent('keydown', { key: text, code, shiftKey: shift });
+    await expect(page.locator('#edit-status')).toContainText('Mapping captured');
+    await page.waitForTimeout(150);
+    await expect(page.locator('#diagnostic-result')).toHaveText(before!);
+    await page.locator('#cancel-profile').click();
   }
 });
