@@ -15,9 +15,9 @@ test('Go survives refresh; Pause and Edit setup remain paused; reset clears pref
   for (const action of ['Pause', 'Edit setup']) {
     await page.getByRole('button', { name: action, exact: true }).click();
     await page.reload();
-    await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeEnabled();
+    await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeEnabled();
     await expect(page.locator('#typing')).toBeDisabled();
-    await page.getByRole('button', { name: 'Go', exact: true }).click();
+    await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
   }
   await page.getByRole('button', { name: 'Reset local data' }).click();
   await page.getByRole('button', { name: 'Confirm reset' }).click();
@@ -88,7 +88,7 @@ test('selected camera is requested after refresh and missing camera offers recov
   await expect(page.locator('#device')).toBeEnabled();
   await page.locator('#device').selectOption('synthetic-macbook-camera');
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
-  await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeEnabled();
 });
 
 test('legacy Go maps auto-start, but changed dimensions cannot auto-start', async ({ page }) => {

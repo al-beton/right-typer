@@ -32,7 +32,7 @@ test.describe('camera view rotation', () => {
         const box = (await canvas.boundingBox())!;
         await page.mouse.click(box.x + x * box.width, box.y + y * box.height);
       }
-      await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeEnabled();
+      await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeEnabled();
       // Video and calibration overlays undergo precisely the same transform.
       const videoBox = (await page.locator('#camera').boundingBox())!;
       const canvasBox = (await page.locator('#overlay').boundingBox())!;
@@ -42,7 +42,7 @@ test.describe('camera view rotation', () => {
         path: `test-results/rotation-${angle}-synthetic.png`,
         fullPage: true,
       });
-      await page.getByRole('button', { name: 'Go', exact: true }).click();
+      await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
       const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('right-typer.v1')!));
       expect(stored.cameraRotation).toBe(angle);
       for (const [key, point] of Object.entries(calibration().points)) {
@@ -89,7 +89,7 @@ test.describe('camera view rotation', () => {
       await rotation.selectOption(String(angle));
       await page.getByRole('button', { name: 'Map q', exact: true }).click();
       await page.locator('#overlay').press('ArrowRight');
-      await page.getByRole('button', { name: 'Go', exact: true }).click();
+      await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
       const q = await page.evaluate(
         () => JSON.parse(localStorage.getItem('right-typer.v1')!).calibration.points.q,
       );

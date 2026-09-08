@@ -105,15 +105,15 @@ export async function setup(page: Page, saved = false) {
   await page.goto('/');
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
   if (!saved) {
-    await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeDisabled();
+    await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeDisabled();
     for (const point of Object.values(calibration().points)) {
       const canvas = page.locator('#overlay');
       const box = await canvas.boundingBox();
       await canvas.click({ position: { x: point.x * box!.width, y: point.y * box!.height } });
     }
   }
-  await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeEnabled();
-  await page.getByRole('button', { name: 'Go', exact: true }).click();
+  await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeEnabled();
+  await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
 }
 export async function press(page: Page, key: string, finger?: Finger, missing = false) {
   await page.evaluate(

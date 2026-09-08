@@ -36,8 +36,8 @@ test('disconnect cancels boundary grading, releases tracks and persists until re
   await expect(page.locator('#typing')).toBeDisabled();
   await expect(page.locator('.target-word')).toHaveText('quick');
   await page.getByRole('button', { name: 'Reconnect camera' }).click();
-  await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeEnabled();
-  await page.getByRole('button', { name: 'Go', exact: true }).click();
+  await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeEnabled();
+  await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
   await expect(page.locator('#typing')).toHaveValue('');
   await expect(page.locator('.practice-metrics')).toContainText('1 /');
   await page.getByRole('button', { name: 'Disconnect camera', exact: true }).click();
@@ -47,7 +47,7 @@ test('disconnect cancels boundary grading, releases tracks and persists until re
   await expect(page.getByLabel('Rotate camera view')).toHaveValue('90');
   await expect(page.locator('#device')).toHaveValue('synthetic-macbook-camera');
   await page.getByRole('button', { name: 'Reconnect camera' }).click();
-  await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeEnabled();
   await expect(page.locator('.cal-key.mapped')).toHaveCount(30);
   await expect(page.locator('#typing')).toBeDisabled();
 });
@@ -123,5 +123,5 @@ test('reconnect retains partial mapping edits in this session', async ({ page })
   await page.getByRole('button', { name: 'Reconnect camera' }).click();
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
   await expect(page.locator('.cal-key.mapped')).toHaveCount(1);
-  await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeDisabled();
 });
