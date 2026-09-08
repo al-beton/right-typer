@@ -3,6 +3,7 @@ import {
   calibrationCodes,
   characterKey,
   coverage,
+  displayCharacters,
   geometrySignature,
   profileFingers,
   resolveEvent,
@@ -47,7 +48,7 @@ let CALIBRATION_KEYS = calibrationCodes(profile);
 const physicalLabel = (code: string) => {
   if (code === 'Space') return 'space';
   const key = profile.keys.find((k) => k.code === code);
-  const characters = key?.outputs.filter((o) => /^[a-z,.]$/.test(o.text)).map((o) => o.text);
+  const characters = key ? displayCharacters(key) : [];
   return characters?.length ? [...new Set(characters)].join(' / ') : code.replace('-', ' ');
 };
 const fingersForText = (text: string) =>
@@ -160,8 +161,9 @@ function keyboard() {
     const background = `background:${fingerBackground(fingers)}`;
     return `<span class="key ${k === 'Space' ? 'space-key' : `finger-${fingers[0]}`}" style="${background}" title="${label}" aria-label="${escapeHtml(physicalLabel(k))}: ${label}" data-key="${k}"><b>${escapeHtml(physicalLabel(k))}</b><small>${compactLabel}</small></span>`;
   };
-  const requiredCodes = new Set(calibrationCodes(profile));
-  const visibleKeys = profile.keys.filter((k) => k.code === 'Space' || requiredCodes.has(k.code));
+  const visibleKeys = profile.keys.filter(
+    (k) => k.code === 'Space' || displayCharacters(k).length > 0,
+  );
   const minX = Math.min(...visibleKeys.map((k) => k.x)),
     minY = Math.min(...visibleKeys.map((k) => k.y));
   const width = Math.max(...visibleKeys.map((k) => k.x + k.width)) - minX;

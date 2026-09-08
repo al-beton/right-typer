@@ -38,6 +38,25 @@ describe('keyboard profiles', () => {
           });
     },
   );
+  it('shows dedicated regional letters without invalidating existing passage calibration', () => {
+    for (const [index, letters] of [
+      [3, 'äöüß'],
+      [4, 'éèçàù'],
+    ] as const) {
+      const profile = PRESETS[index]!;
+      for (const letter of letters)
+        expect(profile.keys.some((k) => k.outputs.some((o) => o.text === letter))).toBe(true);
+      const previous = structuredClone(profile);
+      previous.keys = previous.keys.filter(
+        (k) =>
+          !['BracketLeft', 'Quote', 'Minus', 'Digit2', 'Digit7', 'Digit9', 'Digit0'].includes(
+            k.code,
+          ),
+      );
+      expect(geometrySignature(profile)).toBe(geometrySignature(previous));
+      expect(calibrationCodes(profile)).toEqual(calibrationCodes(previous));
+    }
+  });
   it('grades German Y and French M and shifted period by position rather than QWERTY text', () => {
     for (const [index, code, text, finger] of [
       [3, 'KeyZ', 'y', 'left-little'],

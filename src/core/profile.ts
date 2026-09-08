@@ -85,6 +85,39 @@ export const PRESETS = [
     'wxcvbn,;:!',
   ]),
 ];
+// Dedicated regional letter keys, at their physical positions. They are shown
+// even though the current English passage does not require them for calibration.
+function regionalKey(
+  p: KeyboardProfile,
+  code: string,
+  text: string,
+  x: number,
+  y: number,
+  finger: Finger,
+) {
+  p.keys.push({
+    code,
+    label: text,
+    x,
+    y,
+    width: 1,
+    height: 1,
+    outputs: [{ text, shift: false, altGr: false }],
+    standard: [finger],
+    alternate: [finger],
+  });
+}
+regionalKey(PRESETS[3]!, 'BracketLeft', 'ü', 10, 0, 'right-little');
+regionalKey(PRESETS[3]!, 'Quote', 'ä', 10.25, 1, 'right-little');
+regionalKey(PRESETS[3]!, 'Minus', 'ß', 9.5, -1, 'right-little');
+regionalKey(PRESETS[4]!, 'Digit2', 'é', 0.5, -1, 'left-ring');
+regionalKey(PRESETS[4]!, 'Digit7', 'è', 5.5, -1, 'right-index');
+regionalKey(PRESETS[4]!, 'Digit9', 'ç', 7.5, -1, 'right-ring');
+regionalKey(PRESETS[4]!, 'Digit0', 'à', 8.5, -1, 'right-little');
+regionalKey(PRESETS[4]!, 'Quote', 'ù', 10.25, 1, 'right-little');
+export const displayCharacters = (key: PhysicalKey) => [
+  ...new Set(key.outputs.map((o) => o.text).filter((text) => /^[\p{L},.]$/u.test(text))),
+];
 const frenchPeriod = PRESETS[4]!.keys.find((k) => k.code === 'Comma')!;
 frenchPeriod.outputs.push({ text: '.', shift: true, altGr: false });
 frenchPeriod.label = '; / .';
@@ -108,6 +141,7 @@ export function geometrySignature(p: KeyboardProfile): string {
   return JSON.stringify({
     geometry: p.geometry,
     keys: p.keys
+      .filter((k) => k.code === 'Space' || calibrationCodes(p).includes(k.code))
       .map((k) => [k.code, k.x, k.y, k.width, k.height])
       .sort((a, b) => String(a[0]).localeCompare(String(b[0]))),
     targets: calibrationCodes(p).sort(),
