@@ -10,6 +10,8 @@ export type SavedResult = Stats & {
 export type Saved = {
   calibration?: Calibration;
   cameraRotation?: CameraRotation;
+  cameraDeviceId?: string;
+  practiceEnabled?: boolean;
   results: SavedResult[];
 };
 export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
@@ -48,6 +50,12 @@ export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
     return {
       calibration: validCalibration(parsed.calibration) ? parsed.calibration : undefined,
       results,
+      ...(typeof parsed.cameraDeviceId === 'string'
+        ? { cameraDeviceId: parsed.cameraDeviceId }
+        : {}),
+      ...(typeof parsed.practiceEnabled === 'boolean'
+        ? { practiceEnabled: parsed.practiceEnabled }
+        : {}),
       ...(isCameraRotation(parsed.cameraRotation) ? { cameraRotation: parsed.cameraRotation } : {}),
     };
   } catch {
@@ -61,6 +69,8 @@ export function save(data: Saved, storage: Pick<Storage, 'setItem'> = localStora
       JSON.stringify({
         calibration: data.calibration,
         cameraRotation: data.cameraRotation,
+        cameraDeviceId: data.cameraDeviceId,
+        practiceEnabled: data.practiceEnabled,
         results: data.results.slice(-10),
       }),
     );

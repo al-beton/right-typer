@@ -65,9 +65,10 @@ test.describe('camera view rotation', () => {
       expect(await page.evaluate(() => window.__terminated)).toBe(0);
       expect(await documentBox()).toEqual(initial);
       await page.reload();
-      await expect(page.locator('#setup-message')).toContainText('Saved positions loaded');
+      await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeVisible();
       await expect(rotation).toHaveValue(String((angle + 90) % 360));
-      await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeEnabled();
+      await expect(page.locator('#typing')).toBeEnabled();
+      await page.getByRole('button', { name: 'Edit setup' }).click();
       if (angle === 90) {
         await page.setViewportSize({ width: 640, height: 1000 });
         await expect
