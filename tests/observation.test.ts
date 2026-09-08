@@ -32,6 +32,24 @@ describe('camera evidence, independently from intended finger', () => {
       ).toMatchObject({ kind: 'finger', finger });
     },
   );
+  it('does not substitute callback time when capture timestamps are unavailable', () => {
+    const unavailable = { ...frame(1, 100, 'a', 'right-index'), clock: 'unavailable' as const };
+    expect(attribute({ key: 'a', at: 100 }, [unavailable], calibration())).toMatchObject({
+      kind: 'uncertain',
+      reason: 'Camera capture timing was unavailable around this press.',
+    });
+    expect(
+      attribute(
+        { key: 'a', at: 100 },
+        [unavailable, frame(2, 120, 'a', 'left-little')],
+        calibration(),
+      ),
+    ).toMatchObject({
+      kind: 'finger',
+      finger: 'left-little',
+      frameIds: [2],
+    });
+  });
   it('uses the single nearest frame regardless of side, arrival order or stale results', () => {
     const frames = [
       frame(1, 20, 'a', 'left-little', 900),

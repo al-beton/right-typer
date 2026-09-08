@@ -24,13 +24,11 @@ const escapeHtml = (text: string) =>
     (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!,
   );
 let saved = load();
-let phase: 'intro' | 'setup' | 'calibrate' | 'verify' | 'practice' | 'results' = 'intro';
+let phase: 'setup' | 'calibrate' | 'verify' | 'practice' | 'results' = 'setup';
 let calibration: Calibration | undefined;
 let points: Record<string, Point> = {};
 let selectedKey = 0;
 let swapHands = saved.calibration?.swapHands ?? false;
-let alignmentChecked = false;
-let identityChecked = false;
 let exercise = new Exercise(WORDS);
 let resuming = false;
 let message = '';
@@ -41,15 +39,24 @@ let cameraErrorHandled = false;
 let resetArmed = false;
 
 $('#app').innerHTML = `
-  <header class="topbar"><a class="brand" href="./" aria-label="Right Typer home"><span class="brand-mark">r<span>t</span></span>right typer<span class="beta">first edition</span></a><div class="top-actions"><span class="privacy"><i></i> on your device</span><button class="text-button" id="reset">Reset local data</button></div></header>
-  <main><div id="storage-warning" class="storage-alert" role="status" hidden></div><div id="content"></div>
-    <section class="camera-section" id="camera-section" aria-label="Live camera and finger tracking" hidden>
-      <div class="camera-heading"><div><span class="eyebrow">YOUR VIEW</span><h2>Keep your hands in the picture.</h2></div><span id="camera-badge" class="status-pill">Camera off</span></div>
-      <div class="camera-layout"><div class="view-wrap" id="view-wrap"><video id="camera" autoplay playsinline muted aria-label="Live view of your keyboard"></video><canvas id="overlay" aria-label="Keyboard calibration. Click the center of the requested key, or use arrow keys and Enter." tabindex="0"></canvas><div class="camera-empty" id="camera-empty"><div class="camera-glyph">⌁</div><strong>Your keyboard goes here</strong><span>Tilt your MacBook screen toward the keys.<br/>Use your external display for this page.</span></div></div>
-      <aside class="camera-guide"><span class="eyebrow" id="guide-label">A GOOD ANGLE</span><h3 id="guide-title">A little tilt. A clearer view.</h3><p id="guide-text">Use your MacBook webcam. Tilt the lid down until the letter keys, spacebar and both hands fit in the image. Keep this page on your external display.</p><div class="tracking-readout" id="tracking-readout">Camera frames stay in this browser.</div><div id="camera-finger-map"></div><div id="camera-controls"><label class="field-label" for="device">Camera</label><select id="device"><option value="">MacBook / default camera</option></select><button class="secondary" id="start-camera">Enable camera</button></div><button class="text-button" id="fix-setup" hidden>Fix camera setup ↗</button></aside></div>
-      <p class="camera-footnote">Live, local, temporary. No recordings, uploads or analytics.</p>
+  <header class="topbar"><h1>Right Typer</h1><a href="https://github.com/al-beton/right-typer" target="_blank" rel="noreferrer">Source on GitHub</a></header>
+  <main>
+    <div id="content" aria-label="Typing practice"></div>
+    <section id="finger-map" aria-label="Intended finger map"></section>
+    <section id="camera-section" aria-label="Live camera and finger tracking">
+      <div class="camera-heading"><h2>Camera & key positions</h2><span id="camera-badge" role="status">Camera off</span></div>
+      <div class="camera-layout">
+        <div class="view-wrap" id="view-wrap"><video id="camera" autoplay playsinline muted aria-label="Live view of your keyboard"></video><canvas id="overlay" aria-label="Keyboard calibration. Click the center of the requested key, or use arrow keys and Enter." tabindex="0"></canvas><div class="camera-empty" id="camera-empty"><strong>Enable your camera to get set up</strong><span>Tilt your MacBook screen toward the keyboard.<br/>Use your external display for this page.</span></div></div>
+        <aside>
+          <div id="camera-controls"><label for="device">Camera</label><select id="device"><option value="">MacBook / default camera</option></select><button id="start-camera">Enable camera</button></div>
+          <div id="setup-panel"></div>
+          <p id="tracking-readout">Camera frames stay in this browser.</p>
+        </aside>
+      </div>
     </section>
-  </main><footer><span>Small movements. Better habits.</span><span>Apple British ISO · Chrome on MacBook <span class="footer-dot">•</span> <a href="https://github.com/al-beton/right-typer" target="_blank" rel="noreferrer">Open source ↗</a></span></footer>`;
+    <div id="storage-warning" class="storage-alert" role="status" hidden></div>
+    <footer><span>Local processing · Apple British ISO · Chrome on MacBook</span><button class="text-button" id="reset">Reset local data</button></footer>
+  </main>`;
 const video = $<HTMLVideoElement>('#camera');
 const canvas = $<HTMLCanvasElement>('#overlay');
 const camera = new Camera(video, cameraChanged, drawFrame);
@@ -62,100 +69,28 @@ function store() {
   $('#storage-warning').textContent = storageWarning;
   $('#storage-warning').hidden = !storageWarning;
 }
-function steps(active: number) {
-  return `<div class="steps" aria-label="Setup progress">${['Camera', 'Key positions', 'Check & practise'].map((label, i) => `<span class="${i === active ? 'current' : i < active ? 'done' : ''}"><b>${i < active ? '✓' : `0${i + 1}`}</b>${label}</span>`).join('<i></i>')}</div>`;
-}
 function keyboard() {
-  return `<div class="keyboard" aria-label="Intended finger map">${ROWS.map((row, i) => `<div class="key-row row-${i}">${[...row].map((k) => `<span class="key finger-${EXPECTED[k]?.split('-')[1]}" title="${intended(k)}" data-key="${k}">${k}</span>`).join('')}</div>`).join('')}<div class="key-row"><span class="key space-key" data-key=" ">either thumb</span></div></div>`;
+  return `<h2>Which finger?</h2><div class="keyboard">${ROWS.map((row, i) => `<div class="key-row row-${i}">${[...row].map((k) => `<span class="key finger-${EXPECTED[k]}" title="${intended(k)}" data-key="${k}"><b>${k}</b><small>${intended(k)}</small></span>`).join('')}</div>`).join('')}<div class="key-row"><span class="key space-key" data-key=" "><b>space</b><small>either thumb</small></span></div></div>`;
 }
 function setPhase(next: typeof phase) {
   phase = next;
   render();
 }
 function render() {
-  $('#camera-section').hidden = phase === 'intro' || phase === 'results';
-  $('#fix-setup').hidden = !['practice', 'verify'].includes(phase);
-  $('#camera-controls').hidden = !['setup'].includes(phase);
-  $('#camera-section').classList.toggle('practice-view', phase === 'practice');
   canvas.classList.toggle('calibrating', phase === 'calibrate');
-  if (phase === 'intro') {
-    content.innerHTML = `<section class="intro"><div class="intro-copy"><span class="eyebrow">MAKE THE RIGHT MOVES</span><h1>One word.<br/><em>Well typed.</em></h1><p class="lede">Your fingers have habits.<br/>Give them a little guidance.</p><p class="intro-detail">Right Typer watches your fingers as you type. Finish a word, get useful feedback, and try again until the right movements stick.</p><button class="primary" id="begin">Set up your camera <span>↗</span></button><div class="intro-meta">About 5 minutes to set up <span>·</span> Everything stays here</div></div><div class="intro-art" aria-label="Illustration of word practice"><div class="art-top"><span class="tiny-dot"></span> A LITTLE MORE INTENTION</div><div class="sample-word">q<span>u</span>iet<span class="sample-caret"></span></div><div class="sample-note"><span>↳</span> right index, a little closer.</div>${keyboard()}<div class="art-bottom"><span>01 / ${WORDS.length} words</span><span>take your time ↵</span></div></div></section><section class="principles"><div><span>01</span><h3>See your fingers</h3><p>Tilt your MacBook screen toward the keys. Keep this page on your external display.</p></div><div><span>02</span><h3>Go word by word</h3><p>Finish each word, then press space. Correct text advances unless a wrong finger is detected. Unknown presses stay unverified.</p></div><div><span>03</span><h3>Build the habit</h3><p>Start slowly. Clear movements matter more than a high score.</p></div></section>${saved.results.length ? `<section class="recent"><span class="eyebrow">LAST PRACTICE</span><p>${new Date(saved.results.at(-1)!.date).toLocaleDateString()} <b>${saved.results.at(-1)!.wpm.toFixed(1)} WPM</b> · ${saved.results.at(-1)!.retries} retries${saved.results.at(-1)!.gradingPolicy === 'verified-only' ? ' · Earlier rule: unknown presses required retries' : ''}</p></section>` : ''}`;
-    $('#begin').onclick = () => {
-      resuming = false;
-      setPhase('setup');
-    };
-  } else if (phase === 'setup') {
-    content.innerHTML = `${steps(0)}<section class="setup-title"><span class="eyebrow">01 / FIND YOUR ANGLE</span><h1>Your keyboard.<br/><em>From a new perspective.</em></h1><p>Open this page on your external display, then tilt the MacBook lid toward the keyboard. Both hands and the spacebar should stay visible while typing.</p></section><div class="notice" id="setup-message" role="status">${escapeHtml(message || 'Enable the camera below. Nothing is recorded or sent anywhere.')}</div><div class="setup-actions"><button class="primary" id="calibrate" ${camera.status !== 'ready' ? 'disabled' : ''}>${saved.calibration && sameCamera(saved.calibration) ? 'Check saved key positions' : 'Map the key positions'} <span>→</span></button><span>Keep the lid and keyboard still after calibration.</span></div>`;
-    $('#calibrate').onclick = () => {
-      if (saved.calibration && sameCamera(saved.calibration)) {
-        calibration = structuredClone(saved.calibration);
-        points = calibration.points;
-        swapHands = calibration.swapHands;
-        alignmentChecked = false;
-        identityChecked = false;
-        message = '';
-        setPhase('verify');
-      } else startCalibration();
-    };
-  } else if (phase === 'calibrate') {
-    const key = CALIBRATION_KEYS[selectedKey]!;
-    content.innerHTML = `${steps(1)}<section class="calibration-title"><div><span class="eyebrow">02 / CONNECT THE DOTS</span><h1>Show me <em id="requested-key">${key.startsWith('space') ? (key.endsWith('left') ? 'spacebar’s left end.' : 'spacebar’s right end.') : `the ${keyName(key)} key.`}</em></h1><p>Move your hands aside. Click the center of the highlighted key in the live image below. For space, mark each end along its middle. No training keystrokes needed.</p></div><div class="cal-count"><strong>${Object.keys(points).length}</strong> / ${CALIBRATION_KEYS.length}<span>positions mapped</span></div></section><div class="cal-keys" aria-label="Choose a key to edit">${CALIBRATION_KEYS.map((k, i) => `<button class="cal-key ${points[k] ? 'mapped' : ''} ${i === selectedKey ? 'selected' : ''}" data-cal="${i}" aria-label="Map ${k}">${k.startsWith('space') ? (k.endsWith('left') ? 'space ◂' : 'space ▸') : k}</button>`).join('')}</div><div class="setup-actions"><button class="secondary" id="undo">← Previous key</button><button class="primary" id="save-calibration" ${draftValid() ? '' : 'disabled'}>Check alignment <span>→</span></button><span id="cal-message" role="status">${escapeHtml(message || (Object.keys(points).length === CALIBRATION_KEYS.length && !draftValid() ? 'Some dots overlap or rows are too flat to distinguish. Revisit those keys before continuing.' : 'Click a mapped key above to adjust it. Arrow keys nudge a dot; Enter moves to the next key.'))}</span></div>`;
-    content.querySelectorAll<HTMLButtonElement>('[data-cal]').forEach((el) => {
-      el.onclick = () => {
-        selectedKey = Number(el.dataset.cal);
-        render();
-      };
-    });
-    $('#undo').onclick = () => {
-      selectedKey = Math.max(0, selectedKey - 1);
-      render();
-    };
-    $('#save-calibration').onclick = () => {
-      const draft = makeCalibration();
-      if (!validCalibration(draft)) return;
-      calibration = draft;
-      alignmentChecked = false;
-      identityChecked = false;
-      message = '';
-      setPhase('verify');
-    };
-  } else if (phase === 'verify') {
-    content.innerHTML = `${steps(2)}<section class="setup-title compact"><span class="eyebrow">03 / A QUICK REALITY CHECK</span><h1>All dots <em>in place?</em></h1><p>Check the dots against your keyboard, especially q, p, z, full stop and both ends of space. Saved positions need this check every time the camera starts.</p></section><div class="verify-grid"><div class="check-list"><label><input type="checkbox" id="alignment" ${alignmentChecked ? 'checked' : ''}/> Every dot is on its key. The camera and keyboard are fixed.</label><label><input type="checkbox" id="identity" ${identityChecked ? 'checked' : ''}/> I lifted each hand in turn. The live left/right labels match my actual hands.</label><label class="swap"><input type="checkbox" id="swap" ${swapHands ? 'checked' : ''}/> Swap the model’s left/right labels</label></div><div class="diagnostic"><label for="diagnostic-input" class="eyebrow">TRY A FEW KEYS</label><input id="diagnostic-input" autocomplete="off" placeholder="Click here, then try f, j and space" aria-label="Check observed fingers"/><p id="diagnostic-result" role="status">Optional check: try correct and deliberately different fingers. The labels should follow the finger you actually use.</p></div></div><div class="setup-actions"><button class="primary" id="practice" disabled>${resuming ? 'Return to this word' : 'Start practising'} <span>→</span></button><button class="text-button" id="remap">Remap key positions</button><span id="ready-message" role="status">${escapeHtml(message || 'Confirm alignment and hand labels. Both hands must be visible with camera capture timing available.')}</span></div>`;
-    $<HTMLInputElement>('#alignment').onchange = (e) => {
-      alignmentChecked = (e.target as HTMLInputElement).checked;
-      updateReadiness();
-    };
-    $<HTMLInputElement>('#identity').onchange = (e) => {
-      identityChecked = (e.target as HTMLInputElement).checked;
-      updateReadiness();
-    };
-    $<HTMLInputElement>('#swap').onchange = (e) => {
-      swapHands = (e.target as HTMLInputElement).checked;
-      calibration!.swapHands = swapHands;
-      identityChecked = false;
-      $<HTMLInputElement>('#identity').checked = false;
-      updateReadiness();
-    };
-    $('#remap').onclick = startCalibration;
-    $('#practice').onclick = () => {
-      if (!ready()) return;
-      saved.calibration = calibration;
-      store();
-      camera.evidence.reset();
-      message = '';
-      boundaryKeys = 0;
-      if (resuming) exercise.retry();
-      else exercise = new Exercise(WORDS);
-      setPhase('practice');
-    };
-    $('#diagnostic-input').onkeydown = (event) => diagnostic(event as KeyboardEvent);
-    updateReadiness();
+  $<HTMLSelectElement>('#device').disabled = phase === 'practice';
+  $<HTMLButtonElement>('#start-camera').disabled =
+    phase === 'practice' || camera.status === 'loading';
+  renderSetup();
+  if (phase !== 'practice' && phase !== 'results') {
+    const last = saved.results.at(-1);
+    content.innerHTML = `<section class="practice"><div class="practice-top"><h2>Practice</h2><span>${WORDS.length} words</span></div><div class="progress-track"></div>${passageMarkup()}<div class="entry-heading"><label for="typing">Your word</label><span>Space finishes each word.</span></div><div class="word-entry"><div class="target-word">${WORDS[exercise.index]}</div><input id="typing" aria-label="Type the current word" placeholder="Set up below, then click Go" disabled /></div><div class="feedback">${resuming ? 'Paused. Go resumes this word with a fresh attempt.' : 'Enable your camera, mark the key positions, then click Go.'}</div>${last ? `<p class="recent">Last practice: ${last.wpm.toFixed(1)} WPM · ${last.retries} retries${last.gradingPolicy !== 'wrong-finger-veto' ? ' · Earlier rule: unknown presses required retries' : ''}</p>` : ''}</section>`;
   } else if (phase === 'practice') {
     const retry = exercise.state === 'retry',
       checking = exercise.state === 'checking';
     const stats = exercise.stats(performance.now());
     const word = WORDS[exercise.index]!;
-    content.innerHTML = `<section class="practice"><div class="practice-top"><span class="eyebrow">THE PICNIC / A LITTLE ADVENTURE</span><div class="practice-metrics"><span><b>${exercise.index}</b> / ${WORDS.length} words</span><span><b>${stats.retries}</b> retries</span><button class="text-button" id="pause">Pause</button></div></div><div class="progress-track"><div style="width:${(exercise.index / WORDS.length) * 100}%"></div></div><div class="passage" aria-label="Practice passage">${WORDS.map((w, i) => `<span class="${i < exercise.index ? 'passed' : i === exercise.index ? 'active' : ''}" ${i === exercise.index ? 'aria-current="step"' : ''}>${w}</span>`).join(' ')}</div><div class="entry-heading"><label class="eyebrow" for="typing">${retry ? 'SAME WORD. FRESH START.' : checking ? 'CHECKING THIS WORD' : 'YOUR WORD'}</label><span id="word-hint">${exercise.index === 0 ? 'Include punctuation. Space finishes the word.' : 'Finish the word, then press space.'}</span></div><div class="word-entry ${retry ? 'needs-retry' : ''}"><div class="target-word" aria-label="Current word">${word}</div><input id="typing" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type the current word" placeholder="type here" ${retry || checking ? 'readonly' : ''}/><span class="entry-indicator">${checking ? '<span class="spinner"></span>' : retry ? '↺' : '↵'}</span></div><div id="feedback" class="feedback ${retry ? 'mistake' : ''}" role="status">${retry ? `<div><strong>Let’s give that word another go.</strong><p>${escapeHtml(feedback(exercise.lastVerdict!, word))}</p></div><button class="primary" id="retry">Try this word again <span>↵</span></button>` : checking ? '<span class="spinner"></span> Matching camera evidence to your presses. Wait for the next word before typing.' : escapeHtml(message || 'Take your time. I’ll check your fingers when the word is finished.')}</div>${retry ? attemptDetails() : ''}<p id="input-message" class="input-message" role="status"></p></section>`;
+    content.innerHTML = `<section class="practice"><div class="practice-top"><span class="eyebrow">Practice</span><div class="practice-metrics"><span><b>${exercise.index}</b> / ${WORDS.length} words</span><span><b>${stats.retries}</b> retries</span><button class="text-button" id="pause">Pause</button></div></div><div class="progress-track"><div style="width:${(exercise.index / WORDS.length) * 100}%"></div></div><div class="passage" aria-label="Practice passage">${WORDS.map((w, i) => `<span class="${i < exercise.index ? 'passed' : i === exercise.index ? 'active' : ''}" ${i === exercise.index ? 'aria-current="step"' : ''}>${w}</span>`).join(' ')}</div><div class="entry-heading"><label class="eyebrow" for="typing">${retry ? 'SAME WORD. FRESH START.' : checking ? 'CHECKING THIS WORD' : 'YOUR WORD'}</label><span id="word-hint">${exercise.index === 0 ? 'Include punctuation. Space finishes the word.' : 'Finish the word, then press space.'}</span></div><div class="word-entry ${retry ? 'needs-retry' : ''}"><div class="target-word" aria-label="Current word">${word}</div><input id="typing" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type the current word" placeholder="type here" ${retry || checking ? 'readonly' : ''}/><span class="entry-indicator">${checking ? '<span class="spinner"></span>' : retry ? '↺' : '↵'}</span></div><div id="feedback" class="feedback ${retry ? 'mistake' : ''}" role="status">${retry ? `<div><strong>Let’s give that word another go.</strong><p>${escapeHtml(feedback(exercise.lastVerdict!, word))}</p></div><button class="primary" id="retry">Try this word again <span>↵</span></button>` : checking ? '<span class="spinner"></span> Matching camera evidence to your presses. Wait for the next word before typing.' : escapeHtml(message || 'Take your time. I’ll check your fingers when the word is finished.')}</div><p id="input-message" class="input-message" role="status"></p></section>`;
     const input = $<HTMLInputElement>('#typing');
     input.value = exercise.attempt.text;
     input.onkeydown = typing;
@@ -174,15 +109,18 @@ function render() {
     if (retry) $('#retry').onclick = retryWord;
   } else {
     const stats = exercise.stats(performance.now());
-    content.innerHTML = `<section class="results"><div class="finish-seal">✓</div><span class="eyebrow">PASSAGE COMPLETE</span><h1>Good words.<br/><em>Better movements.</em></h1><p class="lede">Every word’s text matched with no wrong finger detected in its accepted attempt.</p><div class="result-grid"><div class="primary-stat"><strong>${stats.wpm.toFixed(1)}</strong><span>effective WPM</span></div><div><strong>${stats.wrongFingers}</strong><span>wrong-finger presses</span></div><div><strong>${stats.textMistakes}</strong><span>text-mismatch attempts</span></div><div><strong>${stats.uncertainPresses}</strong><span>unverified presses</span></div></div><p class="result-note">${WORDS.length} words · ${stats.attempts} submitted attempts · ${stats.retries} retries · ${formatTime(stats.elapsedMs)} elapsed<br/>Unverified presses remain unknown, including in accepted words. They do not cause retries.</p><details><summary>How these numbers work</summary><p>Effective WPM is the accepted passage characters, including one submitting space per word, divided by five and by elapsed minutes. Timing runs from your first character to the final submitting space and includes retries, reading feedback and pauses. Wrong-finger presses include erased characters. A text mistake is one submitted attempt with mismatched text. Unverified presses count all unknown observations in submitted attempts, including submitting spaces, erased characters and failed attempts. They are not verified correct fingers. An attempt can contain both mistakes and uncertainty.</p></details><div class="result-actions"><button class="primary" id="restart">Practise again <span>↻</span></button><button class="text-button" id="home">Back to the beginning</button></div><p class="result-limit">Camera judgements can be wrong. Clear feedback is useful; it is not ground truth.</p></section>`;
+    content.innerHTML = `<section class="results"><h2>PASSAGE COMPLETE</h2><p class="lede">Every word’s text matched with no wrong finger detected in its accepted attempt.</p><div class="result-grid"><div class="primary-stat"><strong>${stats.wpm.toFixed(1)}</strong><span>effective WPM</span></div><div><strong>${stats.wrongFingers}</strong><span>wrong-finger presses</span></div><div><strong>${stats.textMistakes}</strong><span>text-mismatch attempts</span></div><div><strong>${stats.uncertainPresses}</strong><span>unverified presses</span></div></div><p class="result-note">${WORDS.length} words · ${stats.attempts} submitted attempts · ${stats.retries} retries · ${formatTime(stats.elapsedMs)} elapsed<br/>Unverified presses remain unknown, including in accepted words. They do not cause retries.</p><details><summary>How these numbers work</summary><p>Effective WPM is the accepted passage characters, including one submitting space per word, divided by five and by elapsed minutes. Timing runs from your first character to the final submitting space and includes retries, reading feedback and pauses. Wrong-finger presses include erased characters. A text mistake is one submitted attempt with mismatched text. Unverified presses count all unknown observations in submitted attempts, including submitting spaces, erased characters and failed attempts. They are not verified correct fingers. An attempt can contain both mistakes and uncertainty.</p></details><div class="result-actions"><button class="primary" id="restart">Practise again <span>↻</span></button></div><p class="result-limit">Camera judgements can be wrong. Clear feedback is useful; it is not ground truth.</p></section>`;
     $('#restart').onclick = () => {
       resuming = false;
-      message = 'Start the camera again, then confirm that the saved dots still align.';
-      setPhase('setup');
+      exercise = new Exercise(WORDS);
+      message = '';
+      setPhase(camera.status === 'ready' ? 'verify' : 'setup');
     };
-    $('#home').onclick = () => setPhase('intro');
   }
-  updateGuide();
+  if (phase === 'practice' && exercise.state === 'retry') {
+    $('#feedback').insertAdjacentHTML('beforeend', attemptDetails());
+  }
+
   if (camera.latest) drawOverlay(camera.latest);
 }
 function formatTime(ms: number) {
@@ -216,55 +154,67 @@ function startCalibration() {
   setPhase('calibrate');
 }
 function ready() {
-  return (
-    alignmentChecked &&
-    identityChecked &&
-    calibration &&
-    sameCamera(calibration) &&
-    camera.fresh() &&
-    camera.latest?.clock === 'capture' &&
-    camera.latest.hands.length === 2 &&
-    new Set(camera.latest.hands.map((h) => h.side)).size === 2 &&
-    camera.latest.hands.every((h) => h.score >= 0.8)
-  );
+  return camera.status === 'ready' && draftValid();
 }
-function updateReadiness() {
-  if (phase !== 'verify') return;
-  $<HTMLButtonElement>('#practice').disabled = !ready();
-  if (camera.latest?.clock === 'unavailable')
-    $('#ready-message').textContent =
-      'Chrome is not exposing camera capture timestamps for this stream. Update Chrome and restart the camera. Practice stays blocked because presentation time cannot verify a press.';
-  else if (alignmentChecked && identityChecked)
-    $('#ready-message').textContent = ready()
-      ? 'Ready. Begin at a comfortable, deliberate pace.'
-      : 'Place both hands in view and wait for a fresh, confident frame.';
-  else $('#ready-message').textContent = 'Confirm alignment and hand labels before practising.';
+function passageMarkup() {
+  return `<div class="passage" aria-label="Practice passage">${WORDS.map((w, i) => `<span class="${i < exercise.index ? 'passed' : i === exercise.index ? 'active' : ''}">${w}</span>`).join(' ')}</div>`;
 }
-function updateGuide() {
-  $('#camera-finger-map').innerHTML =
-    phase === 'practice'
-      ? keyboard() +
-        '<p class="map-caption">The highlighted key shows the next intended movement.</p>'
-      : '';
-  const key = CALIBRATION_KEYS[selectedKey]!;
-  $('#guide-label').textContent =
-    phase === 'calibrate'
-      ? 'CLICK IN THE IMAGE'
-      : phase === 'practice'
-        ? 'A LIVE SECOND LOOK'
-        : 'A GOOD ANGLE';
-  $('#guide-title').textContent =
-    phase === 'calibrate'
-      ? `Mark ${key.replace('-', ' ')}.`
-      : phase === 'practice'
-        ? 'Clear view. Steady hands.'
-        : 'A little tilt. A clearer view.';
-  $('#guide-text').textContent =
-    phase === 'calibrate'
-      ? 'Move your hands away. Click the key center, not a fingertip. Keep the lid still. You can revisit any dot before continuing.'
-      : phase === 'practice'
-        ? 'Keep both hands and the key dots visible. If the lid or keyboard moves, fix the setup before continuing.'
-        : 'Use your MacBook webcam. Tilt the lid down until the letter keys, spacebar and both hands fit in the image. Keep this page on your external display.';
+function renderSetup() {
+  diagnosticsId--; // Discard optional checks when setup changes.
+  const editing = phase === 'calibrate';
+  const count = Object.keys(points).length;
+  const complete = ready();
+  const locked = phase === 'practice' || phase === 'results';
+  $('#setup-panel').innerHTML = `
+    <p id="setup-message" role="status">${escapeHtml(message || 'Keep the camera and keyboard still after mapping.')}</p>
+    <div class="mapping-heading"><strong id="requested-key">${editing ? `Mark ${CALIBRATION_KEYS[selectedKey]!.replace('-', ' ')} in the image` : complete ? 'Key positions configured' : 'Configure the key positions'}</strong><span>${count} / ${CALIBRATION_KEYS.length}</span></div>
+    <div class="cal-keys" aria-label="Choose a key to edit">${CALIBRATION_KEYS.map((k, i) => `<button class="cal-key ${points[k] ? 'mapped' : ''} ${editing && i === selectedKey ? 'selected' : ''}" data-cal="${i}" aria-label="Map ${k}" aria-pressed="${editing && i === selectedKey}" ${camera.status !== 'ready' || locked ? 'disabled' : ''}>${k.startsWith('space') ? (k.endsWith('left') ? 'space ◂' : 'space ▸') : k}<span aria-hidden="true" style="visibility:${points[k] ? 'visible' : 'hidden'}"> ✓</span></button>`).join('')}</div>
+    <p id="cal-message">${editing ? 'Click each key centre. Mark both ends of space. Select any key above to adjust it; arrow keys nudge, Enter selects the next.' : 'Dots show the saved positions. If the camera moved, select a key to adjust it or remap below.'}</p>
+    <button id="remap" ${camera.status !== 'ready' || locked ? 'disabled' : ''}>Remap key positions</button>
+    <div class="diagnostic"><label for="diagnostic-input">Test finger detection (optional)</label><input id="diagnostic-input" autocomplete="off" placeholder="Try f, j and space" aria-label="Check observed fingers" ${!complete || locked ? 'disabled' : ''}/><p id="diagnostic-result" role="status">Try correct and different fingers. Check whether the observed labels match.</p><button id="swap" aria-pressed="${swapHands}" ${!complete || locked ? 'disabled' : ''}>${swapHands ? 'Restore' : 'Swap'} left/right hand labels</button></div>
+    <div class="setup-actions"><button class="primary" id="practice" ${!complete || locked ? 'disabled' : ''}>Go</button><button id="fix-setup" ${!locked ? 'disabled' : ''}>Edit setup</button></div>
+    <p id="ready-message" role="status">${complete ? 'Ready. If the camera moved, adjust the dots before Go.' : count === CALIBRATION_KEYS.length && camera.status === 'ready' ? 'Some dots overlap or rows are too flat. Adjust those positions.' : 'Go unlocks when all key positions are configured.'}</p>`;
+  $('#setup-panel')
+    .querySelectorAll<HTMLButtonElement>('[data-cal]')
+    .forEach((el) => {
+      el.onclick = () => {
+        selectedKey = Number(el.dataset.cal);
+        phase = 'calibrate';
+        render();
+      };
+    });
+  $('#remap').onclick = startCalibration;
+  $('#swap').onclick = () => {
+    swapHands = !swapHands;
+    calibration = makeCalibration();
+    camera.evidence.reset();
+    renderSetup();
+  };
+  $('#diagnostic-input').onkeydown = (event) => diagnostic(event as KeyboardEvent);
+  $('#practice').onclick = () => {
+    if (!ready()) return;
+    calibration = makeCalibration();
+    saved.calibration = calibration;
+    store();
+    camera.evidence.reset();
+    message = '';
+    boundaryKeys = 0;
+    if (resuming) exercise.retry();
+    else exercise = new Exercise(WORDS);
+    setPhase('practice');
+    $('#typing').scrollIntoView({ block: 'nearest' });
+  };
+  $('#fix-setup').onclick = () => {
+    if (phase === 'practice') {
+      exercise.pause();
+      resuming = true;
+    } else {
+      exercise = new Exercise(WORDS);
+      resuming = false;
+    }
+    message = 'Adjust any dot in the camera image, or remap if the camera moved.';
+    setPhase('verify');
+  };
 }
 function cameraChanged() {
   $('#camera-empty').hidden = camera.status === 'ready';
@@ -298,8 +248,19 @@ function cameraChanged() {
   }
   if (camera.status === 'ready') {
     cameraErrorHandled = false;
-    message =
-      'Check the framing below. Keep the full letter area, spacebar and both hands in view.';
+    message = 'Mark the key centres in the camera image. Keep the camera still.';
+    if (saved.calibration && sameCamera(saved.calibration)) {
+      calibration = structuredClone(saved.calibration);
+      points = calibration.points;
+      swapHands = calibration.swapHands;
+      phase = 'verify';
+      message = 'Saved positions loaded. Adjust the dots if the camera or keyboard moved.';
+    } else {
+      points = {};
+      calibration = undefined;
+      selectedKey = 0;
+      phase = 'calibrate';
+    }
     navigator.mediaDevices
       .enumerateDevices()
       .then((devices) => {
@@ -315,25 +276,19 @@ function cameraChanged() {
       })
       .catch(() => {});
   }
-  if (phase === 'setup') render();
+  if (phase !== 'practice' && phase !== 'results') render();
 }
 function drawFrame(frame: Frame) {
   $('#camera-badge').textContent =
     frame.clock === 'unavailable'
       ? 'Capture timing unavailable'
-      : frame.hands.length === 2
-        ? 'Both hands in view'
-        : `${frame.hands.length} / 2 hands in view`;
-  $('#camera-badge').classList.toggle(
-    'good',
-    frame.hands.length === 2 && frame.clock === 'capture',
-  );
+      : `${frame.hands.length} hands detected`;
+  $('#camera-badge').classList.toggle('good', frame.clock === 'capture');
   $('#tracking-readout').textContent =
     frame.clock === 'capture'
       ? `Capture → result ${Math.max(0, Math.round(frame.receivedAt - frame.at))} ms · ${frame.hands.length} hands`
-      : 'Frame capture time unavailable. Finger grading is blocked.';
+      : 'Capture timing unavailable. Finger observations stay unknown.';
   drawOverlay(frame);
-  updateReadiness();
 }
 function drawOverlay(frame: Frame) {
   if (!video.videoWidth) return;
@@ -396,7 +351,7 @@ function drawOverlay(frame: Frame) {
       ctx.arc(x, y, 4, 0, Math.PI * 2);
       ctx.fillStyle = ctx.strokeStyle;
       ctx.fill();
-      if (phase === 'verify') {
+      if (phase !== 'practice') {
         ctx.fillStyle = '#fff';
         ctx.fillText(DIGITS[digit]!, x + 6, y - 5);
       }
@@ -419,6 +374,7 @@ canvas.onclick = (event) => {
     y: (event.clientY - box.top) / box.height,
   };
   selectedKey = Math.min(CALIBRATION_KEYS.length - 1, selectedKey + 1);
+  if (draftValid()) phase = 'verify';
   message = '';
   render();
 };
@@ -452,24 +408,14 @@ canvas.onkeydown = (event) => {
   render();
   canvas.focus();
 };
-$('#start-camera').onclick = () => {
-  alignmentChecked = false;
-  identityChecked = false;
+function restartCamera() {
+  calibration = undefined;
+  points = {};
+  phase = 'setup';
   void camera.start($<HTMLSelectElement>('#device').value);
-};
-$('#device').onchange = () => {
-  alignmentChecked = false;
-  identityChecked = false;
-  void camera.start($<HTMLSelectElement>('#device').value);
-};
-$('#fix-setup').onclick = () => {
-  if (phase === 'practice') {
-    exercise.pause();
-    resuming = true;
-  }
-  message = 'Recheck the camera angle. If the lid moved, remap the key positions.';
-  setPhase('setup');
-};
+}
+$('#start-camera').onclick = restartCamera;
+$('#device').onchange = restartCamera;
 $('#reset').onclick = () => {
   if (!resetArmed) {
     resetArmed = true;
@@ -492,7 +438,7 @@ $('#reset').onclick = () => {
   $('#storage-warning').hidden = !storageWarning;
   resetArmed = false;
   $('#reset').textContent = 'Reset local data';
-  setPhase('intro');
+  setPhase('setup');
 };
 function typing(event: KeyboardEvent) {
   if (event.key === 'Tab' || event.metaKey || event.ctrlKey || event.altKey) return;
@@ -557,7 +503,6 @@ function typing(event: KeyboardEvent) {
         gradingPolicy: 'wrong-finger-veto',
       });
       store();
-      camera.stop();
       setPhase('results');
     } else {
       message = verdict.pass
@@ -589,10 +534,7 @@ function retryWord() {
 function pause() {
   exercise.pause();
   resuming = true;
-  message =
-    'Practice paused. Your completed words are kept for this session. Recheck alignment to restart the current word.';
-  alignmentChecked = false;
-  identityChecked = false;
+  message = 'Paused. Your completed words are kept. Click Go to restart the current word.';
   setPhase('verify');
 }
 function attemptDetails() {
@@ -614,7 +556,8 @@ function attemptDetails() {
 function diagnostic(event: KeyboardEvent) {
   if (event.key === 'Tab') return;
   event.preventDefault();
-  if (!/^[a-z,. ]$/.test(event.key) || event.repeat || !calibration) return;
+  if (!/^[a-z,. ]$/.test(event.key) || event.repeat || !ready()) return;
+  calibration = makeCalibration();
   const press: Press = {
     id: diagnosticsId--,
     attemptId: -1,
@@ -624,7 +567,7 @@ function diagnostic(event: KeyboardEvent) {
   const id = press.id;
   $('#diagnostic-result').textContent = `Checking ${keyName(event.key)}…`;
   camera.evidence.request(press, structuredClone(calibration)).then((o) => {
-    if (phase !== 'verify' || id !== diagnosticsId + 1) return;
+    if (phase === 'practice' || phase === 'results' || id !== diagnosticsId + 1) return;
     $('#diagnostic-result').textContent =
       o.kind === 'finger'
         ? `${keyName(press.key)}: saw ${fingerName(o.finger)}. Intended: ${intended(press.key)}. Does that match what you did?`
@@ -635,4 +578,5 @@ document.addEventListener('visibilitychange', () => {
   if (document.hidden && phase === 'practice') pause();
 });
 window.addEventListener('pagehide', () => camera.stop());
+$('#finger-map').innerHTML = keyboard();
 render();

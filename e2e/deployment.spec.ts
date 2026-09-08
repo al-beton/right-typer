@@ -54,9 +54,8 @@ test('repository subpath serves the real worker, model and WASM from the same or
     if (!r.url().startsWith(origin + '/right-typer/')) offOrigin.push(r.url());
   });
   await page.goto(origin + '/right-typer/');
-  await page.getByRole('button', { name: 'Set up your camera' }).click();
   await page.getByRole('button', { name: 'Enable camera' }).click();
-  await expect(page.locator('#camera-badge')).toContainText('0 / 2 hands', { timeout: 45000 });
+  await expect(page.locator('#camera-badge')).toContainText('0 hands detected', { timeout: 45000 });
   expect(failed).toEqual([]);
   expect(offOrigin).toEqual([]);
 });

@@ -7,7 +7,13 @@ export const SEARCH_MS = 500;
 export const DEADLINE_MS = 1000;
 export function nearestFrame(at: number, frames: Frame[]): Frame | undefined {
   return frames
-    .filter((f) => Number.isFinite(f.at) && f.hands.length > 0 && Math.abs(f.at - at) <= SEARCH_MS)
+    .filter(
+      (f) =>
+        f.clock === 'capture' &&
+        Number.isFinite(f.at) &&
+        f.hands.length > 0 &&
+        Math.abs(f.at - at) <= SEARCH_MS,
+    )
     .sort((a, b) => Math.abs(a.at - at) - Math.abs(b.at - at))[0];
 }
 // Model handedness with the user's swap applied. Two hands with the same label are told
@@ -35,7 +41,11 @@ export function attribute(
   if (!frame)
     return {
       kind: 'uncertain',
-      reason: `No hands were seen within ${SEARCH_MS} ms of this press. Keep your hands in the picture.`,
+      reason: frames.some(
+        (f) => f.clock === 'unavailable' && Math.abs(f.at - press.at) <= SEARCH_MS,
+      )
+        ? 'Camera capture timing was unavailable around this press.'
+        : `No hands were seen within ${SEARCH_MS} ms of this press. Keep your hands in the picture.`,
     };
   const sides = handSides(frame.hands, calibration);
   const best = frame.hands
