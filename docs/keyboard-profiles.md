@@ -51,8 +51,8 @@ This feature starts from main and does not include the open recorder branch. Whe
 
 Automated camera tests use synthetic landmarks/fake video; physical keyboard/camera accuracy remains unmeasured.
 
-## Integration acceptance with open UI PRs
+## Setup and calibration integration
 
-When combining setup PR #21, its document-level prepractice diagnostic must use `resolveEvent(profile, event)`, snapshot `Press.code` and `profileFingers(profile, code, mode)`, and retain the full `Calibration.profile`. Keep dynamic `calibrationCodes`/`physicalLabel`; its old `allowedFingers(event.key, mode)` lookup must not survive integration. Exclude `#capture-key`, `#profile-editor` and other editable controls via the existing composed-path/control guards. Add an integration regression proving both an alternate-layout diagnostic and Custom key capture work without competing handlers. This regression belongs to the combined change; #21 is not included here.
+The document-level prepractice diagnostic from PR #21 uses `resolveEvent(profile, event)`, snapshots `Press.code` and `profileFingers(profile, code, mode)`, and retains the full `Calibration.profile`. Calibration targets and labels remain profile-specific. The composed-path/control guards exclude Custom key capture and other editable controls. Browser regressions exercise German/French physical-code diagnostics and confirm Custom key capture does not trigger a competing diagnostic.
 
-PR #20's shared color/dot helpers accept resolved `Finger[]`: pass profile policy results for physical codes (normalize the two space endpoints to `Space`) to both diagram and dots. PR #19's copy changes stack on #21; preserve their concise/neutral feedback without restoring a fixed British footer or fixed target count. These peer PRs remain separately reviewable.
+PR #20's shared color/dot helpers receive resolved profile fingers for physical codes, normalizing the two space endpoints to `Space`. Diagram and camera dots share the same policy colors; automated checks cover policy changes, dot sizes and rotations.
