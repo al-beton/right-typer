@@ -315,7 +315,7 @@ main {
 }
 .camera-layout {
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 22px;
   align-items: start;
 }
@@ -552,4 +552,81 @@ footer {
   .row-2 {
     padding-left: 6.9%;
   }
+}
+
+/* One shared centre line, with a compact word-entry target. */
+.entry-heading,
+.word-entry {
+  width: min(560px, 100%);
+  margin-left: auto;
+  margin-right: auto;
+}
+.word-entry {
+  gap: 18px;
+}
+.target-word {
+  width: 50%;
+  min-width: 0;
+  padding-right: 18px;
+  text-align: right;
+  flex-shrink: 0;
+}
+.word-entry input {
+  flex: 1;
+}
+.entry-indicator {
+  display: none;
+}
+.feedback,
+.input-message,
+.recent {
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+}
+#finger-map > h2 {
+  text-align: center;
+}
+#camera-section {
+  max-width: 720px;
+  margin: auto;
+}
+#camera-image {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform-origin: center;
+}
+.camera-layout aside {
+  width: 100%;
+}
+.camera-options {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.camera-options select {
+  width: 160px;
+}
+#setup-panel .setup-actions {
+  justify-content: center;
+}
+@media (max-width: 760px) {
+  .word-entry {
+    gap: 12px;
+  }
+  .target-word {
+    padding-right: 12px;
+  }
+}
+
+.feedback {
+  justify-content: center;
+  text-align: center;
+}
+.input-message,
+.recent {
+  text-align: center;
 }

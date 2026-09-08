@@ -46,3 +46,7 @@ Effective WPM = accepted passage characters (plus one space per accepted word) /
 The pinned npm model runtime is prebuilt into a classic IIFE worker for both Vite dev and production (Vite’s native dev-worker path serves modules, which cannot call `importScripts`); Emscripten loads its local WASM loader using `importScripts`. The 7.5 MiB model is checked in, and build verifies its SHA-256 against `public/models/SHA256SUMS`. Both SIMD and non-SIMD WASM variants ship. There are no CDN URLs in runtime configuration. The HTML CSP allows same-origin scripts/connections and local WASM compilation. External repository links only navigate on user action.
 
 Browser tests inspect real production requests through model startup, not merely a source-code search. Fake-camera fixtures contain no user images. Test traces/screenshots must stay synthetic; do not record or commit raw personal camera footage.
+
+### Camera view rotation
+
+Quarter-turn rotation is a view-only preference. Video and canvas share a centered transform, fitted inside a fixed preview area without stretching or clipping. Calibration clicks are inverse-rotated into native normalized camera coordinates; arrow-key nudges follow screen directions. Overlay labels counter-rotate to remain readable. Capture timestamps, raw inference frames and saved calibration points are unaffected. The angle is stored separately from calibration and reset with local data.

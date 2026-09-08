@@ -1,12 +1,17 @@
 import { validCalibration } from './calibration';
 import type { Calibration } from './types';
 import type { Stats } from './exercise';
+import { isCameraRotation, type CameraRotation } from '../view/rotation';
 const KEY = 'right-typer.v1';
 export type SavedResult = Stats & {
   date: string;
   gradingPolicy: 'verified-only' | 'wrong-finger-veto';
 };
-export type Saved = { calibration?: Calibration; results: SavedResult[] };
+export type Saved = {
+  calibration?: Calibration;
+  cameraRotation?: CameraRotation;
+  results: SavedResult[];
+};
 export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
   try {
     const parsed = JSON.parse(storage.getItem(KEY) ?? '{}');
@@ -43,6 +48,7 @@ export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
     return {
       calibration: validCalibration(parsed.calibration) ? parsed.calibration : undefined,
       results,
+      ...(isCameraRotation(parsed.cameraRotation) ? { cameraRotation: parsed.cameraRotation } : {}),
     };
   } catch {
     return { results: [] };
@@ -52,7 +58,11 @@ export function save(data: Saved, storage: Pick<Storage, 'setItem'> = localStora
   try {
     storage.setItem(
       KEY,
-      JSON.stringify({ calibration: data.calibration, results: data.results.slice(-10) }),
+      JSON.stringify({
+        calibration: data.calibration,
+        cameraRotation: data.cameraRotation,
+        results: data.results.slice(-10),
+      }),
     );
     return true;
   } catch {
