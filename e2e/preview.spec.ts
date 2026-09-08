@@ -70,7 +70,7 @@ test.afterAll(async () => {
   await new Promise<void>((r) => server.close(() => r()));
 });
 
-test('nested preview serves real model, worker, WASM and commit banner', async ({ page }) => {
+test('nested preview serves real model, worker, WASM and version footer', async ({ page }) => {
   const failures: string[] = [],
     errors: string[] = [],
     requests: string[] = [];
@@ -80,8 +80,12 @@ test('nested preview serves real model, worker, WASM and commit banner', async (
   page.on('pageerror', (e) => errors.push(e.message));
   page.on('request', (r) => requests.push(r.url()));
   await page.goto(origin + '/previews/pr-23/');
-  await expect(page.getByRole('complementary', { name: 'PR preview' })).toContainText(
-    'PR #23 · aaaaaaaaaaaa',
+  await expect(page.locator('footer #build-version')).toContainText('Review PR #23 · aaaaaaa');
+  await expect(page.locator('#build-version')).toHaveCount(1);
+  await expect(page.getByText('Untrusted preview code.', { exact: false })).toHaveCount(0);
+  await expect(page.locator('#build-version a').last()).toHaveAttribute(
+    'href',
+    'https://github.com/al-beton/right-typer/commit/' + 'a'.repeat(40),
   );
   await expect(page.locator('#camera-badge')).toContainText('0 hands detected', { timeout: 45000 });
   await expect(page.locator('#requested-key')).toHaveText('Mark q in the image');
