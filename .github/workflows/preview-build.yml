@@ -24,7 +24,7 @@ jobs:
       - run: pnpm check && pnpm build
       - uses: actions/upload-artifact@v4
         with:
-          name: preview-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}
+          name: preview-${{ github.event.pull_request.number }}-${{ github.event.pull_request.head.sha }}-${{ github.run_attempt }}
           path: dist/
           retention-days: 7
           if-no-files-found: error
