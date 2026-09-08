@@ -16,6 +16,8 @@ export type SampleEvent = { seq: number; at: number } & (
   | {
       type: 'key';
       action: 'keydown' | 'keyup';
+      shiftKey?: boolean;
+      altGraph?: boolean;
       key: string;
       code: string;
       repeat: boolean;
@@ -45,7 +47,7 @@ export type Label = {
   source: string;
 };
 export type Manifest = {
-  schemaVersion: 1;
+  schemaVersion: 1 | 2;
   sessionId: string;
   participantId: string;
   setupId: string;

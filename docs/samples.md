@@ -4,7 +4,7 @@ Open the recording build with `?record=1` appended to its URL (for example,
 `http://127.0.0.1:5173/?record=1`). The developer controls sit below the camera.
 Normal practice does not record anything.
 
-1. Map the keys and choose **Standard**, **Alternate diagonal** or **Either**.
+1. Choose your keyboard layout, map the keys, and choose **Standard**, **Alternate diagonal** or **Either**.
 2. Enter anonymous person/setup IDs and a brief description of the keyboard,
    framing, lighting or problem. Keep the keyboard and camera still.
 3. Click **Start sample (fresh passage)**. This starts a fresh passage and explicitly
@@ -15,7 +15,8 @@ Normal practice does not record anything.
 5. Keep the `.tar` download privately and send it manually to Al if agreed.
    Discard clears the browser copy and enables the next sample.
 
-Recording stops automatically on pause, camera/setup/fingering changes, five
+Recording stops automatically on pause, camera/setup/fingering changes, keyboard
+profile edits or switches, five
 minutes or 256 MiB. Exact frame PNGs can fill that limit much sooner than five
 minutes, depending on frame rate and image detail. The stop reason appears beside
 Download. Do a pilot before scheduling longer sessions. Downloads are not saved
@@ -106,3 +107,16 @@ instead of silently omitting inputs. Final in-flight frames/presses may be unfin
 when Stop is clicked; cached replay does not invent later evidence. Browser tests
 use fake video and synthetic landmarks; only the upcoming physical-camera pilot
 can establish real collection overhead and finger accuracy.
+
+## Layout-aware samples
+
+New recordings use schema v2. `calibration.json` contains the full versioned
+keyboard profile (physical codes, geometry, outputs/modifiers and both finger
+policies). The manifest's finger map is indexed by physical code. Each recorded
+press retains its `code` and resolved `allowedFingers`; raw key events also retain
+Shift and AltGr. Replay and labelled metrics use these snapshots, not whichever
+keyboard is currently selected. Incomplete or inconsistent v2 snapshots are rejected.
+
+Original profile-less schema v1 bundles still replay with their British QWERTY
+interpretation. They are not migrated to the new default layout. Keep the original
+bundle and download independent label revisions alongside it.

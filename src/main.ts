@@ -977,11 +977,20 @@ function diagnostic(event: KeyboardEvent) {
   });
 }
 document.addEventListener('keydown', diagnostic);
+$('#profile-settings').addEventListener(
+  'click',
+  (event) => {
+    if ((event.target as HTMLElement).closest('#custom-layout'))
+      void sample?.stop('keyboard-profile-edit');
+  },
+  true,
+);
 const profilesUI = profileControls(
   $('#profile-settings'),
   profile,
   saved.customProfiles ?? [],
   (next, customs) => {
+    void sample?.stop('keyboard-profile-changed');
     disableAutoStart();
     exercise.pause();
     resuming = phase === 'practice' || resuming;
@@ -1038,7 +1047,12 @@ window.addEventListener('beforeunload', (event) => {
   }
 });
 function recordKey(event: KeyboardEvent, action: 'keydown' | 'keyup') {
-  if (!sample || sample.state !== 'recording' || event.metaKey || event.ctrlKey || event.altKey)
+  if (
+    !sample ||
+    sample.state !== 'recording' ||
+    event.metaKey ||
+    ((event.ctrlKey || event.altKey) && !event.getModifierState('AltGraph'))
+  )
     return;
   // Only the practice input is recorded; never global keystrokes or setup fields.
   sample.event({
@@ -1047,6 +1061,8 @@ function recordKey(event: KeyboardEvent, action: 'keydown' | 'keyup') {
     key: event.key,
     code: event.code,
     repeat: event.repeat,
+    shiftKey: event.shiftKey,
+    altGraph: event.getModifierState('AltGraph'),
     eventAt: keyTime(event, performance.now(), performance.timeOrigin) - sample.origin,
     attemptId: exercise.attempt.id,
     state: exercise.state,

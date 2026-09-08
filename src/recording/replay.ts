@@ -1,6 +1,6 @@
 import { EvidenceBuffer } from '../core/observation';
 import { grade } from '../core/exercise';
-import { isCorrectFinger } from '../core/keyboard';
+import { allowedFingers } from '../core/keyboard';
 import type { Observation } from '../core/types';
 import type { Sample } from './types';
 import { validateSample } from './validate';
@@ -59,17 +59,16 @@ export async function replaySample(sample: Sample) {
         e.event.press.attemptId === label.attemptId,
     );
     if (!request || request.type !== 'evidence' || request.event.type !== 'request') continue;
-    const key = request.event.press.key;
+    const press = request.event.press;
+    const fingers = press.allowedFingers ?? allowedFingers(press.key, sample.manifest.mode);
     const observation = observed.get(`${label.attemptId}/${label.pressId}`);
     confirmed++;
     if (!observation) {
       unresolved++;
       continue;
     }
-    const rejected =
-      observation.kind === 'finger' &&
-      !isCorrectFinger(key, observation.finger, sample.manifest.mode);
-    if (isCorrectFinger(key, label.finger!, sample.manifest.mode)) {
+    const rejected = observation.kind === 'finger' && !fingers.includes(observation.finger);
+    if (fingers.includes(label.finger!)) {
       correctPresses++;
       if (rejected) correctPressesRejected++;
     } else {

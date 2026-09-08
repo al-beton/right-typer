@@ -1,6 +1,7 @@
 import type { Camera } from '../tracking/camera';
 import type { Calibration } from '../core/types';
 import { allowedFingers, CALIBRATION_KEYS, type FingeringMode } from '../core/keyboard';
+import { profileFingers } from '../core/profile';
 import { archive, sha256 } from './archive';
 import type { InputFrame, Label, Manifest, SampleEvent } from './types';
 import { validateSample } from './validate';
@@ -234,7 +235,7 @@ export class SampleRecorder {
     );
     this.files['labels.jsonl'] = jsonl(labels);
     const manifest: Manifest = {
-      schemaVersion: 1,
+      schemaVersion: this.calibration.profile ? 2 : 1,
       sessionId: this.id,
       participantId: this.options.participantId,
       setupId: this.options.setupId,
@@ -243,12 +244,19 @@ export class SampleRecorder {
       stopReason,
       app,
       mode: this.options.mode,
-      expectedFingers: Object.fromEntries(
-        [...CALIBRATION_KEYS.filter((k) => !k.startsWith('space')), ' '].map((key) => [
-          key,
-          allowedFingers(key, this.options.mode),
-        ]),
-      ),
+      expectedFingers: this.calibration.profile
+        ? Object.fromEntries(
+            this.calibration.profile.keys.map((key) => [
+              key.code,
+              profileFingers(this.calibration.profile!, key.code, this.options.mode),
+            ]),
+          )
+        : Object.fromEntries(
+            [...CALIBRATION_KEYS.filter((k) => !k.startsWith('space')), ' '].map((key) => [
+              key,
+              allowedFingers(key, this.options.mode),
+            ]),
+          ),
       words: this.options.words,
       camera: {
         width: this.calibration.width,

@@ -11,9 +11,7 @@ export default defineConfig({
       process.env.BUILD_ENV === 'production' ? 'Production' : 'Local',
     ),
 
-    __APP_COMMIT__: JSON.stringify(
-      execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
-    ),
+    __APP_COMMIT__: JSON.stringify(sha),
     __APP_DIRTY__: JSON.stringify(
       !!execFileSync('git', ['status', '--porcelain'], { encoding: 'utf8' }).trim(),
     ),
