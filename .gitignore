@@ -28,3 +28,6 @@ public/wasm/
 playwright-report/
 test-results/
 public/tracking/
+
+# Python publisher tests
+__pycache__/

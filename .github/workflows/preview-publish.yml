@@ -1,0 +1,39 @@
+name: Publish previews
+on:
+  # Only the default-branch workflow runs; no PR checkout or scripts.
+  pull_request_target:
+    types: [opened, synchronize, reopened, closed]
+  workflow_run:
+    workflows: [Preview build]
+    types: [completed]
+  # Reconciliation also recovers replaced pending concurrency runs and closed PRs.
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: preview-publisher
+  cancel-in-progress: false
+jobs:
+  publish:
+    if: vars.PREVIEWS_ENABLED == 'true' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: pr-preview-publishing
+    permissions:
+      contents: read
+      actions: read
+      pull-requests: write
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          ref: main
+          persist-credentials: false
+      - name: Reconcile generated previews
+        run: python3 scripts/previews/publish.py
+        env:
+          SOURCE_TOKEN: ${{ github.token }}
+          PREVIEW_DEPLOY_TOKEN: ${{ secrets.PREVIEW_DEPLOY_TOKEN }}
+          PREVIEW_REPOSITORY: ${{ vars.PREVIEW_REPOSITORY }}
+          PREVIEW_BASE_URL: ${{ vars.PREVIEW_BASE_URL }}
