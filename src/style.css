@@ -234,7 +234,7 @@ main {
   margin: 0;
 }
 #finger-map {
-  height: 285px;
+  min-height: 285px;
   padding: 12px 0;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
