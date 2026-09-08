@@ -329,11 +329,48 @@ class Publisher:
             "Retired: preview directory deleted from the publishing branch. Pages/CDN removal may still be propagating (closed PR, changed head, or missing current-head approval).",
         )
 
+    def published_manifest(self, number):
+        _, entries = self.tree()
+        preview = next((e for e in entries if e["path"] == f"pr-{number}"), None)
+        if not preview:
+            return None
+        tree = self.target.call(self.root + "/git/trees/" + preview["sha"])
+        if tree.get("truncated"):
+            raise ValueError("Truncated preview tree")
+        entry = next((e for e in tree["tree"] if e["path"] == "preview.json"), None)
+        if not entry:
+            return None
+        blob = self.target.call(self.root + "/git/blobs/" + entry["sha"])
+        manifest = json.loads(base64.b64decode(blob["content"]))
+        return manifest
+
+    def ready(self, number, sha, run_id, url):
+        self.comment(
+            number,
+            f"Ready: [Open preview]({url})\n\nDeployed commit: `{sha}` · [build](https://github.com/{SOURCE}/actions/runs/{run_id})\n\nOnly grant camera access to code you trust. PRs share this review origin.",
+        )
+
     def publish(self, pr, run, workflow_id):
         number, sha = pr["number"], pr["head"]["sha"]
         if not eligible_run(run, pr, workflow_id) or not SHA.fullmatch(sha):
             return
         if not self.current(number, sha):
+            return
+        url = self.url + f"pr-{number}/"
+        # Preserve a working current preview after its disposable artifact expires.
+        # This manifest comes from our trusted generated repository, never PR metadata.
+        existing = self.published_manifest(number)
+        if (
+            existing
+            and existing.get("pr") == number
+            and existing.get("sha") == sha
+            and existing.get("source") == SOURCE
+            and existing.get("run_id") == run["id"]
+            and existing.get("run_attempt") == run["run_attempt"]
+            and served(url, existing)
+            and self.current(number, sha)
+        ):
+            self.ready(number, sha, run["id"], url)
             return
         artifacts = self.source.pages(
             f"repos/{SOURCE}/actions/runs/{run['id']}/artifacts", "artifacts"
@@ -370,13 +407,6 @@ class Publisher:
             run["id"],
             run["run_attempt"],
         )
-        url = self.url + f"pr-{number}/"
-        if served(url, manifest) and self.current(number, sha):
-            self.comment(
-                number,
-                f"Ready: [Open preview]({url})\n\nDeployed commit: `{sha}` · [build](https://github.com/{SOURCE}/actions/runs/{run['id']})\n\nOnly grant camera access to code you trust. PRs share this review origin.",
-            )
-            return
         self.comment(
             number, f"Publishing commit `{sha}`. The preview is not ready yet."
         )
@@ -413,10 +443,7 @@ class Publisher:
                 return
             if served(url, manifest):
                 if self.current(number, sha):
-                    self.comment(
-                        number,
-                        f"Ready: [Open preview]({url})\n\nDeployed commit: `{sha}` · [build](https://github.com/{SOURCE}/actions/runs/{run['id']})\n\nOnly grant camera access to code you trust. PRs share this review origin.",
-                    )
+                    self.ready(number, sha, run["id"], url)
                 else:
                     self.remove(number)
                 return

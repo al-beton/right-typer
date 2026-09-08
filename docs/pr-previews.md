@@ -8,17 +8,21 @@ https://al-beton.github.io/right-typer/ with its existing Pages workflow.
 `Preview build` checks out the exact PR head with no persisted credentials. It
 builds in a disposable GitHub-hosted job with read-only source access, no cache
 shared with publishing and no secrets. Its immutable Actions artifact expires in
-seven days. No feature merge is needed.
+seven days; an already published current preview remains available, re-verified
+from the generated repository's manifest without needing the expired artifact. No feature merge is needed.
 
 `Publish previews` runs only trusted main-branch code, on PR lifecycle events,
 build completion, hourly recovery, or manual dispatch. It reconciles **all** open
 PRs because GitHub concurrency can replace pending runs. A single concurrency
 group serializes preview writes; non-force Git ref updates reject other writers.
-The target contains `pr-N/` trees and generated files; replacing one subtree
+A failed/hostile artifact reports failure without preventing other PRs from
+reconciling. The target contains `pr-N/` trees and generated files; replacing one subtree
 preserves the others. Closed PRs and forks without current approval are retired.
 
 The publisher checks workflow ID, source/head repository, PR number, successful
-run, exact head SHA, artifact identity and size. ZIP entries are validated in
+run, exact head SHA, run-attempt-specific artifact identity and size. For fork runs,
+GitHub may omit the PR list; the fallback binds the run to the live PR's exact
+head repository, branch and SHA. ZIP entries are validated in
 memory: no filesystem extraction, hidden paths, traversal, symlinks, duplicate
 paths, special files or publishing configuration. Expanded files are limited to
 100 MiB / 2,000 entries. Only static blob/tree APIs are used; no package install,
@@ -27,7 +31,7 @@ the privileged job. `.nojekyll` in the generated repository disables Jekyll.
 
 A sticky bot comment says Ready only after public `preview.json` **and every
 listed file's SHA-256** match the expected build. The publisher checks the live
-PR state/head/approval before writing, while waiting and before Ready. A changed
+PR state/head/approval before reading artifacts or writing, while waiting and before Ready. A changed
 head or closure during publication retires the obsolete tree. API/network
 failures fail closed; rerun to reconcile. GitHub events and CDN propagation are
 asynchronous: previously served bytes/cached tabs cannot be recalled immediately.

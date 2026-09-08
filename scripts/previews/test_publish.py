@@ -157,6 +157,7 @@ class LifecycleTests(unittest.TestCase):
             Mock(), Mock(), "example/previews", "https://example.github.io/previews/"
         )
         p.comment = Mock()
+        p.published_manifest = Mock(return_value=None)
         return p
 
     def test_close_preserves_other_preview_and_root_files(self):
