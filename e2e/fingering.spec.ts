@@ -1,3 +1,4 @@
+import { LEGACY_CODES } from '../src/core/profile';
 import { test, expect } from '@playwright/test';
 import { syntheticCamera, setup, press, word } from './helpers';
 import { allowedFingers, intended, ROWS, MODES, type FingeringMode } from '../src/core/keyboard';
@@ -32,7 +33,9 @@ test('policies update labels, hints, errors and preserve camera geometry; refres
   for (const value of Object.keys(MODES) as FingeringMode[]) {
     await mode.selectOption(value);
     for (const key of [...ROWS.join(''), ' ']) {
-      const cell = page.locator(`[data-key="${key}"]`);
+      const cell = page.locator(
+        `[data-key="${key === ' ' ? 'Space' : (LEGACY_CODES[key] ?? key)}"]`,
+      );
       await expect(cell).toHaveAttribute('title', intended(key, value));
       await expect(cell).toHaveAttribute('aria-label', new RegExp(intended(key, value)));
       const split = await cell.evaluate((el) => getComputedStyle(el).backgroundImage);
@@ -41,7 +44,7 @@ test('policies update labels, hints, errors and preserve camera geometry; refres
     expect(await geometry()).toEqual(initial);
   }
   // W must continue Q's pink band into E's orange band, rather than reversing them.
-  await expect(page.locator('[data-key="w"]')).toHaveCSS(
+  await expect(page.locator('[data-key="KeyW"]')).toHaveCSS(
     'background-image',
     'linear-gradient(90deg, rgb(247, 180, 200) 50%, rgb(255, 195, 131) 50%)',
   );
@@ -145,7 +148,7 @@ test('selector supports keyboard focus, updates diagnostics and ignores malforme
   await mode.focus();
   await expect(mode).toBeFocused();
   await mode.press('Tab');
-  await expect(page.locator('#overlay')).toBeFocused();
+  await expect(page.locator('#keyboard-profile')).toBeFocused();
   // Use Playwright's native-select API; macOS headless popup keys are not reliable.
   await mode.selectOption('alternate');
   await expect(mode).toHaveValue('alternate');

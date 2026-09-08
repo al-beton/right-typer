@@ -277,10 +277,10 @@ describe('local persistence', () => {
       },
     };
     expect(save({ calibration: calibration(), results: [] }, storage)).toBe(true);
-    expect(load(storage).calibration).toEqual(calibration());
+    expect(load(storage).legacyCalibration).toEqual(calibration());
     expect(reset(storage)).toBe(true);
     expect(map.get('other')).toBe('untouched');
-    expect(load(storage)).toEqual({
+    expect(load(storage)).toMatchObject({
       results: [],
       calibration: undefined,
       fingeringMode: 'standard',
@@ -315,7 +315,7 @@ describe('local persistence', () => {
     });
     expect(save(saved, storage)).toBe(true);
     expect(load(storage)).toEqual(saved);
-    expect(load(storage).calibration).toEqual(calibration());
+    expect(load(storage).legacyCalibration).toEqual(calibration());
   });
   it('validates new results and still caps history at ten', () => {
     const result = {

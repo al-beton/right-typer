@@ -21,8 +21,11 @@ export function nearestFrame(at: number, frames: Frame[]): Frame | undefined {
 export function handSides(hands: SeenHand[], c: Calibration): Hand[] {
   const flip = (s: Hand): Hand => (s === 'left' ? 'right' : 'left');
   const labelled = hands.map((h) => (c.swapHands ? flip(h.side) : h.side));
-  const q = c.points.q,
-    p = c.points.p;
+  const ordered = c.profile?.keys
+    .filter((k) => c.points[k.code])
+    .sort((a, b) => a.x + a.width / 2 - b.x - b.width / 2);
+  const q = ordered?.length ? c.points[ordered[0]!.code] : c.points.q,
+    p = ordered?.length ? c.points[ordered.at(-1)!.code] : c.points.p;
   if (hands.length !== 2 || labelled[0] !== labelled[1] || !q || !p) return labelled;
   const along = (h: SeenHand) => {
     const n = h.points.length || 1;
@@ -33,7 +36,7 @@ export function handSides(hands: SeenHand[], c: Calibration): Hand[] {
   return along(hands[0]!) <= along(hands[1]!) ? ['left', 'right'] : ['right', 'left'];
 }
 export function attribute(
-  press: Pick<Press, 'at' | 'key'>,
+  press: Pick<Press, 'at' | 'key' | 'code'>,
   frames: Frame[],
   calibration: Calibration,
 ): Observation {
@@ -56,7 +59,7 @@ export function attribute(
         return [
           {
             finger: `${sides[h]!}-${DIGITS[i]!}` as Finger,
-            distance: keyDistance(calibration, press.key, point),
+            distance: keyDistance(calibration, press.code ?? press.key, point),
           },
         ];
       }),

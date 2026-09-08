@@ -1,3 +1,4 @@
+import { calibrationCodes, parseProfile } from './profile';
 import { CALIBRATION_KEYS } from './keyboard';
 import type { Calibration, Point } from './types';
 export const distance = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
@@ -13,8 +14,16 @@ export function validCalibration(value: unknown): value is Calibration {
     !c.points
   )
     return false;
+  if (c.profile) {
+    try {
+      parseProfile(JSON.stringify(c.profile));
+    } catch {
+      return false;
+    }
+  }
+  const keys = c.profile ? calibrationCodes(c.profile) : CALIBRATION_KEYS;
   return (
-    CALIBRATION_KEYS.every((key) => {
+    keys.every((key) => {
       const p = c.points[key];
       return (
         p &&
@@ -26,16 +35,55 @@ export function validCalibration(value: unknown): value is Calibration {
         p.y <= 1
       );
     }) &&
-    CALIBRATION_KEYS.every((key, i) =>
-      CALIBRATION_KEYS.slice(i + 1).every(
-        (other) => distance(c.points[key]!, c.points[other]!) > 0.006,
-      ),
+    keys.every((key, i) =>
+      keys.slice(i + 1).every((other) => distance(c.points[key]!, c.points[other]!) > 0.006),
     ) &&
-    [...'qwertyuiopasdfghjklzxcvbnm,.'].every((key) => keyAxes(c, key) !== null)
+    keys.filter((k) => !k.startsWith('space-')).every((key) => keyAxes(c, key) !== null)
   );
 }
 // Local axes cope with a rotated or perspective-skewed keyboard without assuming a grid.
 export function keyAxes(c: Calibration, key: string): { center: Point; u: Point; v: Point } | null {
+  if (c.profile) {
+    const physical = c.profile.keys.find((k) => k.code === key);
+    const center = c.points[key];
+    if (!physical || !center) return null;
+    const location = (k: typeof physical) => ({ x: k.x + k.width / 2, y: k.y + k.height / 2 });
+    const origin = location(physical);
+    const neighbors = c.profile.keys
+      .filter((k) => k.code !== key && c.points[k.code])
+      .sort(
+        (a, b) =>
+          Math.hypot(location(a).x - origin.x, location(a).y - origin.y) -
+          Math.hypot(location(b).x - origin.x, location(b).y - origin.y),
+      );
+    for (const a of neighbors)
+      for (const b of neighbors) {
+        const ax = location(a).x - origin.x,
+          ay = location(a).y - origin.y,
+          bx = location(b).x - origin.x,
+          by = location(b).y - origin.y;
+        const det = ax * by - ay * bx;
+        if (Math.abs(det) < 0.1) continue;
+        const ap = c.points[a.code]!,
+          bp = c.points[b.code]!;
+        const u = {
+          x: ((ap.x - center.x) * by - (bp.x - center.x) * ay) / det,
+          y: ((ap.y - center.y) * by - (bp.y - center.y) * ay) / det,
+        };
+        const v = {
+          x: (ax * (bp.x - center.x) - bx * (ap.x - center.x)) / det,
+          y: (ax * (bp.y - center.y) - bx * (ap.y - center.y)) / det,
+        };
+        if (
+          Math.hypot(u.x, u.y) < 0.006 ||
+          Math.hypot(v.x, v.y) < 0.006 ||
+          Math.abs(u.x * v.y - u.y * v.x) < 0.000036
+        )
+          continue;
+        return { center, u, v };
+      }
+    return null;
+  }
   const row = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm,.'].find((r) => r.includes(key));
   if (!row || !c.points[key]) return null;
   const i = row.indexOf(key);
@@ -58,14 +106,14 @@ export function keyAxes(c: Calibration, key: string): { center: Point; u: Point;
   return { center, u, v: { x: (-u.y / len) * height, y: (u.x / len) * height } };
 }
 export function keyDistance(c: Calibration, key: string, point: Point): number {
-  if (key === ' ') {
+  if (key === ' ' || key === 'Space') {
     const a = c.points['space-left']!,
       b = c.points['space-right']!;
     const dx = b.x - a.x,
       dy = b.y - a.y,
       square = dx * dx + dy * dy;
     const t = Math.max(0, Math.min(1, ((point.x - a.x) * dx + (point.y - a.y) * dy) / square));
-    const axes = keyAxes(c, 'b');
+    const axes = keyAxes(c, c.profile ? calibrationCodes(c.profile)[0]! : 'b');
     if (!axes) return Infinity;
     const h = Math.hypot(axes.v.x, axes.v.y);
     return distance(point, { x: a.x + t * dx, y: a.y + t * dy }) / h;
@@ -75,7 +123,8 @@ export function keyDistance(c: Calibration, key: string, point: Point): number {
   const { center, u, v } = axes;
   const dx = point.x - center.x,
     dy = point.y - center.y;
-  const x = (dx * u.x + dy * u.y) / (u.x * u.x + u.y * u.y);
-  const y = (dx * v.x + dy * v.y) / (v.x * v.x + v.y * v.y);
+  const det = u.x * v.y - u.y * v.x;
+  const x = (dx * v.y - dy * v.x) / det;
+  const y = (u.x * dy - u.y * dx) / det;
   return Math.hypot(x, y);
 }

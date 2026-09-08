@@ -67,17 +67,17 @@ test('one stable page from camera off through mapping, optional test, retry and 
   await expect(page.locator('#diagnostic-result')).toContainText('saw left index');
   await page.screenshot({ path: 'test-results/single-page-mapped-synthetic.png', fullPage: true });
   await go.click();
-  await expect(page.locator('.next-key')).toHaveAttribute('data-key', 'a');
+  await expect(page.locator('.next-key')).toHaveAttribute('data-key', 'KeyA');
   expect(await positions()).toEqual(initial);
   await press(page, 'a', 'left-index');
   await press(page, ' ');
   await expect(page.locator('#feedback')).toContainText('saw left index');
   expect(await positions()).toEqual(initial);
   await page.locator('#typing').press('Space');
-  await expect(page.locator('.next-key')).toHaveAttribute('data-key', 'a');
+  await expect(page.locator('.next-key')).toHaveAttribute('data-key', 'KeyA');
   await word(page, 'a');
   await expect(page.locator('.target-word')).toHaveText('quick');
-  await expect(page.locator('.next-key')).toHaveAttribute('data-key', 'q');
+  await expect(page.locator('.next-key')).toHaveAttribute('data-key', 'KeyQ');
   expect(await positions()).toEqual(initial);
   await page.getByRole('button', { name: 'Edit setup' }).click();
   await expect(page.locator('.next-key')).toHaveCount(0);
@@ -90,6 +90,6 @@ test('one stable page from camera off through mapping, optional test, retry and 
   const stored = await page.evaluate(
     () => JSON.parse(localStorage.getItem('right-typer.v1')!).calibration,
   );
-  expect(stored.points.q.x).toBeCloseTo(oldQ.x + 0.005, 2);
+  expect(stored.points.KeyQ.x).toBeCloseTo(oldQ.x + 0.005, 2);
   expect(await positions()).toEqual(initial);
 });

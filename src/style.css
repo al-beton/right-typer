@@ -677,3 +677,84 @@ footer {
 #setup-message:empty {
   display: none;
 }
+#profile-settings {
+  max-width: 900px;
+  margin: 10px auto 20px;
+  padding: 12px;
+  background: #e4f0e6;
+  border-radius: 12px;
+}
+.profile-toolbar,
+#profile-editor {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+#profile-editor[hidden] {
+  display: none;
+}
+#profile-settings label {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+}
+#profile-settings select,
+#profile-settings input {
+  max-width: 250px;
+}
+#profile-settings p {
+  font-size: 12px;
+  width: 100%;
+  text-align: center;
+  margin: 6px 0;
+}
+#import-profile {
+  max-width: 180px;
+}
+.physical-keyboard {
+  position: relative;
+  width: 100%;
+  max-width: 900px;
+  margin: auto;
+}
+.physical-position {
+  position: absolute;
+  padding: 2px;
+}
+.physical-position .key {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  margin: 0;
+}
+.physical-position .key small {
+  font-size: clamp(6px, 0.85vw, 11px);
+}
+@media (max-width: 600px) {
+  .physical-position {
+    padding: 1px;
+  }
+  .physical-position .key {
+    padding: 2px;
+  }
+  .physical-position .key b {
+    font-size: 12px;
+  }
+  #profile-settings select {
+    max-width: 220px;
+  }
+}
+@media (max-width: 760px) {
+  .camera-layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .camera-layout aside {
+    min-width: 0;
+  }
+  #camera-controls {
+    flex-wrap: wrap;
+  }
+}
