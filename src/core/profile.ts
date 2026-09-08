@@ -59,11 +59,11 @@ function preset(
     standard: ['left-thumb', 'right-thumb'],
     alternate: ['left-thumb', 'right-thumb'],
   });
-  // ISO's extra position is visible independently of the character layout.
+  // Retain the extra physical position for custom mappings; practice hides unused keys.
   if (geometry === 'ISO')
     keys.push({
       code: 'IntlBackslash',
-      label: 'ISO',
+      label: id === 'apple-gb-iso' ? '`' : id === 'gb-iso' ? '\\' : '<',
       x: -0.25,
       y: 2,
       width: 1,

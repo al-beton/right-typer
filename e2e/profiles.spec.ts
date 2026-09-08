@@ -13,8 +13,12 @@ test('presets update physical labels; French shifted punctuation completes passa
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
   for (const p of PRESETS) {
     await page.locator('#keyboard-profile').selectOption(p.id);
-    for (const k of p.keys)
-      await expect(page.locator(`[data-key="${k.code}"] b`)).toHaveText(k.label);
+    const required = new Set(calibrationCodes(p));
+    for (const k of p.keys) {
+      const shown = page.locator(`[data-key="${k.code}"] b`);
+      if (k.code === 'Space' || required.has(k.code)) await expect(shown).toHaveText(k.label);
+      else await expect(shown).toHaveCount(0);
+    }
   }
   const p = PRESETS[4]!;
   for (const code of calibrationCodes(p)) {

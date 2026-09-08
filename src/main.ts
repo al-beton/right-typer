@@ -156,11 +156,13 @@ function keyboard() {
     const background = `background:${fingerBackground(fingers)}`;
     return `<span class="key ${k === 'Space' ? 'space-key' : `finger-${fingers[0]}`}" style="${background}" title="${label}" aria-label="${escapeHtml(physicalLabel(k))}: ${label}" data-key="${k}"><b>${escapeHtml(physicalLabel(k))}</b><small>${compactLabel}</small></span>`;
   };
-  const minX = Math.min(...profile.keys.map((k) => k.x)),
-    minY = Math.min(...profile.keys.map((k) => k.y));
-  const width = Math.max(...profile.keys.map((k) => k.x + k.width)) - minX;
-  const height = Math.max(...profile.keys.map((k) => k.y + k.height)) - minY;
-  return `<div class="keyboard physical-keyboard" style="aspect-ratio:${width}/${height}">${profile.keys.map((k) => `<div class="physical-position" style="left:${((k.x - minX) / width) * 100}%;top:${((k.y - minY) / height) * 100}%;width:${(k.width / width) * 100}%;height:${(k.height / height) * 100}%">${key(k.code)}</div>`).join('')}</div>`;
+  const requiredCodes = new Set(calibrationCodes(profile));
+  const visibleKeys = profile.keys.filter((k) => k.code === 'Space' || requiredCodes.has(k.code));
+  const minX = Math.min(...visibleKeys.map((k) => k.x)),
+    minY = Math.min(...visibleKeys.map((k) => k.y));
+  const width = Math.max(...visibleKeys.map((k) => k.x + k.width)) - minX;
+  const height = Math.max(...visibleKeys.map((k) => k.y + k.height)) - minY;
+  return `<div class="keyboard physical-keyboard" style="aspect-ratio:${width}/${height}">${visibleKeys.map((k) => `<div class="physical-position" style="left:${((k.x - minX) / width) * 100}%;top:${((k.y - minY) / height) * 100}%;width:${(k.width / width) * 100}%;height:${(k.height / height) * 100}%">${key(k.code)}</div>`).join('')}</div>`;
 }
 const modeControl = $<HTMLSelectElement>('#fingering-mode');
 modeControl.value = fingeringMode;
