@@ -50,3 +50,9 @@ To add a preset, add its data to `PRESETS` in `src/core/profile.ts`, cite its ex
 This feature starts from main and does not include the open recorder branch. When combining them, record the full `Calibration.profile` snapshot (version/id/geometry/keys), and preserve `Press.code` and `Press.allowedFingers` in event JSON and cached replay. Resolved policies must be indexed by code. Stop the recording before any profile edit/switch, just as for other setup changes. Reject profile-aware samples missing their snapshot/allowlist rather than silently falling back to QWERTY. Existing profile-less v1 samples retain their original British/QWERTY interpretation. The recorder owner was notified before implementation. No recordings were captured or uploaded for this change.
 
 Automated camera tests use synthetic landmarks/fake video; physical keyboard/camera accuracy remains unmeasured.
+
+## Integration acceptance with open UI PRs
+
+When combining setup PR #21, its document-level prepractice diagnostic must use `resolveEvent(profile, event)`, snapshot `Press.code` and `profileFingers(profile, code, mode)`, and retain the full `Calibration.profile`. Keep dynamic `calibrationCodes`/`physicalLabel`; its old `allowedFingers(event.key, mode)` lookup must not survive integration. Exclude `#capture-key`, `#profile-editor` and other editable controls via the existing composed-path/control guards. Add an integration regression proving both an alternate-layout diagnostic and Custom key capture work without competing handlers. This regression belongs to the combined change; #21 is not included here.
+
+PR #20's shared color/dot helpers accept resolved `Finger[]`: pass profile policy results for physical codes (normalize the two space endpoints to `Space`) to both diagram and dots. PR #19's copy changes stack on #21; preserve their concise/neutral feedback without restoring a fixed British footer or fixed target count. These peer PRs remain separately reviewable.

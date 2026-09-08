@@ -118,6 +118,13 @@ describe('keyboard profiles', () => {
     );
     expect(observed).toMatchObject({ kind: 'finger', finger: 'left-little' });
   });
+  it('rejects unknown physical codes and reports missing passage mappings', () => {
+    const p = structuredClone(PRESETS[0]!);
+    p.keys[0]!.outputs = [];
+    expect(coverage(p)).toEqual(['q']);
+    p.keys[0]!.code = 'InventedKey';
+    expect(() => parseProfile(JSON.stringify(p))).toThrow('browser character-key code');
+  });
   it('retains unusable legacy maps and explains remapping', () => {
     const broken = { ...calibration(), points: { q: { x: 0, y: 0 } } };
     const s = load({ getItem: () => JSON.stringify({ calibration: broken }) });

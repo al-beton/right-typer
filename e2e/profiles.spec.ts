@@ -117,6 +117,13 @@ test('profile switching invalidates pending attempt and incompatible calibration
   await expect(page.locator('#practice')).toBeEnabled();
   await page.locator('#practice').click();
   await expect(page.locator('#typing')).toHaveValue('');
+  await page.locator('#disconnect-camera').click();
+  await page.locator('#keyboard-profile').selectOption('fr-iso');
+  await page.locator('#keyboard-profile').selectOption('apple-gb-iso');
+  await page.locator('#start-camera').click();
+  await expect(page.locator('#practice')).toBeEnabled();
+  await page.locator('#practice').click();
+  await expect(page.locator('#typing')).toHaveValue('');
 });
 for (const variant of ['success', 'ambiguous', 'absent', 'denied'] as const)
   test(`optional detection ${variant} preserves manual choice`, async ({ page }) => {
