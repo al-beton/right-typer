@@ -12,6 +12,10 @@ test('complete guided setup, a whole correctly observed passage, results, restar
   });
   await syntheticCamera(page);
   await setup(page);
+  const viewPosition = await page.locator('#view-wrap').evaluate((el) => {
+    const r = el.getBoundingClientRect();
+    return { y: r.top + scrollY, width: r.width, height: r.height };
+  });
   for (let i = 0; i < WORDS.length; i++) {
     await expect(page.locator('.target-word')).toHaveText(WORDS[i]!);
     await word(page, WORDS[i]!);
@@ -20,9 +24,15 @@ test('complete guided setup, a whole correctly observed passage, results, restar
       await page.screenshot({ path: 'test-results/practice-synthetic.png', fullPage: true });
   }
   await expect(page.getByText('PASSAGE COMPLETE', { exact: true })).toBeVisible();
+  expect(
+    await page.locator('#view-wrap').evaluate((el) => {
+      const r = el.getBoundingClientRect();
+      return { y: r.top + scrollY, width: r.width, height: r.height };
+    }),
+  ).toEqual(viewPosition);
   await expect(page.locator('.result-note')).toContainText('0 retries');
   await expect(page.locator('.result-grid')).toContainText('0wrong-finger presses');
-  expect(await page.evaluate(() => window.__terminated)).toBeGreaterThan(0);
+  expect(await page.evaluate(() => window.__terminated)).toBe(0);
   const persisted = await page.evaluate(() => JSON.parse(localStorage.getItem('right-typer.v1')!));
   expect(persisted.results).toHaveLength(1);
   expect(persisted.results[0].uncertainPresses).toBe(0);
@@ -30,11 +40,8 @@ test('complete guided setup, a whole correctly observed passage, results, restar
   expect(persisted.results[0].passedWords).toBe(WORDS.length);
   await page.screenshot({ path: 'test-results/results-synthetic.png', fullPage: true });
   await page.getByRole('button', { name: 'Practise again' }).click();
-  await expect(page.locator('#camera-badge')).toHaveText('Camera off');
-  await expect(page.locator('#camera-empty')).toBeVisible();
-  await expect(
-    page.getByRole('heading', { name: 'Your keyboard. From a new perspective.' }),
-  ).toBeVisible();
+  await expect(page.locator('#camera-section')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeEnabled();
   await setup(page, true);
   await expect(page.locator('.target-word')).toHaveText('a');
   await page.getByRole('button', { name: 'Reset local data' }).click();
@@ -84,9 +91,8 @@ test('wrong and erased fingers still retry alongside unknowns; text errors retry
   await expect(page.getByRole('button', { name: 'Try this word again' })).toHaveCount(0);
   await expect(page.locator('.recovery')).toHaveCount(0);
   // Setup repair remains available voluntarily and preserves the next word.
-  await page.getByRole('button', { name: 'Fix camera setup' }).click();
-  await page.getByRole('button', { name: 'Check saved key positions' }).click();
-  await expect(page.getByRole('button', { name: 'Return to this word' })).toBeDisabled();
+  await page.getByRole('button', { name: 'Edit setup' }).click();
+  await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeEnabled();
   const { handsAt } = await import('../tests/fixtures');
   await page.evaluate(
     (h) => {
@@ -94,9 +100,7 @@ test('wrong and erased fingers still retry alongside unknowns; text errors retry
     },
     handsAt('f', 'left-index'),
   );
-  await page.locator('#alignment').check();
-  await page.locator('#identity').check();
-  await page.getByRole('button', { name: 'Return to this word' }).click();
+  await page.getByRole('button', { name: 'Go', exact: true }).click();
   await expect(page.locator('.target-word')).toHaveText(WORDS[2]!);
 });
 
@@ -152,7 +156,7 @@ test('a passage with unknown words reports accurate unverified counts, saves and
   });
   expect(persisted.results[0]).not.toHaveProperty('uncertaintyRetries');
   expect(persisted.results[0].wpm).toBeGreaterThan(0);
-  await page.getByRole('button', { name: 'Back to the beginning' }).click();
+  await page.getByRole('button', { name: 'Practise again' }).click();
   await expect(page.locator('.recent')).toContainText('1 retries');
   await page.reload();
   await expect(page.locator('.recent')).toContainText(`${persisted.results[0].wpm.toFixed(1)} WPM`);
@@ -230,10 +234,7 @@ test('boundary wait owns input; pause resumes the same word and pasted text cann
     window.__inferenceDelay = 12;
   });
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
-  await expect(page.locator('#alignment')).not.toBeChecked();
-  await page.locator('#alignment').check();
-  await page.locator('#identity').check();
-  await page.getByRole('button', { name: 'Return to this word' }).click();
+  await page.getByRole('button', { name: 'Go', exact: true }).click();
   await page.locator('#typing').dispatchEvent('paste');
   await expect(page.locator('#typing')).toHaveValue('');
   await expect(page.locator('#input-message')).toContainText('Pasting is not graded');
@@ -246,10 +247,9 @@ test('permission denial is actionable and blocks calibration', async ({ page }) 
     };
   });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Set up your camera' }).click();
   await page.getByRole('button', { name: 'Enable camera' }).click();
   await expect(page.locator('#setup-message')).toContainText('Camera permission is blocked');
-  await expect(page.getByRole('button', { name: 'Map the key positions' })).toBeDisabled();
+  await expect(page.getByRole('button', { name: 'Remap key positions' })).toBeDisabled();
 });
 
 test('saved calibration survives a reload with the same camera', async ({ page }) => {
@@ -259,9 +259,8 @@ test('saved calibration survives a reload with the same camera', async ({ page }
     () => JSON.parse(localStorage.getItem('right-typer.v1')!).calibration,
   );
   await page.reload();
-  await page.getByRole('button', { name: 'Set up your camera' }).click();
   await page.getByRole('button', { name: 'Enable camera' }).click();
-  await expect(page.locator('#camera-badge')).toContainText('Both hands');
+  await expect(page.locator('#camera-badge')).toContainText('hands detected');
   const current = await page.locator('video').evaluate((v) => ({
     ...((v as HTMLVideoElement).srcObject as MediaStream).getVideoTracks()[0]!.getSettings(),
     actualWidth: (v as HTMLVideoElement).videoWidth,
@@ -271,22 +270,24 @@ test('saved calibration survives a reload with the same camera', async ({ page }
     previous.deviceId,
   );
   expect(current.actualWidth).toBe(previous.width);
-  await expect(page.getByRole('button', { name: 'Check saved key positions' })).toBeVisible();
+  await expect(page.locator('#setup-message')).toContainText('Saved positions loaded');
+  await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeEnabled();
 });
 
 test('changed camera identity requires remapping', async ({ page }) => {
   await syntheticCamera(page);
   await setup(page);
-  await page.getByRole('button', { name: 'Fix camera setup' }).click();
+  await page.getByRole('button', { name: 'Edit setup' }).click();
   await page.evaluate(() => {
     window.__deviceId = 'different-camera';
   });
   await page.getByRole('button', { name: 'Restart camera' }).click();
-  await expect(page.getByRole('button', { name: 'Map the key positions' })).toBeEnabled();
-  await expect(page.getByRole('button', { name: 'Check saved key positions' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: 'Remap key positions' })).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeDisabled();
+  await expect(page.locator('.cal-key.mapped')).toHaveCount(0);
 });
 
-test('missing capture timestamps keep practice blocked with an explanation', async ({ page }) => {
+test('missing capture timestamps remain unknown without a setup gate', async ({ page }) => {
   await syntheticCamera(page);
   await page.addInitScript(() => {
     const nativeCallback = HTMLVideoElement.prototype.requestVideoFrameCallback;
@@ -298,23 +299,20 @@ test('missing capture timestamps keep practice blocked with an explanation', asy
     };
   });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Set up your camera' }).click();
   await page.getByRole('button', { name: 'Enable camera' }).click();
   await expect(page.locator('#camera-badge')).toContainText('Capture timing unavailable');
-  await page.getByRole('button', { name: 'Map the key positions' }).click();
   const { calibration } = await import('../tests/fixtures');
   for (const p of Object.values(calibration().points)) {
     const c = page.locator('#overlay'),
       b = await c.boundingBox();
     await c.click({ position: { x: p.x * b!.width, y: p.y * b!.height } });
   }
-  await page.getByRole('button', { name: 'Check alignment' }).click();
-  await page.locator('#alignment').check();
-  await page.locator('#identity').check();
-  await expect(page.getByRole('button', { name: 'Start practising' })).toBeDisabled();
-  await expect(page.locator('#ready-message')).toContainText(
-    'not exposing camera capture timestamps',
-  );
+  await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeEnabled();
+  await page.getByRole('button', { name: 'Go', exact: true }).click();
+  await page.locator('#typing').press('a');
+  await page.locator('#typing').press('Space');
+  await expect(page.locator('.target-word')).toHaveText('quick');
+  await expect(page.locator('#feedback')).toContainText('could not verify');
 });
 
 test('worker failure releases the stream and returns to camera recovery', async ({ page }) => {
@@ -336,7 +334,6 @@ test('worker failure releases the stream and returns to camera recovery', async 
     } as unknown as typeof Worker;
   });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Set up your camera' }).click();
   await page.getByRole('button', { name: 'Enable camera' }).click();
   await expect(page.locator('#setup-message')).toContainText('model asset unavailable');
   expect(await page.locator('video').evaluate((v) => (v as HTMLVideoElement).srcObject)).toBeNull();

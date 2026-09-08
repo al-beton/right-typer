@@ -77,25 +77,18 @@ export async function syntheticCamera(page: Page) {
 }
 export async function setup(page: Page, saved = false) {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Set up your camera' }).click();
   await page.getByRole('button', { name: 'Enable camera' }).click();
-  await expect(page.locator('#camera-badge')).toContainText('Both hands');
-  if (saved) await page.getByRole('button', { name: 'Check saved key positions' }).click();
-  else {
-    await page.getByRole('button', { name: 'Map the key positions' }).click();
-    const points = calibration().points;
-    for (const point of Object.values(points)) {
+  await expect(page.locator('#camera-badge')).toContainText('hands detected');
+  if (!saved) {
+    await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeDisabled();
+    for (const point of Object.values(calibration().points)) {
       const canvas = page.locator('#overlay');
       const box = await canvas.boundingBox();
       await canvas.click({ position: { x: point.x * box!.width, y: point.y * box!.height } });
     }
-    await page.getByRole('button', { name: 'Check alignment' }).click();
   }
-  await expect(page.getByRole('button', { name: 'Start practising' })).toBeDisabled();
-  await page.locator('#alignment').check();
-  await page.locator('#identity').check();
-  await expect(page.getByRole('button', { name: 'Start practising' })).toBeEnabled();
-  await page.getByRole('button', { name: 'Start practising' }).click();
+  await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeEnabled();
+  await page.getByRole('button', { name: 'Go', exact: true }).click();
 }
 export async function press(page: Page, key: string, finger?: Finger, missing = false) {
   await page.evaluate(
