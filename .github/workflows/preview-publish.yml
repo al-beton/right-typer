@@ -30,10 +30,21 @@ jobs:
         with:
           ref: main
           persist-credentials: false
+      - name: Create preview repository token
+        id: preview-token
+        uses: actions/create-github-app-token@fee1f7d63c2ff003460e3d139729b119787bc349 # v2
+        with:
+          app-id: ${{ vars.PREVIEW_APP_ID }}
+          private-key: ${{ secrets.PREVIEW_APP_PRIVATE_KEY }}
+          owner: AdvantageLabs
+          repositories: right-typer-previews
+          permission-contents: write
+          # Default post-job cleanup revokes this one-hour installation token.
+          skip-token-revoke: false
       - name: Reconcile generated previews
         run: python3 scripts/previews/publish.py
         env:
           SOURCE_TOKEN: ${{ github.token }}
-          PREVIEW_DEPLOY_TOKEN: ${{ secrets.PREVIEW_DEPLOY_TOKEN }}
+          PREVIEW_DEPLOY_TOKEN: ${{ steps.preview-token.outputs.token }}
           PREVIEW_REPOSITORY: ${{ vars.PREVIEW_REPOSITORY }}
           PREVIEW_BASE_URL: ${{ vars.PREVIEW_BASE_URL }}
