@@ -56,3 +56,5 @@ Automated camera tests use synthetic landmarks/fake video; physical keyboard/cam
 The document-level prepractice diagnostic from PR #21 uses `resolveEvent(profile, event)`, snapshots `Press.code` and `profileFingers(profile, code, mode)`, and retains the full `Calibration.profile`. Calibration targets and labels remain profile-specific. The composed-path/control guards exclude Custom key capture and other editable controls. Browser regressions exercise German/French physical-code diagnostics and confirm Custom key capture does not trigger a competing diagnostic.
 
 PR #20's shared color/dot helpers receive resolved profile fingers for physical codes, normalizing the two space endpoints to `Space`. Diagram and camera dots share the same policy colors; automated checks cover policy changes, dot sizes and rotations.
+
+PR #19's concise setup/practice feedback and removal of the diagram heading are retained. Physical labels, the selected profile footer and calibration target counts remain dynamic.
