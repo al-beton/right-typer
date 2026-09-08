@@ -15,6 +15,7 @@ import './view/brand.css';
 import { brandWordmark } from './view/brand';
 import { orderedFingers, fingerBackground, readFingerPalette } from './view/finger-colours';
 import { drawCalibrationDot } from './view/calibration-dot';
+import { SampleRecorder } from './recording/recorder';
 import { unrotatePoint, isCameraRotation } from './view/rotation';
 import { Camera } from './tracking/camera';
 import { keyTime } from './tracking/timing';
@@ -76,6 +77,8 @@ let boundaryKeys = 0;
 let diagnosticsId = -1;
 let cameraErrorHandled = false;
 let resetArmed = false;
+let sample: SampleRecorder | undefined;
+const sampleMode = new URLSearchParams(location.search).get('record') === '1';
 
 $('#app').innerHTML = `
   <header class="topbar"><h1 class="brand" aria-label="Right Typer"><span aria-hidden="true">${brandWordmark()}</span></h1><a href="https://github.com/al-beton/right-typer" target="_blank" rel="noreferrer">Source on GitHub</a></header>
@@ -100,6 +103,7 @@ $('#app').innerHTML = `
         </aside>
       </div>
     </section>
+    <section id="sample-panel" hidden aria-label="Developer sample recording"></section>
     <div id="storage-warning" class="storage-alert" role="status" hidden></div>
     <footer><span>Local processing · Keyboard profiles · Chrome</span><button class="text-button" id="reset">Reset local data</button><span id="build-version" aria-label="App version">${import.meta.env.VITE_BUILD_LABEL} · <a href="https://github.com/al-beton/right-typer/commit/${import.meta.env.VITE_BUILD_SHA}" title="${import.meta.env.VITE_BUILD_SHA}">${import.meta.env.VITE_BUILD_SHA.slice(0, 7)}</a></span></footer>
   </main>`;
@@ -129,6 +133,7 @@ video.addEventListener('loadedmetadata', layoutCameraView);
 rotationControl.onchange = () => {
   const angle = Number(rotationControl.value);
   if (!isCameraRotation(angle)) return;
+  void sample?.stop('camera-view-changed');
   cameraRotation = angle;
   saved.cameraRotation = angle;
   store();
@@ -176,6 +181,7 @@ const modeControl = $<HTMLSelectElement>('#fingering-mode');
 modeControl.value = fingeringMode;
 modeControl.onchange = () => {
   if (!isFingeringMode(modeControl.value)) return;
+  void sample?.stop('fingering-mode-changed');
   fingeringMode = modeControl.value;
   saved.fingeringMode = fingeringMode;
   exercise.changeMode(fingeringMode);
@@ -207,6 +213,7 @@ function render() {
   const ownedTypingFocus = !focused || focused === document.body || focused.id === 'typing';
   const focusedControl =
     content.contains(focused) && focused?.id !== 'typing' ? focused?.id : undefined;
+  updateSampleControls();
   canvas.classList.toggle('calibrating', phase === 'calibrate');
   $<HTMLSelectElement>('#device').disabled = phase === 'practice';
   $<HTMLButtonElement>('#start-camera').disabled =
@@ -228,6 +235,7 @@ function render() {
     const input = $<HTMLInputElement>('#typing');
     input.value = exercise.attempt.text;
     input.onkeydown = typing;
+    input.onkeyup = (event) => recordKey(event, 'keyup');
     input.onbeforeinput = (e) => e.preventDefault();
     input.addEventListener('compositionstart', () => {
       $('#input-message').textContent =
@@ -249,6 +257,7 @@ function render() {
     const stats = exercise.stats(performance.now());
     content.innerHTML = `<section class="results"><h2>Passage complete</h2><p class="lede">All words accepted. No wrong fingers detected in accepted attempts.</p><div class="result-grid"><div class="primary-stat"><strong>${stats.wpm.toFixed(1)}</strong><span>effective WPM</span></div><div><strong>${stats.wrongFingers}</strong><span>wrong-finger presses</span></div><div><strong>${stats.textMistakes}</strong><span>text-mismatch attempts</span></div><div><strong>${stats.uncertainPresses}</strong><span>unverified presses</span></div></div><p class="result-note">Fingering: ${policyLabel(exercise.policies())}<br/>${WORDS.length} words · ${stats.attempts} submitted attempts · ${stats.retries} retries · ${formatTime(stats.elapsedMs)} elapsed<br/>Unverified presses remain unknown and do not cause retries.</p><details><summary>How results are counted</summary><p>WPM = accepted characters (including spaces) ÷ 5 ÷ elapsed minutes. Time includes retries, feedback and pauses, from the first character to the final space. Wrong-finger and unverified counts include erased keys and spaces in all submitted attempts. Text mistakes count attempts with mismatched text. An attempt can include both mistakes and unknown observations.</p></details><div class="result-actions"><button class="primary" id="restart">Practise again <span>↻</span></button><button class="text-button" id="fix-setup">Edit setup</button></div><p class="result-limit">Camera detection can be wrong.</p></section>`;
     $('#restart').onclick = () => {
+      void sample?.stop('passage-restarted');
       disableAutoStart();
       resuming = false;
       exercise = new Exercise(WORDS, fingeringMode);
@@ -302,6 +311,7 @@ function draftValid() {
 function startCalibration() {
   disableAutoStart();
   setupOpen = true;
+  void sample?.stop('calibration-changed');
   points = {};
   calibration = undefined;
   selectedKey = 0;
@@ -329,6 +339,7 @@ function flowMessage() {
     : 'Key positions ready. Start when you’re ready to type.';
 }
 function editSetup() {
+  void sample?.stop('edit-setup');
   disableAutoStart();
   if (phase === 'practice') {
     exercise.pause();
@@ -365,6 +376,7 @@ function renderSetup() {
     .querySelectorAll<HTMLButtonElement>('[data-cal]')
     .forEach((el) => {
       el.onclick = () => {
+        void sample?.stop('calibration-changed');
         selectedKey = Number(el.dataset.cal);
         phase = 'calibrate';
         render();
@@ -379,6 +391,7 @@ function renderSetup() {
   $('#swap').setAttribute('aria-pressed', String(swapHands));
   $('#swap').textContent = `${swapHands ? 'Restore' : 'Swap'} left/right hand labels`;
   $('#swap').onclick = () => {
+    void sample?.stop('hand-labels-changed');
     swapHands = !swapHands;
     calibration = makeCalibration();
     camera.evidence.reset();
@@ -441,6 +454,7 @@ function cameraChanged() {
     canvas.getContext('2d')!.clearRect(0, 0, canvas.width, canvas.height);
     $('#camera-badge').classList.remove('good');
   }
+  if (camera.status !== 'ready') void sample?.stop('camera-stopped');
   $('#camera-empty').hidden = camera.status === 'ready';
   if (camera.status !== 'ready')
     $('#tracking-readout').textContent = 'Camera frames stay in this browser.';
@@ -668,6 +682,7 @@ canvas.onkeydown = (event) => {
   canvas.focus();
 };
 function disconnectCamera() {
+  void sample?.stop('camera-disconnected');
   if (camera.status === 'ready') disconnectedDraft = makeCalibration();
   // Invalidate practice before stop resolves pending evidence promises.
   if (phase === 'practice') pause();
@@ -684,6 +699,7 @@ function restartCamera() {
   message = 'Starting camera…';
   saved.cameraDisconnected = false;
   store();
+  void sample?.stop('camera-restarted');
   calibration = undefined;
   points = {};
   phase = 'setup';
@@ -706,6 +722,7 @@ $('#reset').onclick = () => {
     }, 7000);
     return;
   }
+  void sample?.stop('local-data-reset');
   camera.stop();
   profile = PRESETS[0]!;
   CALIBRATION_KEYS = calibrationCodes(profile);
@@ -743,6 +760,7 @@ function typing(event: KeyboardEvent) {
     ((event.ctrlKey || event.altKey) && !event.getModifierState('AltGraph'))
   )
     return;
+  recordKey(event, 'keydown');
   event.preventDefault();
   if (event.isComposing || event.key === 'Dead' || event.key === 'Process') {
     $('#input-message').textContent =
@@ -802,9 +820,33 @@ function typing(event: KeyboardEvent) {
   const owner = exercise;
   void camera.evidence.request(press, calibration!).then((observation) => {
     if (owner !== exercise) return;
-    if (!exercise.observe(press.id, press.attemptId, observation)) return;
+    const accepted = exercise.observe(press.id, press.attemptId, observation);
+    sample?.event({
+      type: 'observation',
+      pressId: press.id,
+      attemptId: press.attemptId,
+      observation,
+      accepted,
+    });
+    if (!accepted) return;
     const verdict = exercise.settle();
     if (!verdict) return;
+    if (sample?.state === 'recording') {
+      const attempt = structuredClone(exercise.history.at(-1)!.attempt);
+      for (const p of attempt.presses) p.at -= sample.origin;
+      if (attempt.submittedAt !== undefined) attempt.submittedAt -= sample.origin;
+      const replayVerdict = {
+        ...verdict,
+        wrong: attempt.presses.filter((p) => verdict.wrong.some((w) => w.id === p.id)),
+        uncertain: attempt.presses.filter((p) => verdict.uncertain.some((u) => u.id === p.id)),
+      };
+      sample.event({
+        type: 'verdict',
+        attempt,
+        word: WORDS[attempt.wordIndex]!,
+        verdict: replayVerdict,
+      });
+    }
     if (exercise.state === 'complete') {
       saved.results.push({
         ...exercise.stats(performance.now()),
@@ -844,12 +886,14 @@ function updateTyped() {
     );
 }
 function retryWord() {
+  sample?.event({ type: 'lifecycle', name: 'retry' });
   exercise.retry();
   message = 'Type the whole word, then space.';
   render();
   $('#typing').focus({ preventScroll: true });
 }
 function pause(remember = true) {
+  void sample?.stop('practice-paused');
   if (remember) disableAutoStart();
   exercise.pause();
   resuming = true;
@@ -983,7 +1027,80 @@ $('#profile-status').textContent = coverage(profile).length
 document.addEventListener('visibilitychange', () => {
   if (document.hidden && phase === 'practice') pause(false);
 });
-window.addEventListener('pagehide', () => camera.stop());
+window.addEventListener('pagehide', () => {
+  sample?.discard();
+  camera.stop();
+});
+window.addEventListener('beforeunload', (event) => {
+  if (sample && !['discarded'].includes(sample.state)) {
+    event.preventDefault();
+    event.returnValue = '';
+  }
+});
+function recordKey(event: KeyboardEvent, action: 'keydown' | 'keyup') {
+  if (!sample || sample.state !== 'recording' || event.metaKey || event.ctrlKey || event.altKey)
+    return;
+  // Only the practice input is recorded; never global keystrokes or setup fields.
+  sample.event({
+    type: 'key',
+    action,
+    key: event.key,
+    code: event.code,
+    repeat: event.repeat,
+    eventAt: keyTime(event, performance.now(), performance.timeOrigin) - sample.origin,
+    attemptId: exercise.attempt.id,
+    state: exercise.state,
+  });
+}
+function updateSampleControls() {
+  if (!sampleMode || !document.querySelector('#sample-start')) return;
+  const active = sample && sample.state !== 'discarded';
+  $<HTMLButtonElement>('#sample-start').disabled = !!active || !ready();
+  $<HTMLButtonElement>('#sample-stop').disabled = sample?.state !== 'recording';
+  $<HTMLButtonElement>('#sample-download').disabled = sample?.state !== 'ready';
+  $<HTMLButtonElement>('#sample-discard').disabled = !active || sample?.state === 'stopping';
+  $('#sample-status').textContent =
+    sample?.message ?? 'Map your keys, choose a fingering mode, then start a sample.';
+  $('#sample-panel').classList.toggle('is-recording', sample?.state === 'recording');
+}
+if (sampleMode) {
+  const panel = $('#sample-panel');
+  panel.hidden = false;
+  panel.innerHTML = `<h2>Developer sample recording</h2>
+    <p>Records camera video, key positions and practice keys locally. No audio or upload. Start begins a fresh passage. Stop and download before leaving.</p>
+    <div class="sample-fields"><label>Anonymous person ID<input id="sample-person" value="p01" maxlength="40" /></label><label>Setup ID<input id="sample-setup" value="s01" maxlength="40" /></label><label>Setup / issue notes<input id="sample-notes" maxlength="500" placeholder="Keyboard, camera angle, lighting, issue" /></label></div>
+    <div class="sample-actions"><button id="sample-start">Start sample (fresh passage)</button><button id="sample-stop" disabled>Stop sample</button><button id="sample-download" disabled>Download sample</button><button id="sample-discard" disabled>Discard sample</button></div>
+    <p id="sample-status" role="status"></p><small>Stops at five minutes or 256 MiB, or when setup/fingering changes. Use a short pilot first.</small>`;
+  $('#sample-start').onclick = () => {
+    if (!ready() || (sample && sample.state !== 'discarded')) return;
+    try {
+      sample = new SampleRecorder(
+        camera,
+        {
+          calibration: makeCalibration(),
+          mode: fingeringMode,
+          words: WORDS,
+          rotation: cameraRotation,
+          participantId: $<HTMLInputElement>('#sample-person').value,
+          setupId: $<HTMLInputElement>('#sample-setup').value,
+          notes: $<HTMLInputElement>('#sample-notes').value,
+        },
+        updateSampleControls,
+      );
+      resuming = false;
+      startPractice();
+      sample.event({ type: 'lifecycle', name: 'fresh-passage' });
+      updateSampleControls();
+    } catch (error) {
+      $('#sample-status').textContent = String(error);
+    }
+  };
+  $('#sample-stop').onclick = () => void sample?.stop();
+  $('#sample-download').onclick = () => sample?.download();
+  $('#sample-discard').onclick = () => sample?.discard();
+  for (const name of ['focus', 'blur'] as const)
+    window.addEventListener(name, () => sample?.event({ type: 'lifecycle', name }));
+}
 $('#finger-map').innerHTML = keyboard();
 render();
 updateCameraChoices();

@@ -80,7 +80,14 @@ export function attribute(
   };
 }
 // Owns evidence by immutable press/attempt identity. Late results cannot re-grade settled presses.
+export type EvidenceEvent =
+  | { type: 'frame-start'; id: number; at: number }
+  | { type: 'frame-result'; frame: Frame }
+  | { type: 'request'; press: Press }
+  | { type: 'tick'; at: number }
+  | { type: 'reset' };
 export class EvidenceBuffer {
+  trace?: (event: EvidenceEvent) => void;
   frames: Frame[] = [];
   private pending = new Map<
     number,
@@ -89,9 +96,11 @@ export class EvidenceBuffer {
   private inFlight = new Map<number, number>();
   private watermark = -Infinity;
   startFrame(id: number, at: number) {
+    this.trace?.({ type: 'frame-start', id, at });
     this.inFlight.set(id, at);
   }
   add(frame: Frame) {
+    this.trace?.({ type: 'frame-result', frame });
     this.inFlight.delete(frame.id);
     if (!this.frames.some((f) => f.id === frame.id)) this.frames.push(frame);
     this.watermark = Math.max(this.watermark, frame.at);
@@ -99,11 +108,13 @@ export class EvidenceBuffer {
     this.frames = this.frames.filter((f) => f.at >= this.watermark - 4000);
   }
   request(press: Press, calibration: Calibration): Promise<Observation> {
+    this.trace?.({ type: 'request', press });
     return new Promise((resolve) => this.pending.set(press.id, { press, calibration, resolve }));
   }
   // Settle once a frame after the press has landed and no in-flight frame could be nearer,
   // or at the deadline with whatever evidence exists. Either way the press gets an answer.
   tick(now: number) {
+    if (this.pending.size) this.trace?.({ type: 'tick', at: now });
     for (const [id, p] of this.pending) {
       const best = nearestFrame(p.press.at, this.frames);
       const gap = best ? Math.abs(best.at - p.press.at) : SEARCH_MS;
@@ -115,6 +126,7 @@ export class EvidenceBuffer {
     }
   }
   reset() {
+    this.trace?.({ type: 'reset' });
     for (const p of this.pending.values())
       p.resolve({
         kind: 'uncertain',

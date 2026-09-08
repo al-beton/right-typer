@@ -18,7 +18,8 @@
     "check": "tsc --noEmit && vitest run",
     "worker": "vite build --config vite.worker.config.ts",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "sample": "vite build --config vite.sample.config.ts && node .sample-cli/sample.mjs"
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "0.10.32"

@@ -54,3 +54,8 @@ Any static HTTPS host can serve the same folder. Do not use `file://`: camera ac
 - Correct-finger usability and deliberate wrong-finger detection need Al’s complete-passage hardware check. Faster learning is also a hypothesis, not an established result.
 
 Architecture and metric definitions: [docs/architecture.md](docs/architecture.md). Passage data: [src/passage.ts](src/passage.ts). Licensed under [Apache 2.0](LICENSE); [third-party notices](public/THIRD_PARTY_NOTICES.txt) are included in the static distribution.
+
+## Private developer recordings
+
+Use `?record=1` for opt-in camera/keymap/keypress sample export. See
+[the recording and replay guide](docs/samples.md) before collecting a pilot.
