@@ -660,3 +660,20 @@ footer {
 #policy-status {
   width: 240px;
 }
+
+/* The action occupies the same place as word entry, without moving the page. */
+.word-entry:has(#practice) input {
+  display: none;
+}
+.word-entry #practice {
+  flex: 1;
+  min-width: 0;
+  padding: 7px 8px;
+  font-size: 14px;
+}
+.flow-feedback {
+  align-content: center;
+}
+#setup-message:empty {
+  display: none;
+}

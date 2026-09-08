@@ -40,10 +40,14 @@ test('complete guided setup, a whole correctly observed passage, results, restar
   expect(persisted.results[0].gradingPolicy).toBe('wrong-finger-veto');
   expect(persisted.results[0].passedWords).toBe(WORDS.length);
   await page.screenshot({ path: 'test-results/results-synthetic.png', fullPage: true });
-  await page.getByRole('button', { name: 'Practise again' }).click();
+  await page.getByRole('button', { name: 'Edit setup', exact: true }).click();
+  await expect(page.locator('#mapping-editor')).toBeVisible();
+  await expect(page.locator('#typing')).toBeDisabled();
+  await page.getByRole('button', { name: 'Start practice', exact: true }).click();
   await expect(page.locator('#camera-section')).toBeVisible();
-  await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeEnabled();
-  await setup(page, true);
+  await expect(page.locator('#typing')).toBeFocused();
+  await page.reload();
+  await expect(page.locator('#typing')).toBeFocused();
   await expect(page.locator('.target-word')).toHaveText('a');
   await page.getByRole('button', { name: 'Reset local data' }).click();
   await page.getByRole('button', { name: 'Confirm reset' }).click();
@@ -99,7 +103,7 @@ test('wrong and erased fingers still retry alongside unknowns; text errors retry
   await expect(page.locator('.recovery')).toHaveCount(0);
   // Setup repair remains available voluntarily and preserves the next word.
   await page.getByRole('button', { name: 'Edit setup' }).click();
-  await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeEnabled();
+  await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeEnabled();
   const { handsAt } = await import('../tests/fixtures');
   await page.evaluate(
     (h) => {
@@ -107,7 +111,7 @@ test('wrong and erased fingers still retry alongside unknowns; text errors retry
     },
     handsAt('f', 'left-index'),
   );
-  await page.getByRole('button', { name: 'Go', exact: true }).click();
+  await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
   await expect(page.locator('.target-word')).toHaveText(WORDS[2]!);
 });
 
@@ -164,6 +168,10 @@ test('a passage with unknown words reports accurate unverified counts, saves and
   expect(persisted.results[0]).not.toHaveProperty('uncertaintyRetries');
   expect(persisted.results[0].wpm).toBeGreaterThan(0);
   await page.getByRole('button', { name: 'Practise again' }).click();
+  await expect(page.locator('#typing')).toBeFocused();
+  await expect(page.locator('.target-word')).toHaveText('a');
+  await expect(page.locator('.practice-metrics')).toContainText('0 /');
+  await page.getByRole('button', { name: 'Pause', exact: true }).click();
   await expect(page.locator('.recent')).toContainText('1 retries');
   await page.reload();
   await expect(page.locator('.recent')).toContainText(`${persisted.results[0].wpm.toFixed(1)} WPM`);
@@ -241,7 +249,7 @@ test('boundary wait owns input; pause resumes the same word and pasted text cann
     window.__inferenceDelay = 12;
   });
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
-  await page.getByRole('button', { name: 'Go', exact: true }).click();
+  await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
   await page.locator('#typing').dispatchEvent('paste');
   await expect(page.locator('#typing')).toHaveValue('');
   await expect(page.locator('#input-message')).toContainText('Pasting is not graded');
@@ -303,7 +311,7 @@ test('changed camera identity requires remapping', async ({ page }) => {
   });
   await page.getByRole('button', { name: 'Restart camera' }).click();
   await expect(page.getByRole('button', { name: 'Remap key positions' })).toBeEnabled();
-  await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeDisabled();
+  await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeDisabled();
   await expect(page.locator('.cal-key.mapped')).toHaveCount(0);
 });
 
@@ -326,8 +334,8 @@ test('missing capture timestamps remain unknown without a setup gate', async ({ 
       b = await c.boundingBox();
     await c.click({ position: { x: p.x * b!.width, y: p.y * b!.height } });
   }
-  await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeEnabled();
-  await page.getByRole('button', { name: 'Go', exact: true }).click();
+  await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeEnabled();
+  await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
   await page.locator('#typing').press('a');
   await page.locator('#typing').press('Space');
   await expect(page.locator('.target-word')).toHaveText('quick');

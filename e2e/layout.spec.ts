@@ -37,7 +37,7 @@ test('one stable page from camera off through mapping, optional test, retry and 
   expect(centers.controls).toBeCloseTo(centers.camera, 0);
   expect(centers.controlsTop).toBeGreaterThan(centers.cameraBottom);
 
-  const go = page.getByRole('button', { name: 'Go', exact: true });
+  const go = page.getByRole('button', { name: /^(Start|Resume) practice$/ });
   await expect(go).toBeDisabled();
   await expect(page.getByRole('checkbox')).toHaveCount(0);
   await page.screenshot({ path: 'test-results/single-page-initial.png', fullPage: true });

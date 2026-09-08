@@ -9,7 +9,7 @@ test('implicit setup checks report evidence, preserve control ownership and disc
   await setup(page);
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
   const result = page.locator('#diagnostic-result');
-  const go = page.getByRole('button', { name: 'Go', exact: true });
+  const go = page.getByRole('button', { name: /^(Start|Resume) practice$/ });
   await expect(page.locator('#diagnostic-input')).toHaveCount(0);
   await page.locator('#overlay').press('f');
   await expect(result).toContainText('saw left index');
@@ -113,6 +113,6 @@ test('camera controls wrap without overflow and Go remains independent of checks
     expect(boxes.children.every((b) => b.left >= 0 && b.right <= width)).toBe(true);
     await page.screenshot({ path: `test-results/compact-setup-${width}.png`, fullPage: true });
   }
-  await page.getByRole('button', { name: 'Go', exact: true }).click();
+  await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
   await expect(page.locator('#typing')).toBeEnabled();
 });
