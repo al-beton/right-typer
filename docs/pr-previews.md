@@ -48,20 +48,21 @@ Deployment approval does not mean merge approval.
 1. Choose a separate HTTPS origin. `al-beton.github.io/another-repo` is the same
    origin as production and is rejected. An organization Pages hostname or an
    already-owned dedicated subdomain works. Do not reuse an origin holding
-   sensitive applications. AdvantageLabs is accessible to this account, and is being provisioned by the separate setup task.
+   sensitive applications. The configured origin is `advantagelabs.github.io`, with repository `AdvantageLabs/right-typer-previews`.
 2. Create a **public** generated repository, e.g.
    `AdvantageLabs/right-typer-previews`, with a `gh-pages` branch containing only a
    short README and empty `.nojekyll`. Enable GitHub Pages from gh-pages, root.
    Branch publication uses free public-repository GitHub infrastructure.
-3. Create a fine-grained PAT with the target organization as resource owner,
-   **only that generated repository**, **Contents: read/write** and default
-   Metadata: read. No source repo grant, Administration, Workflows, or Pages
-   write permission. Choose a 90-day expiry (or shorter organization policy).
-   Approve the token in organization settings if required. The publisher uses
-   public HTTP byte checks, so it does not need Pages read permission.
+3. Register a **private GitHub App** owned by AdvantageLabs and install it on
+   **only the generated repository**. Grant **Contents: read/write** and automatic
+   Metadata: read. No source repository, organization, Administration, Workflows,
+   or Pages permission. Disable webhooks, subscriptions and user authorization;
+   the App only authenticates the trusted publisher. Current App:
+   [Right Typer Preview Bot](https://github.com/apps/right-typer-preview-bot), ID `4874720`.
 4. Create source Actions environment `pr-preview-publishing`. Set deployment branch
-   policy to **selected branches**, with only `main` allowed. Add `PREVIEW_DEPLOY_TOKEN`
-   as an **environment secret**, never a repository/organization secret. This
+   policy to **selected branches**, with only `main` allowed. Add `PREVIEW_APP_PRIVATE_KEY`
+   as an **environment secret**, never a repository/organization secret, and set
+   environment variable `PREVIEW_APP_ID` to the App ID. This
    prevents a contributor workflow from requesting it from a PR or other branch.
    Only the trusted publishing job references this environment. Protect main and
    review publisher/workflow changes as security-sensitive code.
@@ -69,7 +70,7 @@ Deployment approval does not mean merge approval.
    `PREVIEW_BASE_URL=https://owner.github.io/repo/` (or the chosen subdomain path),
    `PREVIEWS_ENABLED=true`. Set the enable switch last, after origin and secret
    protections are checked. Comments use the separate job-scoped source
-   `GITHUB_TOKEN` with pull-requests write; the PAT never writes source comments.
+   `GITHUB_TOKEN` with pull-requests write; the App never writes source comments.
 6. Merge the reviewed infrastructure PR so workflow_run/dispatch/schedule can
    use it. Existing PRs predating the build workflow need the workflow on their
    branch and a new push, or rebase onto main; do not merge those features.
@@ -98,11 +99,21 @@ Real MacBook camera/setup validation must be reported separately.
 
 ## Rotation, revocation and recovery
 
-- Rotate before expiry: create a replacement PAT with the same single-repository
-  scope, replace the environment secret, dispatch and verify a preview, then
-  revoke the old PAT in GitHub Settings → Developer settings → Fine-grained PATs.
+- The App private key has **no scheduled expiration**; treat it as a long-lived
+  credential that still needs revocation if compromised. No expiring personal
+  token or paid service is required. The pinned `actions/create-github-app-token`
+  step issues a token scoped explicitly to `AdvantageLabs/right-typer-previews`
+  with Contents write. Installation tokens expire after one hour; post-job cleanup
+  revokes them sooner (including ordinary failures). If runner loss prevents
+  cleanup, expiration bounds the lifetime. The publisher job times out at 30 minutes.
+- To rotate the App key, generate a replacement in the App settings, replace
+  `PREVIEW_APP_PRIVATE_KEY`, verify a real changed preview, then delete the old key.
+  Never print keys/tokens, put them in command arguments or retain downloaded keys.
+  Keep the App installed only on the preview repo; a key can mint tokens for any
+  installation of its App. Main administrators and trusted workflow/action code
+  can access this key; no credential design guarantees zero security flaws.
 - Emergency stop: set `PREVIEWS_ENABLED=false`, cancel the active publisher,
-  revoke the PAT, and disable preview Pages if published content must be removed.
+  suspend/uninstall the App and revoke its keys/tokens, and disable preview Pages if published content must be removed.
   Disabling a workflow/credential alone does not remove already published files.
 - Recovery: restore the environment secret/policy, verify origin configuration,
   re-enable and dispatch Publish previews. Re-run Preview build if its artifact
