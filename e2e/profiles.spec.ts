@@ -45,7 +45,7 @@ test('presets update physical labels; French shifted punctuation completes passa
     }
     await expect(page.locator('#typing[readonly]')).toHaveCount(0);
   }
-  await expect(page.locator('.results')).toContainText('PASSAGE COMPLETE');
+  await expect(page.locator('.results')).toContainText('Passage complete');
   const result = await page.evaluate(() =>
     JSON.parse(localStorage.getItem('right-typer.v1')!).results.at(-1),
   );
