@@ -42,7 +42,7 @@ export function feedback(verdict: Verdict, word: string, mode: FingeringMode = '
   }
   if (verdict.uncertain.length)
     parts.push(
-      `I could not verify ${verdict.uncertain.length} ${verdict.uncertain.length === 1 ? 'press' : 'presses'}: no hands were in view. That is not a finger mistake.`,
+      `I could not verify ${verdict.uncertain.length} ${verdict.uncertain.length === 1 ? 'press' : 'presses'}. Unknown observations are not finger mistakes.`,
     );
   return parts.join(' ');
 }

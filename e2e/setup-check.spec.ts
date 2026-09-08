@@ -77,7 +77,7 @@ test('implicit setup checks report evidence, preserve control ownership and disc
   await page.locator('#overlay').press('f');
   await page.locator('#swap').click();
   await page.waitForTimeout(700);
-  await expect(result).toHaveText('Press a practice key to check the observed finger.');
+  await expect(result).toHaveText('Press a key to check its observed finger.');
   await page.evaluate(
     (hands) => {
       window.__hands = hands;
