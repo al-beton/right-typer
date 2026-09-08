@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { syntheticCamera, press } from './helpers';
+import { syntheticCamera, press, word } from './helpers';
 import { calibration, handsAt } from '../tests/fixtures';
 
 test('one stable page from camera off through mapping, optional test, retry and setup edits', async ({
@@ -46,14 +46,20 @@ test('one stable page from camera off through mapping, optional test, retry and 
   await expect(page.locator('#diagnostic-result')).toContainText('saw left index');
   await page.screenshot({ path: 'test-results/single-page-mapped-synthetic.png', fullPage: true });
   await go.click();
+  await expect(page.locator('.next-key')).toHaveAttribute('data-key', 'a');
   expect(await positions()).toEqual(initial);
   await press(page, 'a', 'left-index');
   await press(page, ' ');
   await expect(page.locator('#feedback')).toContainText('saw left index');
   expect(await positions()).toEqual(initial);
   await page.locator('#typing').press('Enter');
+  await expect(page.locator('.next-key')).toHaveAttribute('data-key', 'a');
+  await word(page, 'a');
+  await expect(page.locator('.target-word')).toHaveText('quick');
+  await expect(page.locator('.next-key')).toHaveAttribute('data-key', 'q');
   expect(await positions()).toEqual(initial);
   await page.getByRole('button', { name: 'Edit setup' }).click();
+  await expect(page.locator('.next-key')).toHaveCount(0);
   await expect(go).toBeEnabled();
   await page.getByRole('button', { name: 'Map q', exact: true }).click();
   const oldQ = calibration().points.q!;

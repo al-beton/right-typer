@@ -121,6 +121,10 @@ function render() {
     $('#feedback').insertAdjacentHTML('beforeend', attemptDetails());
   }
 
+  document
+    .querySelectorAll<HTMLElement>('[data-key]')
+    .forEach((el) => el.classList.remove('next-key'));
+  if (phase === 'practice') updateTyped();
   if (camera.latest) drawOverlay(camera.latest);
 }
 function formatTime(ms: number) {
