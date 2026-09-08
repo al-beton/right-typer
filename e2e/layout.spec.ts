@@ -15,6 +15,28 @@ test('one stable page from camera off through mapping, optional test, retry and 
       }),
     );
   const initial = await positions();
+  const centers = await page.evaluate(() => {
+    const box = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
+    const entry = box('.word-entry'),
+      keyboard = box('.keyboard'),
+      camera = box('#view-wrap'),
+      controls = box('.camera-layout aside');
+    return {
+      entry: entry.x + entry.width / 2,
+      keyboard: keyboard.x + keyboard.width / 2,
+      camera: camera.x + camera.width / 2,
+      controls: controls.x + controls.width / 2,
+      entryWidth: entry.width,
+      cameraBottom: camera.bottom,
+      controlsTop: controls.top,
+    };
+  });
+  expect(centers.entryWidth).toBeLessThanOrEqual(560);
+  expect(centers.entry).toBeCloseTo(centers.keyboard, 0);
+  expect(centers.camera).toBeCloseTo(centers.keyboard, 0);
+  expect(centers.controls).toBeCloseTo(centers.camera, 0);
+  expect(centers.controlsTop).toBeGreaterThan(centers.cameraBottom);
+
   const go = page.getByRole('button', { name: 'Go', exact: true });
   await expect(go).toBeDisabled();
   await expect(page.getByRole('checkbox')).toHaveCount(0);

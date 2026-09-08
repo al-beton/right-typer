@@ -4,7 +4,7 @@
 
 Environment: macOS on Apple Silicon, Node 26.8.1, pnpm 11.19.0, Chromium (Playwright 1.63.0). Tests operate on the production static build.
 
-- TypeScript and 72 deterministic tests: full 49-word synthetic passage, all 28 exercised character keys, both thumbs, intentional wrong fingers on both hands/rows, nearest-frame selection with one-sided and out-of-order frames, handless frames skipped, one hand, low handedness score, far fingertips, same-label hands relabelled by position, swap, no-hands unknowns, in-flight waiting, deadlines, attempt ownership, erased mistakes, pause/retry, WPM and storage failure recovery.
+- TypeScript and 73 deterministic tests: full 49-word synthetic passage, all 28 exercised character keys, both thumbs, intentional wrong fingers on both hands/rows, nearest-frame selection with one-sided and out-of-order frames, handless frames skipped, one hand, low handedness score, far fingertips, same-label hands relabelled by position, swap, no-hands unknowns, in-flight waiting, deadlines, attempt ownership, erased mistakes, pause/retry, WPM and storage failure recovery.
 - Real bundled MediaPipe model starts in its worker on Chrome’s **fake camera**, returns zero hands on that fixture, and uses native capture timestamps. Request inspection finds only the application origin, including model and WASM. This checks runtime/network behavior, not recognition accuracy.
 - Browser tests cover in-place calibration, full passage, word feedback, no-hands unknown and mixed words, wrong fingers with unknowns (including erased mistakes and space), text errors, a correctly observed full passage and a passage with unknown words, results/restart, legacy/new persistence and reset, permission denial, missing capture timestamps, worker failure, blocked storage, deadline answers from the nearest completed frame, boundary input ownership and recovery. See the PR/CI result for the final executed counts and screenshots.
 - Production build and formatting checks pass. Workflow validation and the dependency audit were verified in PR #2; neither workflows nor dependencies changed here.
@@ -53,3 +53,13 @@ These are screenshots of the implemented interface. Practice/results images use 
 The browser regression measures the keyboard and camera rectangles before camera enablement, after every mapped key, during optional finger testing, practice, retry and setup edits; all remain unchanged. The full-passage test also checks the camera rectangle at results. Go is tested with zero hands and is disabled until all 30 positions are valid. Missing capture timestamps produce unknown observations instead of using callback time.
 
 Screenshots generated under `test-results/` are synthetic UI evidence, not real-camera accuracy measurements. The camera stays live at results and restarting practice reuses the map in place.
+
+## Centered layout and camera rotation (ALO-224)
+
+The word-entry widget is capped at 560 px and shares the keyboard and camera center line. Camera controls sit below the preview. Browser assertions check these alignments and preserve the camera rectangle throughout setup and practice.
+
+All four camera angles (0°, 90°, 180°, 270°) are tested by clicking all 30 key positions in the rotated view, checking the saved native coordinates within one displayed pixel, and advancing a correctly observed word. Tests also cover changing angle during an attempt without losing input or restarting the worker, persisted rotation after reload, displayed-direction arrow nudges, reset, and resizing a sideways preview without horizontal overflow. Overlay labels stay upright while the video, dots and hand skeleton rotate together.
+
+[90° camera view (synthetic)](images/camera-rotation-90-synthetic.png) · [180° camera view (synthetic)](images/camera-rotation-180-synthetic.png)
+
+These checks verify view geometry and application behavior using synthetic landmarks and fake video. They do not measure physical-camera recognition accuracy.

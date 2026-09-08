@@ -1,4 +1,5 @@
 import './style.css';
+import { unrotatePoint, isCameraRotation } from './view/rotation';
 import { Camera } from './tracking/camera';
 import { keyTime } from './tracking/timing';
 import {
@@ -24,6 +25,7 @@ const escapeHtml = (text: string) =>
     (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!,
   );
 let saved = load();
+let cameraRotation = saved.cameraRotation ?? 0;
 let phase: 'setup' | 'calibrate' | 'verify' | 'practice' | 'results' = 'setup';
 let calibration: Calibration | undefined;
 let points: Record<string, Point> = {};
@@ -46,8 +48,9 @@ $('#app').innerHTML = `
     <section id="camera-section" aria-label="Live camera and finger tracking">
       <div class="camera-heading"><h2>Camera & key positions</h2><span id="camera-badge" role="status">Camera off</span></div>
       <div class="camera-layout">
-        <div class="view-wrap" id="view-wrap"><video id="camera" autoplay playsinline muted aria-label="Live view of your keyboard"></video><canvas id="overlay" aria-label="Keyboard calibration. Click the center of the requested key, or use arrow keys and Enter." tabindex="0"></canvas><div class="camera-empty" id="camera-empty"><strong>Allow camera access to get set up</strong><span>Tilt your MacBook screen toward the keyboard.<br/>Use your external display for this page.</span></div></div>
+        <div class="view-wrap" id="view-wrap"><div id="camera-image"><video id="camera" autoplay playsinline muted aria-label="Live view of your keyboard"></video><canvas id="overlay" aria-label="Keyboard calibration. Click the center of the requested key, or use arrow keys and Enter." tabindex="0"></canvas></div><div class="camera-empty" id="camera-empty"><strong>Allow camera access to get set up</strong><span>Tilt your MacBook screen toward the keyboard.<br/>Use your external display for this page.</span></div></div>
         <aside>
+          <div class="camera-options"><label for="camera-rotation">Rotate camera view</label><select id="camera-rotation"><option value="0">0°</option><option value="90">90° clockwise</option><option value="180">180°</option><option value="270">270° clockwise</option></select></div>
           <div id="camera-controls"><label for="device">Camera</label><select id="device"><option value="">MacBook / default camera</option></select><button id="start-camera">Enable camera</button></div>
           <div id="setup-panel"></div>
           <p id="tracking-readout">Camera frames stay in this browser.</p>
@@ -61,6 +64,33 @@ const video = $<HTMLVideoElement>('#camera');
 const canvas = $<HTMLCanvasElement>('#overlay');
 const camera = new Camera(video, cameraChanged, drawFrame);
 const content = $('#content');
+const rotationControl = $<HTMLSelectElement>('#camera-rotation');
+rotationControl.value = String(cameraRotation);
+function layoutCameraView() {
+  const stage = $('#view-wrap');
+  const aspect =
+    video.videoWidth && video.videoHeight ? video.videoWidth / video.videoHeight : 4 / 3;
+  const sideways = cameraRotation === 90 || cameraRotation === 270;
+  const width = Math.min(
+    sideways ? stage.clientHeight : stage.clientWidth,
+    (sideways ? stage.clientWidth : stage.clientHeight) * aspect,
+  );
+  const image = $('#camera-image');
+  image.style.width = `${width}px`;
+  image.style.height = `${width / aspect}px`;
+  image.style.transform = `translate(-50%, -50%) rotate(${cameraRotation}deg)`;
+}
+new ResizeObserver(layoutCameraView).observe($('#view-wrap'));
+video.addEventListener('loadedmetadata', layoutCameraView);
+rotationControl.onchange = () => {
+  const angle = Number(rotationControl.value);
+  if (!isCameraRotation(angle)) return;
+  cameraRotation = angle;
+  saved.cameraRotation = angle;
+  store();
+  layoutCameraView();
+  if (camera.latest) drawOverlay(camera.latest);
+};
 
 function store() {
   if (!save(saved))
@@ -84,7 +114,7 @@ function render() {
   renderSetup();
   if (phase !== 'practice' && phase !== 'results') {
     const last = saved.results.at(-1);
-    content.innerHTML = `<section class="practice"><div class="practice-top"><h2>Practice</h2><span>${WORDS.length} words</span></div><div class="progress-track"></div>${passageMarkup()}<div class="entry-heading"><label for="typing">Your word</label><span>Space finishes each word.</span></div><div class="word-entry"><div class="target-word">${WORDS[exercise.index]}</div><input id="typing" aria-label="Type the current word" placeholder="Set up below, then click Go" disabled /></div><div class="feedback">${resuming ? 'Paused. Go resumes this word with a fresh attempt.' : 'Allow camera access, mark the key positions, then click Go.'}</div>${last ? `<p class="recent">Last practice: ${last.wpm.toFixed(1)} WPM · ${last.retries} retries${last.gradingPolicy !== 'wrong-finger-veto' ? ' · Earlier rule: unknown presses required retries' : ''}</p>` : ''}</section>`;
+    content.innerHTML = `<section class="practice"><div class="practice-top"><h2>Practice</h2><span>${WORDS.length} words</span></div><div class="progress-track"></div>${passageMarkup()}<div class="entry-heading"><label for="typing">Your word</label><span>Space finishes each word.</span></div><div class="word-entry"><div class="target-word">${WORDS[exercise.index]}</div><input id="typing" aria-label="Type the current word" placeholder="Set up, then Go" disabled /></div><div class="feedback">${resuming ? 'Paused. Go resumes this word with a fresh attempt.' : 'Allow camera access, mark the key positions, then click Go.'}</div>${last ? `<p class="recent">Last practice: ${last.wpm.toFixed(1)} WPM · ${last.retries} retries${last.gradingPolicy !== 'wrong-finger-veto' ? ' · Earlier rule: unknown presses required retries' : ''}</p>` : ''}</section>`;
   } else if (phase === 'practice') {
     const retry = exercise.state === 'retry',
       checking = exercise.state === 'checking';
@@ -304,6 +334,13 @@ function drawOverlay(frame: Frame) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   const pxy = (p: Point): [number, number] => [p.x * canvas.width, p.y * canvas.height];
   ctx.font = `${Math.max(12, canvas.width / 64)}px ui-monospace, monospace`;
+  const uprightLabel = (x: number, y: number, paint: () => void) => {
+    ctx.save();
+    ctx.translate(x, y);
+    ctx.rotate((-cameraRotation * Math.PI) / 180);
+    paint();
+    ctx.restore();
+  };
   for (const [key, point] of Object.entries(points)) {
     const [x, y] = pxy(point);
     const selected = phase === 'calibrate' && key === CALIBRATION_KEYS[selectedKey];
@@ -314,14 +351,12 @@ function drawOverlay(frame: Frame) {
     ctx.strokeStyle = '#183a30';
     ctx.lineWidth = 2;
     ctx.stroke();
-    ctx.fillStyle = '#0e251d';
-    ctx.fillRect(x - 9, y - 25, key.startsWith('space') ? 28 : 19, 17);
-    ctx.fillStyle = '#fff';
-    ctx.fillText(
-      key.startsWith('space') ? (key.endsWith('left') ? 'S◂' : 'S▸') : key,
-      x - 5,
-      y - 12,
-    );
+    uprightLabel(x, y, () => {
+      ctx.fillStyle = '#0e251d';
+      ctx.fillRect(-9, -25, key.startsWith('space') ? 28 : 19, 17);
+      ctx.fillStyle = '#fff';
+      ctx.fillText(key.startsWith('space') ? (key.endsWith('left') ? 'S◂' : 'S▸') : key, -5, -12);
+    });
   }
   const connections = [
     [0, 1, 2, 3, 4],
@@ -356,27 +391,34 @@ function drawOverlay(frame: Frame) {
       ctx.fillStyle = ctx.strokeStyle;
       ctx.fill();
       if (phase !== 'practice') {
-        ctx.fillStyle = '#fff';
-        ctx.fillText(DIGITS[digit]!, x + 6, y - 5);
+        uprightLabel(x, y, () => {
+          ctx.fillStyle = '#fff';
+          ctx.fillText(DIGITS[digit]!, 6, -5);
+        });
       }
     });
     const wrist = hand.points[0];
     if (wrist) {
       const [x, y] = pxy(wrist);
-      ctx.fillStyle = '#152d26';
-      ctx.fillRect(x - 5, y + 5, 125, 23);
-      ctx.fillStyle = '#fff';
-      ctx.fillText(`${side} hand`, x, y + 21);
+      uprightLabel(x, y, () => {
+        ctx.fillStyle = '#152d26';
+        ctx.fillRect(-5, 5, 125, 23);
+        ctx.fillStyle = '#fff';
+        ctx.fillText(`${side} hand`, 0, 21);
+      });
     }
   }
 }
 canvas.onclick = (event) => {
   if (phase !== 'calibrate') return;
   const box = canvas.getBoundingClientRect();
-  points[CALIBRATION_KEYS[selectedKey]!] = {
-    x: (event.clientX - box.left) / box.width,
-    y: (event.clientY - box.top) / box.height,
-  };
+  points[CALIBRATION_KEYS[selectedKey]!] = unrotatePoint(
+    {
+      x: (event.clientX - box.left) / box.width,
+      y: (event.clientY - box.top) / box.height,
+    },
+    cameraRotation,
+  );
   selectedKey = Math.min(CALIBRATION_KEYS.length - 1, selectedKey + 1);
   if (draftValid()) phase = 'verify';
   message = '';
@@ -396,18 +438,16 @@ canvas.onkeydown = (event) => {
   const key = CALIBRATION_KEYS[selectedKey]!;
   const p = points[key] ?? { x: 0.5, y: 0.5 };
   const step = event.shiftKey ? 0.001 : 0.005;
+  const delta = unrotatePoint(
+    {
+      x: 0.5 + (event.key === 'ArrowLeft' ? -step : event.key === 'ArrowRight' ? step : 0),
+      y: 0.5 + (event.key === 'ArrowUp' ? -step : event.key === 'ArrowDown' ? step : 0),
+    },
+    cameraRotation,
+  );
   points[key] = {
-    x: Math.max(
-      0,
-      Math.min(
-        1,
-        p.x + (event.key === 'ArrowLeft' ? -step : event.key === 'ArrowRight' ? step : 0),
-      ),
-    ),
-    y: Math.max(
-      0,
-      Math.min(1, p.y + (event.key === 'ArrowUp' ? -step : event.key === 'ArrowDown' ? step : 0)),
-    ),
+    x: Math.max(0, Math.min(1, p.x + delta.x - 0.5)),
+    y: Math.max(0, Math.min(1, p.y + delta.y - 0.5)),
   };
   render();
   canvas.focus();
@@ -433,6 +473,9 @@ $('#reset').onclick = () => {
   camera.stop();
   exercise = new Exercise(WORDS);
   saved = { results: [] };
+  cameraRotation = 0;
+  rotationControl.value = '0';
+  layoutCameraView();
   calibration = undefined;
   points = {};
   resuming = false;
