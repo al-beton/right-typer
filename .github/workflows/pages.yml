@@ -22,6 +22,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm check
       - run: pnpm build
+        env:
+          BUILD_ENV: production
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

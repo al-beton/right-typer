@@ -17,6 +17,7 @@ export default defineConfig({
   },
   webServer: {
     command: 'pnpm build && pnpm preview --port 4173',
+    env: { BUILD_ENV: 'production' },
     url: 'http://127.0.0.1:4173',
     reuseExistingServer: false,
   },

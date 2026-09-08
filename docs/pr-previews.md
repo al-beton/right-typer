@@ -82,15 +82,21 @@ Deployment approval does not mean merge approval.
 
 ## Camera, storage and trust
 
-A publisher-injected script adds the PR/commit/backlink and namespaces
+A publisher-injected script adds a muted footer label (`Review PR #N · short SHA`)
+with links to the PR and commit, and namespaces
 `localStorage` methods by PR before app modules start. This also works for older
 feature heads without changing production application code. Reset/clear stays
 within that PR namespace. This is convenience, **not isolation**: JavaScript can
 bypass it, read other same-origin storage, register service workers or modify the
-banner. PRs share camera permissions and one review origin. Only open code you
+label. PRs share camera permissions and one review origin. Only open code you
 trust and grant camera access deliberately. Use a separate browser profile for
 untrusted reviews and clear site permissions/storage afterward. No claim is made
 that a manifest makes reviewed JavaScript safe or that previews isolate PRs.
+
+The production Pages build shows `Production · short SHA` in the same footer; local
+builds show `Local`. No warning banner, overlay or acknowledgement is added.
+Publisher format changes regenerate current previews from retained artifacts; if
+an artifact has expired, re-run its Preview build to apply the new format.
 
 Assets, model, WASM and classic tracking worker use relative paths. Browser checks
 must exercise `/repo/pr-N/`, including the real local model with fake video.
