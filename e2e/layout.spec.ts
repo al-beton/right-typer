@@ -52,7 +52,7 @@ test('one stable page from camera off through mapping, optional test, retry and 
   await press(page, ' ');
   await expect(page.locator('#feedback')).toContainText('saw left index');
   expect(await positions()).toEqual(initial);
-  await page.locator('#typing').press('Enter');
+  await page.locator('#typing').press('Space');
   await expect(page.locator('.next-key')).toHaveAttribute('data-key', 'a');
   await word(page, 'a');
   await expect(page.locator('.target-word')).toHaveText('quick');

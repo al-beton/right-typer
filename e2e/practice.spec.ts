@@ -65,7 +65,13 @@ test('wrong and erased fingers still retry alongside unknowns; text errors retry
   await expect(page.locator('.target-word')).toHaveText('a');
   await expect(page.locator('.press-result.unseen')).toHaveCount(2);
   await page.screenshot({ path: 'test-results/wrong-finger-synthetic.png', fullPage: true });
+  // Holding the submitting space must not dismiss feedback, and Enter is no longer retry.
+  await page.locator('#typing').dispatchEvent('keydown', { key: ' ', repeat: true });
   await page.locator('#typing').press('Enter');
+  await expect(page.locator('#retry')).toBeVisible();
+  await page.locator('#typing').press('Space');
+  await expect(page.locator('#retry')).toHaveCount(0);
+  await expect(page.locator('.target-word')).toHaveText('a');
   await expect(page.locator('#typing')).toHaveValue('');
   await press(page, 'b', undefined, true);
   await press(page, ' ', undefined, true);
@@ -75,7 +81,7 @@ test('wrong and erased fingers still retry alongside unknowns; text errors retry
   await press(page, 'a', undefined, true);
   await press(page, ' ', 'right-index');
   await expect(page.locator('#feedback')).toContainText('For space, I saw right index');
-  await page.locator('#typing').press('Enter');
+  await page.locator('#typing').press('Space');
   await press(page, 'a', undefined, true);
   await press(page, ' ', undefined, true);
   await expect(page.locator('.target-word')).toHaveText('quick');
@@ -116,7 +122,7 @@ test('a passage with unknown words reports accurate unverified counts, saves and
   await press(page, 'b', undefined, true);
   await press(page, ' ', undefined, true);
   await expect(page.locator('#feedback')).toContainText('text did not match');
-  await page.locator('#typing').press('Enter');
+  await page.locator('#typing').press('Space');
   const unknownWords = 2;
   for (let i = 0; i < WORDS.length; i++) {
     await expect(page.locator('.target-word')).toHaveText(WORDS[i]!);
