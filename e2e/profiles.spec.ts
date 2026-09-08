@@ -40,7 +40,7 @@ test('presets update physical labels; French shifted punctuation completes passa
       .locator('#overlay')
       .click({ position: { x: pt.x * box!.width, y: pt.y * box!.height } });
   }
-  await page.getByRole('button', { name: 'Go', exact: true }).click();
+  await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
   await page.evaluate(() => {
     window.__hands = [];
   });
@@ -125,8 +125,18 @@ test('profile switching invalidates pending attempt and incompatible calibration
   await expect(page.locator('#profile-status')).toContainText('own key positions');
   await page.locator('#keyboard-profile').selectOption('apple-gb-iso');
   await expect(page.locator('#practice')).toBeEnabled();
+  await expect(page.locator('#mapping-editor')).toBeHidden();
   await page.locator('#practice').click();
   await expect(page.locator('#typing')).toHaveValue('');
+  await expect(page.locator('#typing')).toBeFocused();
+  await page.locator('#pause').click();
+  await expect(page.locator('#practice')).toHaveText('Resume practice');
+  await expect(page.locator('#mapping-editor')).toBeHidden();
+  await page.locator('#fix-setup').click();
+  await expect(page.locator('#mapping-editor')).toBeVisible();
+  await expect(page.locator('#overlay')).toBeFocused();
+  await page.locator('#practice').click();
+  await expect(page.locator('#mapping-editor')).toBeHidden();
   await page.locator('#disconnect-camera').click();
   await page.locator('#keyboard-profile').selectOption('fr-iso');
   await page.locator('#keyboard-profile').selectOption('apple-gb-iso');

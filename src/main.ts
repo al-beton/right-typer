@@ -316,6 +316,8 @@ function flowMessage() {
   if (camera.status === 'loading') return 'Starting camera…';
   if (camera.status !== 'ready')
     return camera.status === 'error' ? camera.error : 'Connect the camera to practise.';
+  if (coverage(profile).length)
+    return `Missing passage characters: ${coverage(profile).join(' ')}. Edit your keyboard profile.`;
   if (!draftValid())
     return Object.keys(points).length === CALIBRATION_KEYS.length
       ? 'Adjust overlapping dots or flat rows in the camera image.'
@@ -961,9 +963,10 @@ const profilesUI = profileControls(
     points = calibration?.points ?? {};
     disconnectedDraft = undefined;
     saved.calibration = calibration;
+    setupOpen = !calibration;
     message = calibration
-      ? 'Compatible key positions kept. Go starts a fresh attempt.'
-      : 'This keyboard needs its own key positions. Previous calibration is retained locally; map the keys before Go.';
+      ? 'Compatible key positions kept. Start or resume when ready.'
+      : 'This keyboard needs its own key positions. Previous calibration is retained locally; map the keys before starting.';
     $('#profile-status').textContent = message;
     phase = camera.status === 'ready' ? (calibration ? 'verify' : 'calibrate') : 'setup';
     if (!resuming) exercise = new Exercise(WORDS, fingeringMode);
