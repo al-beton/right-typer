@@ -9,6 +9,8 @@ declare global {
     __inferenceDelay: number;
     __terminated: number;
     __deviceId: string;
+    __cameraRequests: number;
+    __denyCamera: boolean;
   }
 }
 // Test-only replacement at the worker boundary. Production code exposes no simulation mode.
@@ -77,7 +79,6 @@ export async function syntheticCamera(page: Page) {
 }
 export async function setup(page: Page, saved = false) {
   await page.goto('/');
-  await page.getByRole('button', { name: 'Enable camera' }).click();
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
   if (!saved) {
     await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeDisabled();

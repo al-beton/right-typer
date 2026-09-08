@@ -46,7 +46,7 @@ $('#app').innerHTML = `
     <section id="camera-section" aria-label="Live camera and finger tracking">
       <div class="camera-heading"><h2>Camera & key positions</h2><span id="camera-badge" role="status">Camera off</span></div>
       <div class="camera-layout">
-        <div class="view-wrap" id="view-wrap"><video id="camera" autoplay playsinline muted aria-label="Live view of your keyboard"></video><canvas id="overlay" aria-label="Keyboard calibration. Click the center of the requested key, or use arrow keys and Enter." tabindex="0"></canvas><div class="camera-empty" id="camera-empty"><strong>Enable your camera to get set up</strong><span>Tilt your MacBook screen toward the keyboard.<br/>Use your external display for this page.</span></div></div>
+        <div class="view-wrap" id="view-wrap"><video id="camera" autoplay playsinline muted aria-label="Live view of your keyboard"></video><canvas id="overlay" aria-label="Keyboard calibration. Click the center of the requested key, or use arrow keys and Enter." tabindex="0"></canvas><div class="camera-empty" id="camera-empty"><strong>Allow camera access to get set up</strong><span>Tilt your MacBook screen toward the keyboard.<br/>Use your external display for this page.</span></div></div>
         <aside>
           <div id="camera-controls"><label for="device">Camera</label><select id="device"><option value="">MacBook / default camera</option></select><button id="start-camera">Enable camera</button></div>
           <div id="setup-panel"></div>
@@ -84,7 +84,7 @@ function render() {
   renderSetup();
   if (phase !== 'practice' && phase !== 'results') {
     const last = saved.results.at(-1);
-    content.innerHTML = `<section class="practice"><div class="practice-top"><h2>Practice</h2><span>${WORDS.length} words</span></div><div class="progress-track"></div>${passageMarkup()}<div class="entry-heading"><label for="typing">Your word</label><span>Space finishes each word.</span></div><div class="word-entry"><div class="target-word">${WORDS[exercise.index]}</div><input id="typing" aria-label="Type the current word" placeholder="Set up below, then click Go" disabled /></div><div class="feedback">${resuming ? 'Paused. Go resumes this word with a fresh attempt.' : 'Enable your camera, mark the key positions, then click Go.'}</div>${last ? `<p class="recent">Last practice: ${last.wpm.toFixed(1)} WPM · ${last.retries} retries${last.gradingPolicy !== 'wrong-finger-veto' ? ' · Earlier rule: unknown presses required retries' : ''}</p>` : ''}</section>`;
+    content.innerHTML = `<section class="practice"><div class="practice-top"><h2>Practice</h2><span>${WORDS.length} words</span></div><div class="progress-track"></div>${passageMarkup()}<div class="entry-heading"><label for="typing">Your word</label><span>Space finishes each word.</span></div><div class="word-entry"><div class="target-word">${WORDS[exercise.index]}</div><input id="typing" aria-label="Type the current word" placeholder="Set up below, then click Go" disabled /></div><div class="feedback">${resuming ? 'Paused. Go resumes this word with a fresh attempt.' : 'Allow camera access, mark the key positions, then click Go.'}</div>${last ? `<p class="recent">Last practice: ${last.wpm.toFixed(1)} WPM · ${last.retries} retries${last.gradingPolicy !== 'wrong-finger-veto' ? ' · Earlier rule: unknown presses required retries' : ''}</p>` : ''}</section>`;
   } else if (phase === 'practice') {
     const retry = exercise.state === 'retry',
       checking = exercise.state === 'checking';
@@ -584,3 +584,5 @@ document.addEventListener('visibilitychange', () => {
 window.addEventListener('pagehide', () => camera.stop());
 $('#finger-map').innerHTML = keyboard();
 render();
+
+restartCamera();
