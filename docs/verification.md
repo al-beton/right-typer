@@ -4,7 +4,7 @@
 
 Environment: macOS on Apple Silicon, Node 26.8.1, pnpm 11.19.0, Chromium (Playwright 1.63.0). Tests operate on the production static build.
 
-- TypeScript and 73 deterministic tests: full 49-word synthetic passage, all 28 exercised character keys, both thumbs, intentional wrong fingers on both hands/rows, nearest-frame selection with one-sided and out-of-order frames, handless frames skipped, one hand, low handedness score, far fingertips, same-label hands relabelled by position, swap, no-hands unknowns, in-flight waiting, deadlines, attempt ownership, erased mistakes, pause/retry, WPM and storage failure recovery.
+- TypeScript and 74 deterministic tests: full 49-word synthetic passage, all 28 exercised character keys, both thumbs, intentional wrong fingers on both hands/rows, nearest-frame selection with one-sided and out-of-order frames, handless frames skipped, one hand, low handedness score, far fingertips, same-label hands relabelled by position, swap, no-hands unknowns, in-flight waiting, deadlines, attempt ownership, erased mistakes, pause/retry, WPM and storage failure recovery.
 - Real bundled MediaPipe model starts in its worker on Chrome’s **fake camera**, returns zero hands on that fixture, and uses native capture timestamps. Request inspection finds only the application origin, including model and WASM. This checks runtime/network behavior, not recognition accuracy.
 - Browser tests cover in-place calibration, full passage, word feedback, no-hands unknown and mixed words, wrong fingers with unknowns (including erased mistakes and space), text errors, a correctly observed full passage and a passage with unknown words, results/restart, legacy/new persistence and reset, permission denial, missing capture timestamps, worker failure, blocked storage, deadline answers from the nearest completed frame, boundary input ownership and recovery. See the PR/CI result for the final executed counts and screenshots.
 - Production build and formatting checks pass. Workflow validation and the dependency audit were verified in PR #2; neither workflows nor dependencies changed here.
@@ -63,3 +63,7 @@ All four camera angles (0°, 90°, 180°, 270°) are tested by clicking all 30 k
 [90° camera view (synthetic)](images/camera-rotation-90-synthetic.png) · [180° camera view (synthetic)](images/camera-rotation-180-synthetic.png)
 
 These checks verify view geometry and application behavior using synthetic landmarks and fake video. They do not measure physical-camera recognition accuracy.
+
+## Refresh preferences (ALO-225)
+
+Browser regressions verify rotation and camera selection across refreshes, automatic practice after Go, explicit Pause/Edit setup staying paused, legacy saved-map migration, mismatched-dimension rejection, missing-camera recovery and reset. Refresh starts a fresh passage; partial input and grading evidence are not restored. The visibility pause on reload preserves the Go preference. These checks use fake video and synthetic landmarks.

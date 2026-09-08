@@ -289,8 +289,8 @@ test('saved calibration survives a reload with the same camera', async ({ page }
     previous.deviceId,
   );
   expect(current.actualWidth).toBe(previous.width);
-  await expect(page.locator('#setup-message')).toContainText('Saved positions loaded');
-  await expect(page.getByRole('button', { name: 'Go', exact: true })).toBeEnabled();
+  await expect(page.locator('#typing')).toBeEnabled();
+  await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeVisible();
 });
 
 test('changed camera identity requires remapping', async ({ page }) => {

@@ -18,3 +18,22 @@ it('persists quarter turns and ignores malformed saved camera angles', () => {
     expect(load(storage).cameraRotation).toBeUndefined();
   }
 });
+
+it('persists explicit camera and Go preferences without treating malformed values as enabled', () => {
+  let raw = '{}';
+  const storage = {
+    getItem: () => raw,
+    setItem: (_key: string, value: string) => {
+      raw = value;
+    },
+  };
+  for (const practiceEnabled of [true, false]) {
+    expect(save({ cameraDeviceId: 'external-camera', practiceEnabled, results: [] }, storage)).toBe(
+      true,
+    );
+    expect(load(storage)).toMatchObject({ cameraDeviceId: 'external-camera', practiceEnabled });
+  }
+  raw = JSON.stringify({ cameraDeviceId: {}, practiceEnabled: 'true' });
+  expect(load(storage).cameraDeviceId).toBeUndefined();
+  expect(load(storage).practiceEnabled).toBeUndefined();
+});

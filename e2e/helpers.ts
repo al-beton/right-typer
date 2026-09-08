@@ -21,6 +21,30 @@ export async function syntheticCamera(page: Page) {
       // Incognito fake cameras rotate their opaque IDs on reload. Supply a stable
       // identity for the persistence scenario; real-camera identity changes are tested separately.
       window.__deviceId = 'synthetic-macbook-camera';
+      const getUserMedia = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+      navigator.mediaDevices.getUserMedia = (constraints) => {
+        const video = constraints?.video;
+        // Stable test IDs stand in for Chrome's changing incognito fake-camera ID.
+        if (
+          video &&
+          typeof video === 'object' &&
+          (video.deviceId as ConstrainDOMStringParameters)?.exact === 'synthetic-macbook-camera'
+        ) {
+          return getUserMedia({ ...constraints, video: { ...video, deviceId: undefined } });
+        }
+        return getUserMedia(constraints);
+      };
+      navigator.mediaDevices.enumerateDevices = async () => [
+        {
+          kind: 'videoinput',
+          deviceId: 'synthetic-macbook-camera',
+          label: 'Synthetic camera',
+          groupId: '',
+          toJSON() {
+            return {};
+          },
+        } as MediaDeviceInfo,
+      ];
       const getSettings = MediaStreamTrack.prototype.getSettings;
       MediaStreamTrack.prototype.getSettings = function () {
         const settings = getSettings.call(this);

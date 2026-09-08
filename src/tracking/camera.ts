@@ -110,11 +110,13 @@ export class Camera {
       this.fail(
         e.name === 'NotAllowedError'
           ? 'Camera permission is blocked. In Chrome, open the site controls beside the address, allow Camera, then try again.'
-          : e.name === 'NotFoundError'
-            ? 'No camera was found. Connect or enable the MacBook camera, then try again.'
-            : e.name === 'NotReadableError'
-              ? 'Chrome could not open the camera. Close another app using it, then try again.'
-              : e.message,
+          : e.name === 'OverconstrainedError'
+            ? 'The saved camera is unavailable. Reconnect it or choose another camera below.'
+            : e.name === 'NotFoundError'
+              ? 'No camera was found. Connect or enable the MacBook camera, then try again.'
+              : e.name === 'NotReadableError'
+                ? 'Chrome could not open the camera. Close another app using it, then try again.'
+                : e.message,
       );
     }
   }

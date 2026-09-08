@@ -19,7 +19,7 @@ Open the printed localhost URL in current Chrome on your external display. The p
 
 Type the active word, including its punctuation, and **press space to submit**. Space is also checked; use either thumb, including after the last word. Every press is attributed to the fingertip nearest the key in the camera frame nearest the press. Matching text advances unless a wrong finger was observed. A press is unverified when no usable capture-timed hand evidence is available around it; unverified presses do not cause retries. A wrong finger or text mismatch stays on that word. Press Space again or click the retry button for a fresh attempt. Backspace edits the text but does not erase observed finger mistakes. Wait through the brief boundary check; keys pressed during it are explicitly reported as not entered. Escape pauses. Recheck setup whenever the lid moves.
 
-Calibration and the last ten completed results are saved in this browser’s local storage. Saved positions load automatically for the same camera and image dimensions. Inspect the overlaid dots and adjust them if the camera moved; a different camera requires remapping. An interrupted passage stays only in memory. **Reset local data** clears this app’s calibration/history after a second confirming click.
+Calibration, camera selection, rotation, whether you pressed Go, and the last ten completed results are saved in this browser’s local storage. Refresh reopens the selected camera and starts a fresh passage automatically after Go, provided its saved positions match the camera and image dimensions. Pause or Edit setup keeps practice paused across refreshes. Inspect the overlaid dots and adjust them if the camera moved; a different camera requires remapping. An interrupted passage stays only in memory. **Reset local data** clears this app’s calibration, preferences and history after a second confirming click.
 
 ## Verify and build
 
@@ -44,7 +44,7 @@ Any static HTTPS host can serve the same folder. Do not use `file://`: camera ac
 ## Privacy and limitations
 
 - Inference runs in a worker on this device. No analytics, CDN, font service, upload, audio access or cloud inference. Runtime requests are same-origin; a content security policy restricts connections. The host still receives ordinary requests for static files.
-- Camera frames are transient, closed after inference and never recorded or persisted. Only calibration, camera ID and small aggregate results are saved locally.
+- Camera frames are transient, closed after inference and never recorded or persisted. Only calibration, camera preferences, the Go preference and small aggregate results are saved locally.
 - Recognition takes the capture-timestamped frame nearest each keypress (within ±500 ms) and names the fingertip nearest the calibrated key on any visible hand. There are no proximity, separation, confidence or frame-agreement gates: a press always gets the best available answer. Occlusion, depth/perspective error, crossed hands or slow frames can therefore produce a wrong finger rather than an unknown. It cannot prove physical key contact from 2D landmarks.
 - Missing capture timestamps or no hands around a press leave its finger unknown; these do not block matching text. Setup repair remains available. Attribution accuracy on real hardware is unmeasured; the rule is chosen for simplicity and coverage, not proven precision.
 - Correct-finger usability and deliberate wrong-finger detection need Al’s complete-passage hardware check. Faster learning is also a hypothesis, not an established result.

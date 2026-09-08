@@ -26,6 +26,8 @@ const escapeHtml = (text: string) =>
   );
 let saved = load();
 let cameraRotation = saved.cameraRotation ?? 0;
+let autoStartPending = saved.practiceEnabled ?? !!saved.calibration;
+let selectedCamera = saved.cameraDeviceId ?? saved.calibration?.deviceId ?? '';
 let phase: 'setup' | 'calibrate' | 'verify' | 'practice' | 'results' = 'setup';
 let calibration: Calibration | undefined;
 let points: Record<string, Point> = {};
@@ -135,12 +137,13 @@ function render() {
     const passage = $('.passage'),
       activeWord = $('.passage .active');
     passage.scrollTop = Math.max(0, activeWord.offsetTop - 40);
-    $('#pause').onclick = pause;
+    $('#pause').onclick = () => pause();
     if (retry) $('#retry').onclick = retryWord;
   } else {
     const stats = exercise.stats(performance.now());
     content.innerHTML = `<section class="results"><h2>PASSAGE COMPLETE</h2><p class="lede">Every word’s text matched with no wrong finger detected in its accepted attempt.</p><div class="result-grid"><div class="primary-stat"><strong>${stats.wpm.toFixed(1)}</strong><span>effective WPM</span></div><div><strong>${stats.wrongFingers}</strong><span>wrong-finger presses</span></div><div><strong>${stats.textMistakes}</strong><span>text-mismatch attempts</span></div><div><strong>${stats.uncertainPresses}</strong><span>unverified presses</span></div></div><p class="result-note">${WORDS.length} words · ${stats.attempts} submitted attempts · ${stats.retries} retries · ${formatTime(stats.elapsedMs)} elapsed<br/>Unverified presses remain unknown, including in accepted words. They do not cause retries.</p><details><summary>How these numbers work</summary><p>Effective WPM is the accepted passage characters, including one submitting space per word, divided by five and by elapsed minutes. Timing runs from your first character to the final submitting space and includes retries, reading feedback and pauses. Wrong-finger presses include erased characters. A text mistake is one submitted attempt with mismatched text. Unverified presses count all unknown observations in submitted attempts, including submitting spaces, erased characters and failed attempts. They are not verified correct fingers. An attempt can contain both mistakes and uncertainty.</p></details><div class="result-actions"><button class="primary" id="restart">Practise again <span>↻</span></button></div><p class="result-limit">Camera judgements can be wrong. Clear feedback is useful; it is not ground truth.</p></section>`;
     $('#restart').onclick = () => {
+      disableAutoStart();
       resuming = false;
       exercise = new Exercise(WORDS);
       message = '';
@@ -225,20 +228,9 @@ function renderSetup() {
     renderSetup();
   };
   $('#diagnostic-input').onkeydown = (event) => diagnostic(event as KeyboardEvent);
-  $('#practice').onclick = () => {
-    if (!ready()) return;
-    calibration = makeCalibration();
-    saved.calibration = calibration;
-    store();
-    camera.evidence.reset();
-    message = '';
-    boundaryKeys = 0;
-    if (resuming) exercise.retry();
-    else exercise = new Exercise(WORDS);
-    setPhase('practice');
-    $('#typing').scrollIntoView({ block: 'nearest' });
-  };
+  $('#practice').onclick = startPractice;
   $('#fix-setup').onclick = () => {
+    disableAutoStart();
     if (phase === 'practice') {
       exercise.pause();
       resuming = true;
@@ -249,6 +241,50 @@ function renderSetup() {
     message = 'Adjust any dot in the camera image, or remap if the camera moved.';
     setPhase('verify');
   };
+}
+function startPractice() {
+  if (!ready()) return;
+  calibration = makeCalibration();
+  saved.calibration = calibration;
+  saved.practiceEnabled = true;
+  autoStartPending = false;
+  store();
+  camera.evidence.reset();
+  message = '';
+  boundaryKeys = 0;
+  if (resuming) exercise.retry();
+  else exercise = new Exercise(WORDS);
+  setPhase('practice');
+  $('#typing').scrollIntoView({ block: 'nearest' });
+}
+function disableAutoStart() {
+  autoStartPending = false;
+  saved.practiceEnabled = false;
+  store();
+}
+function updateCameraChoices() {
+  const select = $<HTMLSelectElement>('#device');
+  // Keep recovery available even if the remembered camera is disconnected.
+  select.innerHTML = `<option value="">Default camera</option>${selectedCamera ? `<option value="${escapeHtml(selectedCamera)}">Saved camera</option>` : ''}`;
+  select.value = selectedCamera;
+  navigator.mediaDevices
+    ?.enumerateDevices()
+    .then((devices) => {
+      const cameras = devices.filter((d) => d.kind === 'videoinput' && d.deviceId);
+      select.innerHTML =
+        `<option value="">Default camera</option>` +
+        cameras
+          .map(
+            (d) =>
+              `<option value="${escapeHtml(d.deviceId)}">${escapeHtml(d.label || 'Camera')}</option>`,
+          )
+          .join('') +
+        (selectedCamera && !cameras.some((d) => d.deviceId === selectedCamera)
+          ? `<option value="${escapeHtml(selectedCamera)}">Saved camera (unavailable)</option>`
+          : '');
+      select.value = selectedCamera;
+    })
+    .catch(() => {});
 }
 function cameraChanged() {
   $('#camera-empty').hidden = camera.status === 'ready';
@@ -282,6 +318,9 @@ function cameraChanged() {
   }
   if (camera.status === 'ready') {
     cameraErrorHandled = false;
+    selectedCamera = camera.settings()?.deviceId ?? selectedCamera;
+    saved.cameraDeviceId = selectedCamera;
+    store();
     message = 'Mark the key centres in the camera image. Keep the camera still.';
     if (saved.calibration && sameCamera(saved.calibration)) {
       calibration = structuredClone(saved.calibration);
@@ -295,21 +334,13 @@ function cameraChanged() {
       selectedKey = 0;
       phase = 'calibrate';
     }
-    navigator.mediaDevices
-      .enumerateDevices()
-      .then((devices) => {
-        const select = $<HTMLSelectElement>('#device');
-        const id = camera.settings()?.deviceId;
-        select.innerHTML = devices
-          .filter((d) => d.kind === 'videoinput')
-          .map(
-            (d) =>
-              `<option value="${escapeHtml(d.deviceId)}" ${d.deviceId === id ? 'selected' : ''}>${escapeHtml(d.label || 'Camera')}</option>`,
-          )
-          .join('');
-      })
-      .catch(() => {});
+    if (autoStartPending) {
+      autoStartPending = false;
+      if (calibration && ready()) startPractice();
+      else disableAutoStart();
+    }
   }
+  if (camera.status === 'ready' || camera.status === 'error') updateCameraChoices();
   if (phase !== 'practice' && phase !== 'results') render();
 }
 function drawFrame(frame: Frame) {
@@ -456,10 +487,15 @@ function restartCamera() {
   calibration = undefined;
   points = {};
   phase = 'setup';
-  void camera.start($<HTMLSelectElement>('#device').value);
+  void camera.start(selectedCamera);
 }
 $('#start-camera').onclick = restartCamera;
-$('#device').onchange = restartCamera;
+$('#device').onchange = () => {
+  selectedCamera = $<HTMLSelectElement>('#device').value;
+  saved.cameraDeviceId = selectedCamera;
+  disableAutoStart();
+  restartCamera();
+};
 $('#reset').onclick = () => {
   if (!resetArmed) {
     resetArmed = true;
@@ -473,6 +509,9 @@ $('#reset').onclick = () => {
   camera.stop();
   exercise = new Exercise(WORDS);
   saved = { results: [] };
+  autoStartPending = false;
+  selectedCamera = '';
+  updateCameraChoices();
   cameraRotation = 0;
   rotationControl.value = '0';
   layoutCameraView();
@@ -578,7 +617,8 @@ function retryWord() {
   message = 'Fresh attempt. Type the whole word, then space.';
   render();
 }
-function pause() {
+function pause(remember = true) {
+  if (remember) disableAutoStart();
   exercise.pause();
   resuming = true;
   message = 'Paused. Your completed words are kept. Click Go to restart the current word.';
@@ -622,10 +662,11 @@ function diagnostic(event: KeyboardEvent) {
   });
 }
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden && phase === 'practice') pause();
+  if (document.hidden && phase === 'practice') pause(false);
 });
 window.addEventListener('pagehide', () => camera.stop());
 $('#finger-map').innerHTML = keyboard();
 render();
+updateCameraChoices();
 
 restartCamera();
