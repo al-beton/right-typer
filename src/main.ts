@@ -770,6 +770,7 @@ function retryWord() {
   exercise.retry();
   message = 'Type the whole word, then space.';
   render();
+  $('#typing').focus({ preventScroll: true });
 }
 function pause(remember = true) {
   if (remember) disableAutoStart();

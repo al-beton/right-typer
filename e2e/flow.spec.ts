@@ -147,3 +147,22 @@ for (const control of ['Pause', 'Edit setup']) {
     await expect(page.locator('#typing')).toBeDisabled();
   });
 }
+
+test('Retry button hands focus back to typing for the next physical keypress', async ({ page }) => {
+  await syntheticCamera(page);
+  await setup(page);
+  for (const activation of ['click', 'Space']) {
+    await page.keyboard.type('b ');
+    const retry = page.getByRole('button', { name: 'Retry word' });
+    await expect(retry).toBeVisible();
+    if (activation === 'click') await retry.click();
+    else {
+      await retry.focus();
+      await page.keyboard.press('Space');
+    }
+    await expect(page.locator('#typing')).toBeFocused();
+    await page.keyboard.type('a');
+    await expect(page.locator('#typing')).toHaveValue('a');
+    await page.keyboard.press('Backspace');
+  }
+});
