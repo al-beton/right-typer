@@ -161,6 +161,8 @@ describe('word practice', () => {
     };
     expect(grade(attempt, 'a')).toMatchObject({ pass: true, uncertain: attempt.presses });
     expect(grade(attempt, 'b')).toMatchObject({ pass: false, textWrong: true });
+    // Missing evidence does not establish that hands were absent.
+    expect(feedback(grade(attempt, 'a'), 'a')).not.toContain('no hands');
   });
   it('accepts a full all-unknown passage, including spaces, without inventing fingers', () => {
     const e = new Exercise(WORDS);

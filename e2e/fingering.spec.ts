@@ -99,7 +99,7 @@ test('switch while typing and checking discards pending evidence; completed mixe
   });
   await page.locator('#typing').pressSequentially(WORDS[1]!);
   await page.locator('#typing').press('Space');
-  await expect(page.locator('#feedback')).toContainText('Matching camera evidence');
+  await expect(page.locator('#feedback')).toContainText('Checking fingers');
   await mode.selectOption('either');
   await page.waitForTimeout(1000);
   await expect(page.locator('.target-word')).toHaveText(WORDS[1]!);
