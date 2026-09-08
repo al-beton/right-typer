@@ -378,8 +378,8 @@ aside {
   align-items: center;
 }
 #camera-controls select {
-  min-width: 0;
-  flex: 1;
+  min-width: 120px;
+  flex: 1 180px;
   width: 120px;
 }
 #camera-controls button {
