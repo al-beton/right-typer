@@ -1,11 +1,14 @@
 import { test, expect } from '@playwright/test';
-test('bundled real model runs on a fake camera; no external network requests', async ({ page }) => {
+test('bundled real model runs on a fake camera; no external network requests', async ({
+  page,
+  baseURL,
+}) => {
   const external: string[] = [],
     errors: string[] = [],
     requested: string[] = [];
   page.on('request', (r) => {
     requested.push(r.url());
-    if (!r.url().startsWith('http://127.0.0.1:4173/')) external.push(r.url());
+    if (new URL(r.url()).origin !== new URL(baseURL!).origin) external.push(r.url());
   });
   page.on('pageerror', (e) => errors.push(e.message));
   await page.goto('/');

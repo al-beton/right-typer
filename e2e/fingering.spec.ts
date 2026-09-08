@@ -151,10 +151,10 @@ test('selector supports keyboard focus, updates diagnostics and ignores malforme
   // Use Playwright's native-select API; macOS headless popup keys are not reliable.
   await mode.selectOption('alternate');
   await expect(mode).toHaveValue('alternate');
-  await page.locator('#diagnostic-input').press('c');
+  await page.locator('#overlay').press('c');
   await expect(page.locator('#diagnostic-result')).toContainText('Intended: left index.');
   await mode.selectOption('either');
-  await page.locator('#diagnostic-input').press('c');
+  await page.locator('#overlay').press('c');
   await expect(page.locator('#diagnostic-result')).toContainText(
     'Intended: left middle or left index.',
   );

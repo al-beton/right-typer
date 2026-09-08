@@ -421,24 +421,23 @@ aside {
   height: 54px;
   overflow: auto;
 }
-.diagnostic {
-  margin-top: 12px;
-}
-.diagnostic label {
-  display: block;
-  margin-bottom: 6px;
-}
-.diagnostic input {
-  width: 100%;
-}
 #diagnostic-result {
-  height: 54px;
+  height: 36px;
   overflow: auto;
+  margin: 8px 0;
 }
 .setup-actions {
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
-  margin-top: 12px;
+}
+.setup-actions #fix-setup {
+  margin-left: auto;
+}
+.camera-options,
+#camera-controls {
+  flex-wrap: wrap;
 }
 .primary {
   background: #204e91;
@@ -449,7 +448,7 @@ aside {
   background: #163967;
 }
 #ready-message {
-  min-height: 36px;
+  flex: 1;
 }
 #tracking-readout {
   color: #505b68;

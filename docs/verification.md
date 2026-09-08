@@ -23,7 +23,7 @@ No physical MacBook keyboard attempts were observed during ALO-185 implementatio
 
 A short hands-on check:
 
-1. Run `pnpm dev`; use Chrome on the external display. Tilt the built-in MacBook webcam toward the keyboard. Map the 30 positions; inspect the dots and hand labels. Go should unlock without checkboxes or a both-hands gate. Try f, j and space in the optional diagnostic; confirm the observed labels match your actual fingers.
+1. Run `pnpm dev`; use Chrome on the external display. Tilt the built-in MacBook webcam toward the keyboard. Map the 30 positions; inspect the dots and hand labels. Go should unlock without checkboxes or a both-hands gate. Click the camera view, then try f, j and space before Go; confirm the observed labels match your actual fingers.
 2. Complete the 49-word passage using correct fingers at a comfortable, deliberate pace. Record false wrong-finger rejections and unverified press counts; record any unverified presses and whether the camera reports missing capture timing or no hands. If false rejections repeatedly interrupt you, use setup repair, adjust lighting/framing/dots, and repeat the complete passage. Do not count this acceptance as passed merely because the results screen is reachable.
 3. On another passage, deliberately use the left index for **a** (first word), **q** (quick), **z** (zipped), and right index for **o** (fox), **l** (sleepy), **.** (village.). Keep the other letters correct. Confidently detected wrong fingers should stay on the word and explain the finger; repeat correctly to advance. Record missed deliberate mistakes as well: every press now receives a finger, so a missed mistake means the nearest-fingertip estimate named a different finger. Also submit a word’s space with a non-thumb. Complete the passage.
 4. Reload, check that saved dots load automatically and can be adjusted, then move the lid slightly and **remap**. Check that Reset local data removes calibration/history. Observe whether word boundaries are responsive and whether attempted input during checking is clearly explained.
@@ -50,7 +50,7 @@ These are screenshots of the implemented interface. Practice/results images use 
 
 ## Single-page restyle (ALO-222)
 
-The browser regression measures the keyboard and camera rectangles before camera enablement, after every mapped key, during optional finger testing, practice, retry and setup edits; all remain unchanged. The full-passage test also checks the camera rectangle at results. Go is tested with zero hands and is disabled until all 30 positions are valid. Missing capture timestamps produce unknown observations instead of using callback time.
+The browser regression measures the keyboard and camera rectangles before camera enablement, after every mapped key, during pre-practice key checks, practice, retry and setup edits; all remain unchanged. The full-passage test also checks the camera rectangle at results. Go is tested with zero hands and is disabled until all 30 positions are valid. Missing capture timestamps produce unknown observations instead of using callback time.
 
 Screenshots generated under `test-results/` are synthetic UI evidence, not real-camera accuracy measurements. The camera stays live at results and restarting practice reuses the map in place.
 

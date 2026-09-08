@@ -4,11 +4,12 @@ import { WORDS } from '../src/passage';
 
 test('complete guided setup, a whole correctly observed passage, results, restart and persistence', async ({
   page,
+  baseURL,
 }) => {
   test.setTimeout(150000);
   const external: string[] = [];
   page.on('request', (r) => {
-    if (!r.url().startsWith('http://127.0.0.1:4173/')) external.push(r.url());
+    if (new URL(r.url()).origin !== new URL(baseURL!).origin) external.push(r.url());
   });
   await syntheticCamera(page);
   await setup(page);
