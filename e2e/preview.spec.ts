@@ -132,3 +132,19 @@ test('two previews preserve separate storage across updates and resets', async (
   });
   expect(await first.evaluate(() => sessionStorage.getItem('probe'))).toBeNull();
 });
+
+test('production footer identifies the built commit without review branding', async ({ page }) => {
+  const sha =
+    process.env.GITHUB_SHA ||
+    execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+  await page.goto('/');
+  const label = page.locator('footer #build-version');
+  await expect(label).toHaveText(`Production · ${sha.slice(0, 7)}`);
+  await expect(label.locator('a')).toHaveAttribute(
+    'href',
+    `https://github.com/al-beton/right-typer/commit/${sha}`,
+  );
+  await page.setViewportSize({ width: 375, height: 812 });
+  await label.scrollIntoViewIfNeeded();
+  expect(await label.evaluate((el) => el.getBoundingClientRect().right <= innerWidth)).toBe(true);
+});
