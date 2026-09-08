@@ -19,7 +19,6 @@ test('one stable page from camera off through mapping, optional test, retry and 
   await expect(go).toBeDisabled();
   await expect(page.getByRole('checkbox')).toHaveCount(0);
   await page.screenshot({ path: 'test-results/single-page-initial.png', fullPage: true });
-  await page.getByRole('button', { name: 'Enable camera' }).click();
   await expect(page.locator('#requested-key')).toHaveText('Mark q in the image');
   // No hands at all: setup completion is independent of inference confidence/visibility.
   await page.evaluate(() => {

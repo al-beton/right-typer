@@ -246,16 +246,30 @@ test('boundary wait owns input; pause resumes the same word and pasted text cann
   await expect(page.locator('#input-message')).toContainText('Pasting is not graded');
 });
 
-test('permission denial is actionable and blocks calibration', async ({ page }) => {
+test('camera is requested on load; denial is actionable and the button retries once', async ({
+  page,
+}) => {
+  await syntheticCamera(page);
   await page.addInitScript(() => {
-    navigator.mediaDevices.getUserMedia = async () => {
-      throw new DOMException('Denied', 'NotAllowedError');
+    const original = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+    window.__cameraRequests = 0;
+    window.__denyCamera = true;
+    navigator.mediaDevices.getUserMedia = async (constraints) => {
+      window.__cameraRequests++;
+      if (window.__denyCamera) throw new DOMException('Denied', 'NotAllowedError');
+      return original(constraints);
     };
   });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Enable camera' }).click();
   await expect(page.locator('#setup-message')).toContainText('Camera permission is blocked');
   await expect(page.getByRole('button', { name: 'Remap key positions' })).toBeDisabled();
+  expect(await page.evaluate(() => window.__cameraRequests)).toBe(1);
+  await page.evaluate(() => {
+    window.__denyCamera = false;
+  });
+  await page.getByRole('button', { name: 'Enable camera' }).click();
+  await expect(page.locator('#camera-badge')).toContainText('hands detected');
+  expect(await page.evaluate(() => window.__cameraRequests)).toBe(2);
 });
 
 test('saved calibration survives a reload with the same camera', async ({ page }) => {
@@ -265,7 +279,6 @@ test('saved calibration survives a reload with the same camera', async ({ page }
     () => JSON.parse(localStorage.getItem('right-typer.v1')!).calibration,
   );
   await page.reload();
-  await page.getByRole('button', { name: 'Enable camera' }).click();
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
   const current = await page.locator('video').evaluate((v) => ({
     ...((v as HTMLVideoElement).srcObject as MediaStream).getVideoTracks()[0]!.getSettings(),
@@ -305,7 +318,6 @@ test('missing capture timestamps remain unknown without a setup gate', async ({ 
     };
   });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Enable camera' }).click();
   await expect(page.locator('#camera-badge')).toContainText('Capture timing unavailable');
   const { calibration } = await import('../tests/fixtures');
   for (const p of Object.values(calibration().points)) {
@@ -340,7 +352,6 @@ test('worker failure releases the stream and returns to camera recovery', async 
     } as unknown as typeof Worker;
   });
   await page.goto('/');
-  await page.getByRole('button', { name: 'Enable camera' }).click();
   await expect(page.locator('#setup-message')).toContainText('model asset unavailable');
   expect(await page.locator('video').evaluate((v) => (v as HTMLVideoElement).srcObject)).toBeNull();
   await expect(page.getByRole('button', { name: 'Enable camera' })).toBeEnabled();
