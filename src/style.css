@@ -291,10 +291,7 @@ main {
 }
 .space-key {
   width: 360px;
-  height: 36px;
   background: #e2e5e9;
-  flex-direction: row;
-  gap: 15px;
 }
 .next-key {
   outline: 3px solid #172c50;
