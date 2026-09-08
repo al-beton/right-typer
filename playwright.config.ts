@@ -1,4 +1,5 @@
 import { defineConfig } from '@playwright/test';
+const port = Number(process.env.PLAYWRIGHT_PORT ?? 4173);
 export default defineConfig({
   testDir: './e2e',
   timeout: 90000,
@@ -6,7 +7,7 @@ export default defineConfig({
   workers: 1,
   expect: { timeout: 10000 },
   use: {
-    baseURL: 'http://127.0.0.1:4173',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? `http://127.0.0.1:${port}`,
     viewport: { width: 1440, height: 1100 },
     permissions: ['camera'],
     launchOptions: {
@@ -15,10 +16,12 @@ export default defineConfig({
     trace: 'retain-on-failure',
     screenshot: 'only-on-failure',
   },
-  webServer: {
-    command: 'pnpm build && pnpm preview --port 4173',
-    env: { BUILD_ENV: 'production' },
-    url: 'http://127.0.0.1:4173',
-    reuseExistingServer: false,
-  },
+  webServer: process.env.PLAYWRIGHT_BASE_URL
+    ? undefined
+    : {
+        command: `pnpm build && pnpm preview --port ${port}`,
+        env: { BUILD_ENV: 'production' },
+        url: `http://127.0.0.1:${port}`,
+        reuseExistingServer: false,
+      },
 });

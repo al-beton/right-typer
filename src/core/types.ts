@@ -12,6 +12,7 @@ export type Frame = {
 };
 export type Calibration = {
   version: 1;
+  profile?: import('./profile').KeyboardProfile;
   points: Record<string, Point>;
   deviceId: string;
   width: number;
@@ -26,6 +27,8 @@ export type Press = {
   id: number;
   attemptId: number;
   key: string;
+  code?: string;
+  allowedFingers?: Finger[];
   at: number;
   observation?: Observation;
 };

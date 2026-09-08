@@ -1,3 +1,14 @@
+import {
+  PRESETS,
+  calibrationCodes,
+  characterKey,
+  coverage,
+  geometrySignature,
+  profileFingers,
+  resolveEvent,
+  type KeyboardProfile,
+} from './core/profile';
+import { profileControls } from './view/profiles';
 import './style.css';
 import { orderedFingers, fingerBackground, readFingerPalette } from './view/finger-colours';
 import { drawCalibrationDot } from './view/calibration-dot';
@@ -5,15 +16,12 @@ import { unrotatePoint, isCameraRotation } from './view/rotation';
 import { Camera } from './tracking/camera';
 import { keyTime } from './tracking/timing';
 import {
-  CALIBRATION_KEYS,
   DIGITS,
   allowedFingers,
-  isCorrectFinger,
   MODES,
   isFingeringMode,
   policyLabel,
   LANDMARK_TIPS,
-  ROWS,
   fingerName,
   intended,
   keyName,
@@ -31,6 +39,17 @@ const escapeHtml = (text: string) =>
     (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!,
   );
 let saved = load();
+let profile =
+  [...PRESETS, ...(saved.customProfiles ?? [])].find((p) => p.id === saved.profileId) ??
+  PRESETS[0]!;
+saved.profileId = profile.id;
+let CALIBRATION_KEYS = calibrationCodes(profile);
+const physicalLabel = (code: string) =>
+  profile.keys.find((k) => k.code === code)?.label ?? code.replace('-', ' ');
+const fingersForText = (text: string) =>
+  profileFingers(profile, characterKey(profile, text)?.code ?? '', fingeringMode);
+const hintForText = (text: string) =>
+  text === ' ' ? 'either thumb' : fingersForText(text).map(fingerName).join(' or ');
 let fingeringMode = saved.fingeringMode ?? 'standard';
 let cameraRotation = saved.cameraRotation ?? 0;
 let autoStartPending = saved.practiceEnabled ?? !!saved.calibration;
@@ -44,7 +63,7 @@ let swapHands = saved.calibration?.swapHands ?? false;
 let exercise = new Exercise(WORDS, fingeringMode);
 let resuming = false;
 let setupOpen = true;
-let message = '';
+let message = saved.migrationNotice ?? '';
 let storageWarning = '';
 let boundaryKeys = 0;
 let diagnosticsId = -1;
@@ -61,6 +80,7 @@ $('#app').innerHTML = `
     )
       .map(([value, name]) => `<option value="${value}">${name}</option>`)
       .join('')}</select><span id="policy-status" role="status"></span></div>
+    <section id="profile-settings" aria-label="Keyboard settings"></section>
     <section id="camera-section" aria-label="Live camera and finger tracking">
       <div class="camera-heading"><h2>Camera & key positions</h2><span id="camera-badge" role="status">Camera off</span></div>
       <div class="camera-layout">
@@ -74,7 +94,7 @@ $('#app').innerHTML = `
       </div>
     </section>
     <div id="storage-warning" class="storage-alert" role="status" hidden></div>
-    <footer><span>Local processing · Apple British ISO · Chrome on MacBook</span><button class="text-button" id="reset">Reset local data</button><span id="build-version" aria-label="App version">${import.meta.env.VITE_BUILD_LABEL} · <a href="https://github.com/al-beton/right-typer/commit/${import.meta.env.VITE_BUILD_SHA}" title="${import.meta.env.VITE_BUILD_SHA}">${import.meta.env.VITE_BUILD_SHA.slice(0, 7)}</a></span></footer>
+    <footer><span>Local processing · Keyboard profiles · Chrome</span><button class="text-button" id="reset">Reset local data</button><span id="build-version" aria-label="App version">${import.meta.env.VITE_BUILD_LABEL} · <a href="https://github.com/al-beton/right-typer/commit/${import.meta.env.VITE_BUILD_SHA}" title="${import.meta.env.VITE_BUILD_SHA}">${import.meta.env.VITE_BUILD_SHA.slice(0, 7)}</a></span></footer>
   </main>`;
 const video = $<HTMLVideoElement>('#camera');
 const canvas = $<HTMLCanvasElement>('#overlay');
@@ -118,12 +138,15 @@ function store() {
 }
 function keyboard() {
   const key = (k: string) => {
-    const fingers = orderedFingers(allowedFingers(k, fingeringMode));
-    const label = intended(k, fingeringMode);
+    const fingers = orderedFingers(profileFingers(profile, k, fingeringMode));
+    const label =
+      k === 'Space'
+        ? 'either thumb'
+        : profileFingers(profile, k, fingeringMode).map(fingerName).join(' or ');
     const names = fingers.map(fingerName);
     const [first, second] = fingers;
     const compactLabel =
-      k === ' '
+      k === 'Space'
         ? label
         : first && second && first.split('-')[0] === second.split('-')[0]
           ? `${names[0]}/${second.split('-')[1]}`
@@ -131,9 +154,13 @@ function keyboard() {
             ? `left/right ${first.split('-')[1]}`
             : names.join('/');
     const background = `background:${fingerBackground(fingers)}`;
-    return `<span class="key ${k === ' ' ? 'space-key' : `finger-${fingers[0]}`}" style="${background}" title="${label}" aria-label="${keyName(k)}: ${label}" data-key="${k}"><b>${k === ' ' ? 'space' : k}</b><small>${compactLabel}</small></span>`;
+    return `<span class="key ${k === 'Space' ? 'space-key' : `finger-${fingers[0]}`}" style="${background}" title="${label}" aria-label="${escapeHtml(physicalLabel(k))}: ${label}" data-key="${k}"><b>${escapeHtml(physicalLabel(k))}</b><small>${compactLabel}</small></span>`;
   };
-  return `<div class="keyboard">${ROWS.map((row, i) => `<div class="key-row row-${i}">${[...row].map(key).join('')}</div>`).join('')}<div class="key-row">${key(' ')}</div></div>`;
+  const minX = Math.min(...profile.keys.map((k) => k.x)),
+    minY = Math.min(...profile.keys.map((k) => k.y));
+  const width = Math.max(...profile.keys.map((k) => k.x + k.width)) - minX;
+  const height = Math.max(...profile.keys.map((k) => k.y + k.height)) - minY;
+  return `<div class="keyboard physical-keyboard" style="aspect-ratio:${width}/${height}">${profile.keys.map((k) => `<div class="physical-position" style="left:${((k.x - minX) / width) * 100}%;top:${((k.y - minY) / height) * 100}%;width:${(k.width / width) * 100}%;height:${(k.height / height) * 100}%">${key(k.code)}</div>`).join('')}</div>`;
 }
 const modeControl = $<HTMLSelectElement>('#fingering-mode');
 modeControl.value = fingeringMode;
@@ -192,6 +219,10 @@ function render() {
     input.value = exercise.attempt.text;
     input.onkeydown = typing;
     input.onbeforeinput = (e) => e.preventDefault();
+    input.addEventListener('compositionstart', () => {
+      $('#input-message').textContent =
+        'Composition cannot be graded. Use a direct input source or edit your keyboard profile.';
+    });
     input.onpaste = (e) => {
       e.preventDefault();
       $('#input-message').textContent =
@@ -236,12 +267,17 @@ function formatTime(ms: number) {
 function sameCamera(c: Calibration) {
   const s = camera.settings();
   return (
-    s?.deviceId === c.deviceId && video.videoWidth === c.width && video.videoHeight === c.height
+    !!c.profile &&
+    geometrySignature(c.profile) === geometrySignature(profile) &&
+    s?.deviceId === c.deviceId &&
+    video.videoWidth === c.width &&
+    video.videoHeight === c.height
   );
 }
 function makeCalibration(): Calibration {
   return {
     version: 1,
+    profile: structuredClone(profile),
     points: structuredClone(points),
     deviceId: camera.settings()?.deviceId ?? '',
     width: video.videoWidth,
@@ -263,7 +299,7 @@ function startCalibration() {
   setPhase('calibrate');
 }
 function ready() {
-  return camera.status === 'ready' && draftValid();
+  return camera.status === 'ready' && coverage(profile).length === 0 && draftValid();
 }
 function passageMarkup() {
   return `<div class="passage" aria-label="Practice passage">${WORDS.map((w, i) => `<span class="${i < exercise.index ? 'passed' : i === exercise.index ? 'active' : ''}">${w}</span>`).join(' ')}</div>`;
@@ -307,8 +343,8 @@ function renderSetup() {
   $('#setup-panel').innerHTML = `
     <p id="setup-message" role="status">${escapeHtml(locked ? 'Keep the camera and keyboard still.' : message)}</p>
     <div id="mapping-editor" ${showMapping ? '' : 'hidden'}>
-    <div class="mapping-heading"><strong id="requested-key">${editing ? `Mark ${CALIBRATION_KEYS[selectedKey]!.replace('-', ' ')} in the image` : 'Key positions'}</strong><span>${count} / ${CALIBRATION_KEYS.length}</span></div>
-    <div class="cal-keys" aria-label="Choose a key to edit">${CALIBRATION_KEYS.map((k, i) => `<button class="cal-key ${points[k] ? 'mapped' : ''} ${editing && i === selectedKey ? 'selected' : ''}" data-cal="${i}" aria-label="Map ${k}" aria-pressed="${editing && i === selectedKey}" ${camera.status !== 'ready' || locked ? 'disabled' : ''}>${k.startsWith('space') ? (k.endsWith('left') ? 'space ◂' : 'space ▸') : k}<span aria-hidden="true" style="visibility:${points[k] ? 'visible' : 'hidden'}"> ✓</span></button>`).join('')}</div>
+    <div class="mapping-heading"><strong id="requested-key">${editing ? `Mark ${escapeHtml(physicalLabel(CALIBRATION_KEYS[selectedKey]!))} in the image` : 'Key positions'}</strong><span>${count} / ${CALIBRATION_KEYS.length}</span></div>
+    <div class="cal-keys" aria-label="Choose a key to edit">${CALIBRATION_KEYS.map((k, i) => `<button class="cal-key ${points[k] ? 'mapped' : ''} ${editing && i === selectedKey ? 'selected' : ''}" data-cal="${i}" aria-label="Map ${escapeHtml(physicalLabel(k))}" aria-pressed="${editing && i === selectedKey}" ${camera.status !== 'ready' || locked ? 'disabled' : ''}>${k.startsWith('space') ? (k.endsWith('left') ? 'space ◂' : 'space ▸') : escapeHtml(physicalLabel(k))}<span aria-hidden="true" style="visibility:${points[k] ? 'visible' : 'hidden'}"> ✓</span></button>`).join('')}</div>
     <p id="cal-message">Click key centres and both ends of space. Select a key to adjust it. Arrows nudge; Enter selects the next.</p>
     <button id="remap" ${camera.status !== 'ready' || locked ? 'disabled' : ''}>Remap key positions</button>
     </div>
@@ -342,6 +378,7 @@ function startPractice() {
   setupOpen = false;
   calibration = makeCalibration();
   saved.calibration = calibration;
+  saved.calibrations = { ...saved.calibrations, [profile.id]: calibration };
   saved.practiceEnabled = true;
   autoStartPending = false;
   store();
@@ -431,10 +468,10 @@ function cameraChanged() {
     saved.cameraDeviceId = selectedCamera;
     store();
     message = 'Mark the key centres in the camera image. Keep the camera still.';
-    const previous = disconnectedDraft ?? saved.calibration;
+    const previous = disconnectedDraft ?? saved.calibration ?? saved.calibrations?.[profile.id];
     disconnectedDraft = undefined;
     if (previous && sameCamera(previous)) {
-      calibration = structuredClone(previous);
+      calibration = { ...structuredClone(previous), profile: structuredClone(profile) };
       points = calibration.points;
       swapHands = calibration.swapHands;
       phase = validCalibration(calibration) ? 'verify' : 'calibrate';
@@ -492,7 +529,7 @@ function drawOverlay(frame: Frame) {
       ctx,
       x,
       y,
-      allowedFingers(key === 'space-left' || key === 'space-right' ? ' ' : key, fingeringMode),
+      profileFingers(profile, key.startsWith('space-') ? 'Space' : key, fingeringMode),
       fingerPalette,
       selected,
       cameraRotation,
@@ -501,7 +538,11 @@ function drawOverlay(frame: Frame) {
       ctx.fillStyle = '#0e251d';
       ctx.fillRect(-9, -25, key.startsWith('space') ? 28 : 19, 17);
       ctx.fillStyle = '#fff';
-      ctx.fillText(key.startsWith('space') ? (key.endsWith('left') ? 'S◂' : 'S▸') : key, -5, -12);
+      ctx.fillText(
+        key.startsWith('space') ? (key.endsWith('left') ? 'S◂' : 'S▸') : physicalLabel(key),
+        -5,
+        -12,
+      );
     });
   }
   const connections = [
@@ -654,6 +695,10 @@ $('#reset').onclick = () => {
     return;
   }
   camera.stop();
+  profile = PRESETS[0]!;
+  CALIBRATION_KEYS = calibrationCodes(profile);
+  saved.profileId = profile.id;
+  profilesUI.reset();
   fingeringMode = 'standard';
   modeControl.value = fingeringMode;
   $('#policy-status').textContent = '';
@@ -680,10 +725,16 @@ $('#reset').onclick = () => {
 };
 function typing(event: KeyboardEvent) {
   if (phase !== 'practice' || event.currentTarget !== document.activeElement || !ready()) return;
-  if (event.key === 'Tab' || event.metaKey || event.ctrlKey || event.altKey) return;
+  if (
+    event.key === 'Tab' ||
+    event.metaKey ||
+    ((event.ctrlKey || event.altKey) && !event.getModifierState('AltGraph'))
+  )
+    return;
   event.preventDefault();
-  if (event.isComposing) {
-    $('#input-message').textContent = 'Switch to the English keyboard input source to practise.';
+  if (event.isComposing || event.key === 'Dead' || event.key === 'Process') {
+    $('#input-message').textContent =
+      'Composition/dead keys cannot be graded. Use a direct input source or edit your keyboard profile.';
     return;
   }
   if (event.key === 'Escape') {
@@ -722,11 +773,18 @@ function typing(event: KeyboardEvent) {
       'This attempt is getting long. Press space for feedback, or Escape to pause.';
     return;
   }
+  const resolved = resolveEvent(profile, event);
+  if ('error' in resolved) {
+    $('#input-message').textContent = resolved.error;
+    return;
+  }
   const press = exercise.press(
     event.key,
     keyTime(event, performance.now(), performance.timeOrigin),
   );
   if (!press) return;
+  press.code = resolved.code;
+  press.allowedFingers = profileFingers(profile, resolved.code, fingeringMode);
   if (event.key === ' ') render();
   else updateTyped();
   const owner = exercise;
@@ -761,10 +819,17 @@ function updateTyped() {
   const input = $<HTMLInputElement>('#typing');
   input.value = exercise.attempt.text;
   const next = WORDS[exercise.index]?.[exercise.attempt.text.length] ?? ' ';
-  $('#word-hint').textContent = `Next: ${keyName(next)} · ${intended(next, fingeringMode)}`;
+  const nextOutput = characterKey(profile, next)?.outputs.find((o) => o.text === next);
+  const modifiers = [nextOutput?.shift ? 'Shift' : '', nextOutput?.altGr ? 'AltGr' : '']
+    .filter(Boolean)
+    .join('+');
+  $('#word-hint').textContent =
+    `Next: ${keyName(next)}${modifiers ? ` (${modifiers})` : ''} · ${hintForText(next)}`;
   document
     .querySelectorAll<HTMLElement>('[data-key]')
-    .forEach((el) => el.classList.toggle('next-key', el.dataset.key === next));
+    .forEach((el) =>
+      el.classList.toggle('next-key', el.dataset.key === characterKey(profile, next)?.code),
+    );
 }
 function retryWord() {
   exercise.retry();
@@ -789,10 +854,11 @@ function attemptDetails() {
       const cls =
         !o || o.kind === 'uncertain'
           ? 'unseen'
-          : o?.kind === 'finger' && isCorrectFinger(p.key, o.finger, a.mode)
+          : o?.kind === 'finger' &&
+              (p.allowedFingers ?? allowedFingers(p.key, a.mode)).includes(o.finger)
             ? 'ok'
             : 'wrong';
-      return `<span class="press-result ${cls}" title="${escapeHtml(o?.kind === 'finger' ? `Saw ${fingerName(o.finger)}; use ${intended(p.key, a.mode)}` : (o?.reason ?? 'No evidence'))}">${p.key === ' ' ? 'space' : p.key} <small>${cls === 'ok' ? '✓' : cls === 'wrong' ? '×' : '?'}</small></span>`;
+      return `<span class="press-result ${cls}" title="${escapeHtml(o?.kind === 'finger' ? `Saw ${fingerName(o.finger)}; use ${p.allowedFingers?.map(fingerName).join(' or ') ?? intended(p.key, a.mode)}` : (o?.reason ?? 'No evidence'))}">${p.key === ' ' ? 'space' : p.key} <small>${cls === 'ok' ? '✓' : cls === 'wrong' ? '×' : '?'}</small></span>`;
     })
     .join('')}</div>`;
 }
@@ -805,9 +871,8 @@ function diagnostic(event: KeyboardEvent) {
     event.repeat ||
     event.isComposing ||
     event.metaKey ||
-    event.ctrlKey ||
-    event.altKey ||
-    !allowedFingers(event.key, fingeringMode).length
+    ((event.ctrlKey || event.altKey) && !event.getModifierState('AltGraph')) ||
+    !/^[a-z,. ]$/.test(event.key)
   )
     return;
   // Form controls and keyboard editors own their keys, including Space activation.
@@ -819,17 +884,30 @@ function diagnostic(event: KeyboardEvent) {
           target instanceof HTMLElement &&
           (target.isContentEditable ||
             target.matches(
-              'input, textarea, select, button, a, summary, [role="textbox"], [role="combobox"], [role="grid"], [data-keyboard-editor]',
+              'input, textarea, select, button, a, summary, [role="textbox"], [role="combobox"], [role="grid"], [data-keyboard-editor], #profile-editor',
             )),
       )
   )
     return;
   event.preventDefault();
+  if (event.isComposing || ['Dead', 'Process'].includes(event.key)) {
+    $('#diagnostic-result').textContent =
+      'Composition/dead keys cannot be observed. Use a direct input source or edit your profile.';
+    return;
+  }
+  if (!/^[a-z,. ]$/.test(event.key) || event.repeat || !ready()) return;
+  const resolved = resolveEvent(profile, event);
+  if ('error' in resolved) {
+    $('#diagnostic-result').textContent = resolved.error;
+    return;
+  }
   const checkCalibration = makeCalibration();
   const press: Press = {
     id: diagnosticsId--,
     attemptId: -1,
     key: event.key,
+    code: resolved.code,
+    allowedFingers: profileFingers(profile, resolved.code, fingeringMode),
     at: keyTime(event, performance.now(), performance.timeOrigin),
   };
   const id = press.id;
@@ -838,11 +916,57 @@ function diagnostic(event: KeyboardEvent) {
     if (phase === 'practice' || phase === 'results' || id !== diagnosticsId + 1) return;
     $('#diagnostic-result').textContent =
       o.kind === 'finger'
-        ? `${keyName(press.key)}: saw ${fingerName(o.finger)}. Intended: ${intended(press.key, fingeringMode)}.`
+        ? `${keyName(press.key)}: saw ${fingerName(o.finger)}. Intended: ${press.allowedFingers!.map(fingerName).join(' or ')}.`
         : `${keyName(press.key)}: unknown. ${o.reason}`;
   });
 }
 document.addEventListener('keydown', diagnostic);
+const profilesUI = profileControls(
+  $('#profile-settings'),
+  profile,
+  saved.customProfiles ?? [],
+  (next, customs) => {
+    disableAutoStart();
+    exercise.pause();
+    resuming = phase === 'practice' || resuming;
+    diagnosticsId--;
+    boundaryKeys = 0;
+    camera.evidence.reset();
+    if (calibration && validCalibration(calibration))
+      saved.calibrations = { ...saved.calibrations, [profile.id]: structuredClone(calibration) };
+    const previous = makeCalibration();
+    profile = next;
+    CALIBRATION_KEYS = calibrationCodes(profile);
+    selectedKey = 0;
+    saved.profileId = profile.id;
+    saved.customProfiles = customs;
+    const own = saved.calibrations?.[profile.id];
+    const candidate =
+      own && sameCamera(own)
+        ? own
+        : validCalibration(previous) && sameCamera(previous)
+          ? previous
+          : undefined;
+    calibration = candidate
+      ? { ...structuredClone(candidate), profile: structuredClone(profile) }
+      : undefined;
+    points = calibration?.points ?? {};
+    disconnectedDraft = undefined;
+    saved.calibration = calibration;
+    message = calibration
+      ? 'Compatible key positions kept. Go starts a fresh attempt.'
+      : 'This keyboard needs its own key positions. Previous calibration is retained locally; map the keys before Go.';
+    $('#profile-status').textContent = message;
+    phase = camera.status === 'ready' ? (calibration ? 'verify' : 'calibrate') : 'setup';
+    if (!resuming) exercise = new Exercise(WORDS, fingeringMode);
+    $('#finger-map').innerHTML = keyboard();
+    store();
+    render();
+  },
+);
+$('#profile-status').textContent = coverage(profile).length
+  ? `Missing passage characters: ${coverage(profile).join(' ')}. Edit your profile before practice.`
+  : (saved.migrationNotice ?? '');
 document.addEventListener('visibilitychange', () => {
   if (document.hidden && phase === 'practice') pause(false);
 });

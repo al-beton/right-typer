@@ -1,3 +1,4 @@
+import { LEGACY_CODES } from '../src/core/profile';
 import { test, expect } from '@playwright/test';
 import { syntheticCamera, word } from './helpers';
 import { calibration } from '../tests/fixtures';
@@ -48,11 +49,11 @@ test.describe('camera view rotation', () => {
       for (const [key, point] of Object.entries(calibration().points)) {
         // Browser pointer events round to CSS pixels; bound the native-coordinate error to one displayed pixel.
         expect(
-          Math.abs(stored.calibration.points[key].x - point.x) *
+          Math.abs(stored.calibration.points[LEGACY_CODES[key] ?? key].x - point.x) *
             (angle % 180 ? canvasBox.height : canvasBox.width),
         ).toBeLessThanOrEqual(1.01);
         expect(
-          Math.abs(stored.calibration.points[key].y - point.y) *
+          Math.abs(stored.calibration.points[LEGACY_CODES[key] ?? key].y - point.y) *
             (angle % 180 ? canvasBox.width : canvasBox.height),
         ).toBeLessThanOrEqual(1.01);
       }
@@ -91,7 +92,7 @@ test.describe('camera view rotation', () => {
       await page.locator('#overlay').press('ArrowRight');
       await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
       const q = await page.evaluate(
-        () => JSON.parse(localStorage.getItem('right-typer.v1')!).calibration.points.q,
+        () => JSON.parse(localStorage.getItem('right-typer.v1')!).calibration.points.KeyQ,
       );
       const [dx, dy] =
         angle === 90
@@ -101,8 +102,8 @@ test.describe('camera view rotation', () => {
             : angle === 270
               ? [0, 0.005]
               : [0.005, 0];
-      expect(q.x).toBeCloseTo(stored.calibration.points.q.x + dx, 8);
-      expect(q.y).toBeCloseTo(stored.calibration.points.q.y + dy, 8);
+      expect(q.x).toBeCloseTo(stored.calibration.points.KeyQ.x + dx, 8);
+      expect(q.y).toBeCloseTo(stored.calibration.points.KeyQ.y + dy, 8);
       await page.getByRole('button', { name: 'Reset local data' }).click();
       await page.getByRole('button', { name: 'Confirm reset' }).click();
       await expect(rotation).toHaveValue('0');

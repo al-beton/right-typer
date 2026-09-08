@@ -1,5 +1,5 @@
 import type { Observation, Press } from './types';
-import { intended, isCorrectFinger, keyName, type FingeringMode } from './keyboard';
+import { intended, allowedFingers, keyName, type FingeringMode } from './keyboard';
 export type Attempt = {
   id: number;
   wordIndex: number;
@@ -23,7 +23,7 @@ export function grade(attempt: Attempt, word: string): Verdict {
   const wrong = attempt.presses.filter(
     (p) =>
       p.observation?.kind === 'finger' &&
-      !isCorrectFinger(p.key, p.observation.finger, attempt.mode),
+      !(p.allowedFingers ?? allowedFingers(p.key, attempt.mode)).includes(p.observation.finger),
   );
   const uncertain = attempt.presses.filter(
     (p) => !p.observation || p.observation.kind === 'uncertain',
@@ -38,7 +38,9 @@ export function feedback(verdict: Verdict, word: string, mode: FingeringMode = '
   if (verdict.wrong.length) {
     const p = verdict.wrong[0]!;
     const actual = p.observation?.kind === 'finger' ? p.observation.finger.replace('-', ' ') : '';
-    parts.push(`For ${keyName(p.key)}, I saw ${actual}. Use ${intended(p.key, mode)}.`);
+    parts.push(
+      `For ${keyName(p.key)}, I saw ${actual}. Use ${p.allowedFingers?.map((f) => f.replace('-', ' ')).join(' or ') ?? intended(p.key, mode)}.`,
+    );
   }
   if (verdict.uncertain.length)
     parts.push(
