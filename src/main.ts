@@ -65,7 +65,7 @@ $('#app').innerHTML = `
       <div class="camera-layout">
         <div class="view-wrap" id="view-wrap"><div id="camera-image"><video id="camera" autoplay playsinline muted aria-label="Live view of your keyboard"></video><canvas id="overlay" aria-label="Keyboard calibration. Click the center of the requested key, or use arrow keys and Enter." tabindex="0"></canvas></div><div class="camera-empty" id="camera-empty"><strong>Allow camera access to get set up</strong><span>Tilt your MacBook screen toward the keyboard.<br/>Use your external display for this page.</span></div></div>
         <aside>
-          <div class="camera-options"><label for="camera-rotation">Rotate camera view</label><select id="camera-rotation"><option value="0">0°</option><option value="90">90° clockwise</option><option value="180">180°</option><option value="270">270° clockwise</option></select></div>
+          <div class="camera-options"><label for="camera-rotation">Rotate camera view</label><select id="camera-rotation"><option value="0">0°</option><option value="90">90° clockwise</option><option value="180">180°</option><option value="270">270° clockwise</option></select><button id="swap" aria-pressed="false">Swap left/right hand labels</button></div>
           <div id="camera-controls"><label for="device">Camera</label><select id="device"><option value="">MacBook / default camera</option></select><button id="start-camera">Enable camera</button><button id="disconnect-camera" hidden>Disconnect camera</button></div>
           <div id="setup-panel"></div>
           <p id="tracking-readout">Camera frames stay in this browser.</p>
@@ -264,9 +264,8 @@ function renderSetup() {
     <div class="cal-keys" aria-label="Choose a key to edit">${CALIBRATION_KEYS.map((k, i) => `<button class="cal-key ${points[k] ? 'mapped' : ''} ${editing && i === selectedKey ? 'selected' : ''}" data-cal="${i}" aria-label="Map ${k}" aria-pressed="${editing && i === selectedKey}" ${camera.status !== 'ready' || locked ? 'disabled' : ''}>${k.startsWith('space') ? (k.endsWith('left') ? 'space ◂' : 'space ▸') : k}<span aria-hidden="true" style="visibility:${points[k] ? 'visible' : 'hidden'}"> ✓</span></button>`).join('')}</div>
     <p id="cal-message">${editing ? 'Click each key centre. Mark both ends of space. Select any key above to adjust it; arrow keys nudge, Enter selects the next.' : 'Dots show the saved positions. If the camera moved, select a key to adjust it or remap below.'}</p>
     <button id="remap" ${camera.status !== 'ready' || locked ? 'disabled' : ''}>Remap key positions</button>
-    <div class="diagnostic"><label for="diagnostic-input">Test finger detection (optional)</label><input id="diagnostic-input" autocomplete="off" placeholder="Try f, j and space" aria-label="Check observed fingers" ${!complete || locked ? 'disabled' : ''}/><p id="diagnostic-result" role="status">Try correct and different fingers. Check whether the observed labels match.</p><button id="swap" aria-pressed="${swapHands}" ${!complete || locked ? 'disabled' : ''}>${swapHands ? 'Restore' : 'Swap'} left/right hand labels</button></div>
-    <div class="setup-actions"><button class="primary" id="practice" ${!complete || locked ? 'disabled' : ''}>Go</button><button id="fix-setup" ${!locked ? 'disabled' : ''}>Edit setup</button></div>
-    <p id="ready-message" role="status">${complete ? 'Ready. If the camera moved, adjust the dots before Go.' : count === CALIBRATION_KEYS.length && camera.status === 'ready' ? 'Some dots overlap or rows are too flat. Adjust those positions.' : 'Go unlocks when all key positions are configured.'}</p>`;
+    <p id="diagnostic-result" role="status">${complete && !locked ? 'Press a practice key to check the observed finger.' : ''}</p>
+    <div class="setup-actions"><button class="primary" id="practice" ${!complete || locked ? 'disabled' : ''}>Go</button><span id="ready-message" role="status">${locked ? (phase === 'practice' ? 'Practising' : 'Complete') : complete ? 'Ready' : camera.status !== 'ready' ? 'Connect the camera to begin.' : count === CALIBRATION_KEYS.length ? 'Adjust overlapping dots or flat rows.' : 'Mark all key positions to begin.'}</span><button id="fix-setup" ${!locked ? 'disabled' : ''}>Edit setup</button></div>`;
   $('#setup-panel')
     .querySelectorAll<HTMLButtonElement>('[data-cal]')
     .forEach((el) => {
@@ -277,13 +276,15 @@ function renderSetup() {
       };
     });
   $('#remap').onclick = startCalibration;
+  $<HTMLButtonElement>('#swap').disabled = !complete || locked;
+  $('#swap').setAttribute('aria-pressed', String(swapHands));
+  $('#swap').textContent = `${swapHands ? 'Restore' : 'Swap'} left/right hand labels`;
   $('#swap').onclick = () => {
     swapHands = !swapHands;
     calibration = makeCalibration();
     camera.evidence.reset();
     renderSetup();
   };
-  $('#diagnostic-input').onkeydown = (event) => diagnostic(event as KeyboardEvent);
   $('#practice').onclick = startPractice;
   $('#fix-setup').onclick = () => {
     disableAutoStart();
@@ -734,10 +735,35 @@ function attemptDetails() {
     .join('')}</div>`;
 }
 function diagnostic(event: KeyboardEvent) {
-  if (event.key === 'Tab') return;
+  if (
+    phase === 'practice' ||
+    phase === 'results' ||
+    !ready() ||
+    event.defaultPrevented ||
+    event.repeat ||
+    event.isComposing ||
+    event.metaKey ||
+    event.ctrlKey ||
+    event.altKey ||
+    !allowedFingers(event.key, fingeringMode).length
+  )
+    return;
+  // Form controls and keyboard editors own their keys, including Space activation.
+  if (
+    event
+      .composedPath()
+      .some(
+        (target) =>
+          target instanceof HTMLElement &&
+          (target.isContentEditable ||
+            target.matches(
+              'input, textarea, select, button, a, summary, [role="textbox"], [role="combobox"], [role="grid"], [data-keyboard-editor]',
+            )),
+      )
+  )
+    return;
   event.preventDefault();
-  if (!/^[a-z,. ]$/.test(event.key) || event.repeat || !ready()) return;
-  calibration = makeCalibration();
+  const checkCalibration = makeCalibration();
   const press: Press = {
     id: diagnosticsId--,
     attemptId: -1,
@@ -746,14 +772,15 @@ function diagnostic(event: KeyboardEvent) {
   };
   const id = press.id;
   $('#diagnostic-result').textContent = `Checking ${keyName(event.key)}…`;
-  camera.evidence.request(press, structuredClone(calibration)).then((o) => {
+  camera.evidence.request(press, checkCalibration).then((o) => {
     if (phase === 'practice' || phase === 'results' || id !== diagnosticsId + 1) return;
     $('#diagnostic-result').textContent =
       o.kind === 'finger'
-        ? `${keyName(press.key)}: saw ${fingerName(o.finger)}. Intended: ${intended(press.key, fingeringMode)}. Does that match what you did?`
-        : `Could not verify ${keyName(press.key)}. ${o.reason}`;
+        ? `${keyName(press.key)}: saw ${fingerName(o.finger)}. Intended: ${intended(press.key, fingeringMode)}.`
+        : `${keyName(press.key)}: unknown. ${o.reason}`;
   });
 }
+document.addEventListener('keydown', diagnostic);
 document.addEventListener('visibilitychange', () => {
   if (document.hidden && phase === 'practice') pause(false);
 });

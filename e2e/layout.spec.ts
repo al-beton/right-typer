@@ -63,7 +63,7 @@ test('one stable page from camera off through mapping, optional test, retry and 
     handsAt('f', 'left-index'),
   );
   await page.waitForTimeout(150);
-  await page.locator('#diagnostic-input').press('f');
+  await page.locator('#overlay').press('f');
   await expect(page.locator('#diagnostic-result')).toContainText('saw left index');
   await page.screenshot({ path: 'test-results/single-page-mapped-synthetic.png', fullPage: true });
   await go.click();
