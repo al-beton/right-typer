@@ -35,13 +35,18 @@ test('policies update labels, hints, errors and preserve camera geometry; refres
       const cell = page.locator(`[data-key="${key}"]`);
       await expect(cell).toHaveAttribute('title', intended(key, value));
       await expect(cell).toHaveAttribute('aria-label', new RegExp(intended(key, value)));
-      const split = await cell.evaluate((el) => getComputedStyle(el, '::after').backgroundImage);
+      const split = await cell.evaluate((el) => getComputedStyle(el).backgroundImage);
       expect(split.includes('linear-gradient')).toBe(
         key !== ' ' && allowedFingers(key, value).length === 2,
       );
     }
     expect(await geometry()).toEqual(initial);
   }
+  // W must continue Q's pink band into E's orange band, rather than reversing them.
+  await expect(page.locator('[data-key="w"]')).toHaveCSS(
+    'background-image',
+    'linear-gradient(90deg, rgb(247, 180, 200) 50%, rgb(255, 195, 131) 50%)',
+  );
   await page.screenshot({ path: 'docs/images/fingering-either-synthetic.png', fullPage: true });
   await mode.selectOption('alternate');
   await press(page, 'c', 'left-middle');
