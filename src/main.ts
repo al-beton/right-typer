@@ -30,6 +30,7 @@ let autoStartPending = saved.practiceEnabled ?? !!saved.calibration;
 let selectedCamera = saved.cameraDeviceId ?? saved.calibration?.deviceId ?? '';
 let phase: 'setup' | 'calibrate' | 'verify' | 'practice' | 'results' = 'setup';
 let calibration: Calibration | undefined;
+let disconnectedDraft: Calibration | undefined;
 let points: Record<string, Point> = {};
 let selectedKey = 0;
 let swapHands = saved.calibration?.swapHands ?? false;
@@ -53,7 +54,7 @@ $('#app').innerHTML = `
         <div class="view-wrap" id="view-wrap"><div id="camera-image"><video id="camera" autoplay playsinline muted aria-label="Live view of your keyboard"></video><canvas id="overlay" aria-label="Keyboard calibration. Click the center of the requested key, or use arrow keys and Enter." tabindex="0"></canvas></div><div class="camera-empty" id="camera-empty"><strong>Allow camera access to get set up</strong><span>Tilt your MacBook screen toward the keyboard.<br/>Use your external display for this page.</span></div></div>
         <aside>
           <div class="camera-options"><label for="camera-rotation">Rotate camera view</label><select id="camera-rotation"><option value="0">0°</option><option value="90">90° clockwise</option><option value="180">180°</option><option value="270">270° clockwise</option></select></div>
-          <div id="camera-controls"><label for="device">Camera</label><select id="device"><option value="">MacBook / default camera</option></select><button id="start-camera">Enable camera</button></div>
+          <div id="camera-controls"><label for="device">Camera</label><select id="device"><option value="">MacBook / default camera</option></select><button id="start-camera">Enable camera</button><button id="disconnect-camera" hidden>Disconnect camera</button></div>
           <div id="setup-panel"></div>
           <p id="tracking-readout">Camera frames stay in this browser.</p>
         </aside>
@@ -287,6 +288,14 @@ function updateCameraChoices() {
     .catch(() => {});
 }
 function cameraChanged() {
+  $('#disconnect-camera').hidden = !['loading', 'ready'].includes(camera.status);
+  $('#camera-empty strong').textContent = saved.cameraDisconnected
+    ? 'Camera disconnected'
+    : 'Allow camera access to get set up';
+  if (camera.status !== 'ready') {
+    canvas.getContext('2d')!.clearRect(0, 0, canvas.width, canvas.height);
+    $('#camera-badge').classList.remove('good');
+  }
   $('#camera-empty').hidden = camera.status === 'ready';
   if (camera.status !== 'ready')
     $('#tracking-readout').textContent = 'Camera frames stay in this browser.';
@@ -297,14 +306,18 @@ function cameraChanged() {
         ? 'Camera live'
         : camera.status === 'error'
           ? 'Camera needs attention'
-          : 'Camera off';
+          : saved.cameraDisconnected
+            ? 'Camera disconnected'
+            : 'Camera off';
   $<HTMLButtonElement>('#start-camera').disabled = camera.status === 'loading';
   $('#start-camera').textContent =
     camera.status === 'loading'
       ? 'Starting…'
       : camera.status === 'ready'
         ? 'Restart camera'
-        : 'Enable camera';
+        : saved.cameraDisconnected
+          ? 'Reconnect camera'
+          : 'Enable camera';
   if (camera.status === 'error') {
     message = camera.error;
     if (!cameraErrorHandled && ['practice', 'verify', 'calibrate'].includes(phase)) {
@@ -322,11 +335,13 @@ function cameraChanged() {
     saved.cameraDeviceId = selectedCamera;
     store();
     message = 'Mark the key centres in the camera image. Keep the camera still.';
-    if (saved.calibration && sameCamera(saved.calibration)) {
-      calibration = structuredClone(saved.calibration);
+    const previous = disconnectedDraft ?? saved.calibration;
+    disconnectedDraft = undefined;
+    if (previous && sameCamera(previous)) {
+      calibration = structuredClone(previous);
       points = calibration.points;
       swapHands = calibration.swapHands;
-      phase = 'verify';
+      phase = validCalibration(calibration) ? 'verify' : 'calibrate';
       message = 'Saved positions loaded. Adjust the dots if the camera or keyboard moved.';
     } else {
       points = {};
@@ -483,7 +498,23 @@ canvas.onkeydown = (event) => {
   render();
   canvas.focus();
 };
+function disconnectCamera() {
+  if (camera.status === 'ready') disconnectedDraft = makeCalibration();
+  // Invalidate practice before stop resolves pending evidence promises.
+  if (phase === 'practice') pause();
+  if (phase !== 'results') phase = 'setup';
+  diagnosticsId--;
+  boundaryKeys = 0;
+  saved.cameraDisconnected = true;
+  disableAutoStart();
+  message = 'Camera disconnected. Reconnect when you are ready.';
+  camera.stop();
+}
+$('#disconnect-camera').onclick = disconnectCamera;
 function restartCamera() {
+  message = 'Starting camera…';
+  saved.cameraDisconnected = false;
+  store();
   calibration = undefined;
   points = {};
   phase = 'setup';
@@ -494,7 +525,7 @@ $('#device').onchange = () => {
   selectedCamera = $<HTMLSelectElement>('#device').value;
   saved.cameraDeviceId = selectedCamera;
   disableAutoStart();
-  restartCamera();
+  if (!saved.cameraDisconnected) restartCamera();
 };
 $('#reset').onclick = () => {
   if (!resetArmed) {
@@ -509,6 +540,7 @@ $('#reset').onclick = () => {
   camera.stop();
   exercise = new Exercise(WORDS);
   saved = { results: [] };
+  disconnectedDraft = undefined;
   autoStartPending = false;
   selectedCamera = '';
   updateCameraChoices();
@@ -669,4 +701,5 @@ $('#finger-map').innerHTML = keyboard();
 render();
 updateCameraChoices();
 
-restartCamera();
+if (saved.cameraDisconnected) cameraChanged();
+else restartCamera();

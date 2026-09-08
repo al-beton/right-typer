@@ -37,3 +37,19 @@ it('persists explicit camera and Go preferences without treating malformed value
   expect(load(storage).cameraDeviceId).toBeUndefined();
   expect(load(storage).practiceEnabled).toBeUndefined();
 });
+
+it('persists explicit disconnect and ignores malformed disconnect preferences', () => {
+  let raw = '{}';
+  const storage = {
+    getItem: () => raw,
+    setItem: (_key: string, value: string) => {
+      raw = value;
+    },
+  };
+  for (const cameraDisconnected of [true, false]) {
+    save({ cameraDisconnected, results: [] }, storage);
+    expect(load(storage).cameraDisconnected).toBe(cameraDisconnected);
+  }
+  raw = JSON.stringify({ cameraDisconnected: 'true' });
+  expect(load(storage).cameraDisconnected).toBeUndefined();
+});
