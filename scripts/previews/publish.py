@@ -15,6 +15,7 @@ import urllib.request
 import zipfile
 
 SOURCE = "al-beton/right-typer"
+PUBLISHER_VERSION = 2
 MARKER = "<!-- right-typer-preview -->"
 MAX_BYTES = 100 * 1024 * 1024
 MAX_FILES = 2000
@@ -47,7 +48,9 @@ def unpack(data):
                 raise ValueError("Unsafe artifact entry")
             if entry.is_dir():
                 continue
-            if name in files or name in ("CNAME", "preview.json", "preview-banner.js"):
+            if name in files or name in (
+                "CNAME", "preview.json", "preview-banner.js", "preview-metadata.js"
+            ):
                 raise ValueError("Duplicate or reserved artifact path")
             total += entry.file_size
             if total > MAX_BYTES or entry.file_size > 50 * 1024 * 1024:
@@ -168,6 +171,7 @@ def eligible_run(run, pr, workflow_id):
 def decorate(files, number, sha, run_id, run_attempt=1):
     manifest = {
         "pr": number,
+        "publisher_version": PUBLISHER_VERSION,
         "sha": sha,
         "run_id": run_id,
         "run_attempt": run_attempt,
@@ -175,7 +179,7 @@ def decorate(files, number, sha, run_id, run_attempt=1):
         "files": {},
     }
     # This is a label, not a sandbox; reviewed JavaScript can modify/remove it.
-    banner = f"""// Convenience namespacing, not a security boundary.
+    metadata = f"""// Convenience namespacing, not a security boundary.
 const prefix='right-typer-preview-{number}:';
 const proto=Storage.prototype;
 const get=proto.getItem,set=proto.setItem,remove=proto.removeItem,key=proto.key;
@@ -186,22 +190,28 @@ const clear=proto.clear;
 proto.clear=function(){{if(this!==localStorage)return clear.call(this);
 const keys=[];for(let i=0;i<this.length;i++){{const k=key.call(this,i);if(k?.startsWith(prefix))keys.push(k)}}
 for(const k of keys)remove.call(this,k)}};
-addEventListener('DOMContentLoaded',()=>{{const b=document.createElement('aside');
-b.setAttribute('aria-label','PR preview');
-b.style.cssText='padding:12px;background:#fff3cd;color:#211b00;text-align:center';
-const a=document.createElement('a');a.href='https://github.com/{SOURCE}/pull/{number}';
-a.textContent='Review PR #{number} · {sha[:12]}';b.append(a);
-b.append(' · Untrusted preview code. Only allow camera access if you trust this PR. All previews share one origin.');
-document.body.prepend(b);}});"""
+addEventListener('DOMContentLoaded',()=>{{
+const label=document.getElementById('build-version')||document.createElement('span');
+label.id='build-version';label.setAttribute('aria-label','App version');
+label.style.cssText='font-size:12px;color:inherit;white-space:nowrap';
+const pr=document.createElement('a');pr.href='https://github.com/{SOURCE}/pull/{number}';
+pr.textContent='Review PR #{number}';pr.style.color='inherit';
+const commit=document.createElement('a');commit.href='https://github.com/{SOURCE}/commit/{sha}';
+commit.textContent='{sha[:7]}';commit.title='{sha}';commit.style.color='inherit';
+label.replaceChildren(pr,' · ',commit);
+const footer=document.querySelector('footer');
+if(footer){{footer.style.flexWrap='wrap';footer.append(label)}}
+else{{const footer=document.createElement('footer');footer.append(label);document.body.append(footer)}}
+}});"""
     files = dict(files)
-    files["preview-banner.js"] = banner.encode()
+    files["preview-metadata.js"] = metadata.encode()
     html = files["index.html"].decode("utf-8")
     # Relative script remains valid under /repository/pr-N/.
     if not re.search(r"<head(?:\s[^>]*)?>", html, re.IGNORECASE):
         raise ValueError("Missing HTML head")
     files["index.html"] = re.sub(
         r"(<head(?:\s[^>]*)?>)",
-        r'\1<script src="./preview-banner.js"></script>',
+        r'\1<script src="./preview-metadata.js"></script>',
         html,
         count=1,
         flags=re.IGNORECASE,
@@ -362,6 +372,7 @@ class Publisher:
         existing = self.published_manifest(number)
         if (
             existing
+            and existing.get("publisher_version") == PUBLISHER_VERSION
             and existing.get("pr") == number
             and existing.get("sha") == sha
             and existing.get("source") == SOURCE

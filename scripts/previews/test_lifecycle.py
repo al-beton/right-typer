@@ -188,6 +188,24 @@ class IntegrationTests(unittest.TestCase):
             )
             self.assertIn("README.md", [e["path"] for e in target.root()])
 
+    def test_publisher_upgrade_refreshes_same_head_preview(self):
+        source, target = Source(), Target()
+        source.build(23, SHA, 99)
+        publisher = Publisher(
+            source, target, "example/previews", "https://example.github.io/previews/"
+        )
+        with patch("publish.public_bytes", side_effect=target.fetch):
+            with patch("publish.PUBLISHER_VERSION", 1):
+                publisher.reconcile()
+            before = target.head
+            publisher.reconcile()
+            self.assertNotEqual(target.head, before)
+            self.assertEqual(publisher.published_manifest(23)["publisher_version"], 2)
+            self.assertIn("Ready:", source.comment(23))
+            before = target.head
+            publisher.reconcile()
+            self.assertEqual(target.head, before)
+
     def test_bad_artifact_does_not_block_other_preview(self):
         source, target = Source(), Target()
         source.build(23, SHA, 99, malicious=True)

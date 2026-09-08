@@ -61,6 +61,7 @@ class SecurityTests(unittest.TestCase):
             "CNAME",
             "preview.json",
             "preview-banner.js",
+            "preview-metadata.js",
             "a\nb",
         ):
             with self.subTest(path=path), self.assertRaises(ValueError):
@@ -136,9 +137,9 @@ class SecurityTests(unittest.TestCase):
             side_effect=[json.dumps(manifest).encode(), b"wrong"],
         ):
             self.assertFalse(served("https://review.example/pr-23/", manifest))
-        self.assertIn(b"right-typer-preview-23:", files["preview-banner.js"])
+        self.assertIn(b"right-typer-preview-23:", files["preview-metadata.js"])
         self.assertLess(
-            files["index.html"].index(b"preview-banner.js"),
+            files["index.html"].index(b"preview-metadata.js"),
             files["index.html"].index(b"</head>"),
         )
 
