@@ -116,11 +116,21 @@ function keyboard() {
   const key = (k: string) => {
     const fingers = allowedFingers(k, fingeringMode);
     const label = intended(k, fingeringMode);
+    const names = fingers.map(fingerName);
+    const [first, second] = fingers;
+    const compactLabel =
+      k === ' '
+        ? label
+        : first && second && first.split('-')[0] === second.split('-')[0]
+          ? `${names[0]}/${second.split('-')[1]}`
+          : first && second && first.split('-')[1] === second.split('-')[1]
+            ? `left/right ${first.split('-')[1]}`
+            : names.join('/');
     const background =
       fingers.length === 2 && k !== ' '
-        ? `background:linear-gradient(90deg,var(--${fingers[0]}) 50%,var(--${fingers[1]}) 50%)`
+        ? `--key-accent:linear-gradient(90deg,var(--${fingers[0]}) 50%,var(--${fingers[1]}) 50%)`
         : '';
-    return `<span class="key ${k === ' ' ? 'space-key' : `finger-${fingers[0]}`}" style="${background}" title="${label}" aria-label="${keyName(k)}: ${label}" data-key="${k}"><b>${k === ' ' ? 'space' : k}</b><small>${label.replace(' or ', '<br/>or ')}</small></span>`;
+    return `<span class="key ${k === ' ' ? 'space-key' : `finger-${fingers[0]}`}" style="${background}" title="${label}" aria-label="${keyName(k)}: ${label}" data-key="${k}"><b>${k === ' ' ? 'space' : k}</b><small>${compactLabel}</small></span>`;
   };
   return `<h2>Which finger?</h2><div class="keyboard">${ROWS.map((row, i) => `<div class="key-row row-${i}">${[...row].map(key).join('')}</div>`).join('')}<div class="key-row">${key(' ')}</div></div>`;
 }
