@@ -44,8 +44,12 @@ let profile =
   PRESETS[0]!;
 saved.profileId = profile.id;
 let CALIBRATION_KEYS = calibrationCodes(profile);
-const physicalLabel = (code: string) =>
-  profile.keys.find((k) => k.code === code)?.label ?? code.replace('-', ' ');
+const physicalLabel = (code: string) => {
+  if (code === 'Space') return 'space';
+  const key = profile.keys.find((k) => k.code === code);
+  const characters = key?.outputs.filter((o) => /^[a-z,.]$/.test(o.text)).map((o) => o.text);
+  return characters?.length ? [...new Set(characters)].join(' / ') : code.replace('-', ' ');
+};
 const fingersForText = (text: string) =>
   profileFingers(profile, characterKey(profile, text)?.code ?? '', fingeringMode);
 const hintForText = (text: string) =>

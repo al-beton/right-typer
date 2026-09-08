@@ -16,7 +16,14 @@ test('presets update physical labels; French shifted punctuation completes passa
     const required = new Set(calibrationCodes(p));
     for (const k of p.keys) {
       const shown = page.locator(`[data-key="${k.code}"] b`);
-      if (k.code === 'Space' || required.has(k.code)) await expect(shown).toHaveText(k.label);
+      if (k.code === 'Space' || required.has(k.code))
+        await expect(shown).toHaveText(
+          k.code === 'Space'
+            ? 'space'
+            : [
+                ...new Set(k.outputs.filter((o) => /^[a-z,.]$/.test(o.text)).map((o) => o.text)),
+              ].join(' / '),
+        );
       else await expect(shown).toHaveCount(0);
     }
   }
