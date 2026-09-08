@@ -12,6 +12,7 @@ export type Saved = {
   cameraRotation?: CameraRotation;
   cameraDeviceId?: string;
   practiceEnabled?: boolean;
+  cameraDisconnected?: boolean;
   results: SavedResult[];
 };
 export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
@@ -53,6 +54,9 @@ export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
       ...(typeof parsed.cameraDeviceId === 'string'
         ? { cameraDeviceId: parsed.cameraDeviceId }
         : {}),
+      ...(typeof parsed.cameraDisconnected === 'boolean'
+        ? { cameraDisconnected: parsed.cameraDisconnected }
+        : {}),
       ...(typeof parsed.practiceEnabled === 'boolean'
         ? { practiceEnabled: parsed.practiceEnabled }
         : {}),
@@ -71,6 +75,7 @@ export function save(data: Saved, storage: Pick<Storage, 'setItem'> = localStora
         cameraRotation: data.cameraRotation,
         cameraDeviceId: data.cameraDeviceId,
         practiceEnabled: data.practiceEnabled,
+        cameraDisconnected: data.cameraDisconnected,
         results: data.results.slice(-10),
       }),
     );

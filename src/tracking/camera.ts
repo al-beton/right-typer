@@ -47,18 +47,22 @@ export class Camera {
         return;
       }
       this.stream = stream;
-      stream.getVideoTracks()[0]!.onended = () =>
-        this.fail('The camera disconnected. Reconnect it, then check the keyboard alignment.');
+      stream.getVideoTracks()[0]!.onended = () => {
+        if (generation === this.generation)
+          this.fail('The camera disconnected. Reconnect it, then check the keyboard alignment.');
+      };
       this.video.srcObject = stream;
       await this.video.play();
       if (generation !== this.generation) return;
       this.worker = new Worker(
         new URL(`${import.meta.env.BASE_URL}tracking/tracking-worker.js`, document.baseURI),
       );
-      this.worker.onerror = () =>
-        this.fail(
-          'The tracking worker could not run. Reload the page and check that all static model assets are available.',
-        );
+      this.worker.onerror = () => {
+        if (generation === this.generation)
+          this.fail(
+            'The tracking worker could not run. Reload the page and check that all static model assets are available.',
+          );
+      };
       this.worker.onmessage = (event) => {
         if (generation !== this.generation) return;
         const message = event.data;
@@ -186,6 +190,7 @@ export class Camera {
       t.stop();
     });
     this.stream = undefined;
+    this.video.pause();
     this.video.srcObject = null;
     this.evidence.reset();
     this.busy = false;
