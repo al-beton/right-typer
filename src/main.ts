@@ -5,7 +5,11 @@ import { keyTime } from './tracking/timing';
 import {
   CALIBRATION_KEYS,
   DIGITS,
-  EXPECTED,
+  allowedFingers,
+  isCorrectFinger,
+  MODES,
+  isFingeringMode,
+  policyLabel,
   LANDMARK_TIPS,
   ROWS,
   fingerName,
@@ -25,6 +29,7 @@ const escapeHtml = (text: string) =>
     (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!,
   );
 let saved = load();
+let fingeringMode = saved.fingeringMode ?? 'standard';
 let cameraRotation = saved.cameraRotation ?? 0;
 let autoStartPending = saved.practiceEnabled ?? !!saved.calibration;
 let selectedCamera = saved.cameraDeviceId ?? saved.calibration?.deviceId ?? '';
@@ -34,7 +39,7 @@ let disconnectedDraft: Calibration | undefined;
 let points: Record<string, Point> = {};
 let selectedKey = 0;
 let swapHands = saved.calibration?.swapHands ?? false;
-let exercise = new Exercise(WORDS);
+let exercise = new Exercise(WORDS, fingeringMode);
 let resuming = false;
 let message = '';
 let storageWarning = '';
@@ -48,6 +53,11 @@ $('#app').innerHTML = `
   <main>
     <div id="content" aria-label="Typing practice"></div>
     <section id="finger-map" aria-label="Intended finger map"></section>
+    <div class="fingering-control"><label for="fingering-mode">Fingering</label><select id="fingering-mode">${Object.entries(
+      MODES,
+    )
+      .map(([value, name]) => `<option value="${value}">${name}</option>`)
+      .join('')}</select><span id="policy-status" role="status"></span></div>
     <section id="camera-section" aria-label="Live camera and finger tracking">
       <div class="camera-heading"><h2>Camera & key positions</h2><span id="camera-badge" role="status">Camera off</span></div>
       <div class="camera-layout">
@@ -103,8 +113,43 @@ function store() {
   $('#storage-warning').hidden = !storageWarning;
 }
 function keyboard() {
-  return `<h2>Which finger?</h2><div class="keyboard">${ROWS.map((row, i) => `<div class="key-row row-${i}">${[...row].map((k) => `<span class="key finger-${EXPECTED[k]}" title="${intended(k)}" data-key="${k}"><b>${k}</b><small>${intended(k)}</small></span>`).join('')}</div>`).join('')}<div class="key-row"><span class="key space-key" data-key=" "><b>space</b><small>either thumb</small></span></div></div>`;
+  const key = (k: string) => {
+    const fingers = allowedFingers(k, fingeringMode);
+    const label = intended(k, fingeringMode);
+    const background =
+      fingers.length === 2 && k !== ' '
+        ? `background:linear-gradient(90deg,var(--${fingers[0]}) 50%,var(--${fingers[1]}) 50%)`
+        : '';
+    return `<span class="key ${k === ' ' ? 'space-key' : `finger-${fingers[0]}`}" style="${background}" title="${label}" aria-label="${keyName(k)}: ${label}" data-key="${k}"><b>${k === ' ' ? 'space' : k}</b><small>${label.replace(' or ', '<br/>or ')}</small></span>`;
+  };
+  return `<h2>Which finger?</h2><div class="keyboard">${ROWS.map((row, i) => `<div class="key-row row-${i}">${[...row].map(key).join('')}</div>`).join('')}<div class="key-row">${key(' ')}</div></div>`;
 }
+const modeControl = $<HTMLSelectElement>('#fingering-mode');
+modeControl.value = fingeringMode;
+modeControl.onchange = () => {
+  if (!isFingeringMode(modeControl.value)) return;
+  fingeringMode = modeControl.value;
+  saved.fingeringMode = fingeringMode;
+  exercise.changeMode(fingeringMode);
+  diagnosticsId--;
+  boundaryKeys = 0;
+  message =
+    phase === 'results'
+      ? `${MODES[fingeringMode]} selected for your next practice.`
+      : phase === 'practice' || resuming
+        ? `${MODES[fingeringMode]} selected. Fresh attempt at this word; completed work is kept.`
+        : `${MODES[fingeringMode]} fingering selected.`;
+  $('#policy-status').textContent =
+    phase === 'results'
+      ? 'Applies to your next practice.'
+      : phase === 'practice' || resuming
+        ? 'Fresh attempt; completed work kept.'
+        : 'Fingering updated.';
+  $('#finger-map').innerHTML = keyboard();
+  store();
+  render();
+  modeControl.focus({ preventScroll: true });
+};
 function setPhase(next: typeof phase) {
   phase = next;
   render();
@@ -117,13 +162,13 @@ function render() {
   renderSetup();
   if (phase !== 'practice' && phase !== 'results') {
     const last = saved.results.at(-1);
-    content.innerHTML = `<section class="practice"><div class="practice-top"><h2>Practice</h2><span>${WORDS.length} words</span></div><div class="progress-track"></div>${passageMarkup()}<div class="entry-heading"><label for="typing">Your word</label><span>Space finishes each word.</span></div><div class="word-entry"><div class="target-word">${WORDS[exercise.index]}</div><input id="typing" aria-label="Type the current word" placeholder="Set up, then Go" disabled /></div><div class="feedback">${resuming ? 'Paused. Go resumes this word with a fresh attempt.' : 'Allow camera access, mark the key positions, then click Go.'}</div>${last ? `<p class="recent">Last practice: ${last.wpm.toFixed(1)} WPM · ${last.retries} retries${last.gradingPolicy !== 'wrong-finger-veto' ? ' · Earlier rule: unknown presses required retries' : ''}</p>` : ''}</section>`;
+    content.innerHTML = `<section class="practice"><div class="practice-top"><h2>Practice</h2><span>${WORDS.length} words</span></div><div class="progress-track"></div>${passageMarkup()}<div class="entry-heading"><label for="typing">Your word</label><span>Space finishes each word.</span></div><div class="word-entry"><div class="target-word">${WORDS[exercise.index]}</div><input id="typing" aria-label="Type the current word" placeholder="Set up, then Go" disabled /></div><div class="feedback">${resuming ? 'Paused. Go resumes this word with a fresh attempt.' : 'Allow camera access, mark the key positions, then click Go.'}</div>${last ? `<p class="recent">Last practice: ${policyLabel(last.fingeringModes ?? ['standard'])} · ${last.wpm.toFixed(1)} WPM · ${last.retries} retries${last.gradingPolicy !== 'wrong-finger-veto' ? ' · Earlier rule: unknown presses required retries' : ''}</p>` : ''}</section>`;
   } else if (phase === 'practice') {
     const retry = exercise.state === 'retry',
       checking = exercise.state === 'checking';
     const stats = exercise.stats(performance.now());
     const word = WORDS[exercise.index]!;
-    content.innerHTML = `<section class="practice"><div class="practice-top"><span class="eyebrow">Practice</span><div class="practice-metrics"><span><b>${exercise.index}</b> / ${WORDS.length} words</span><span><b>${stats.retries}</b> retries</span><button class="text-button" id="pause">Pause</button></div></div><div class="progress-track"><div style="width:${(exercise.index / WORDS.length) * 100}%"></div></div><div class="passage" aria-label="Practice passage">${WORDS.map((w, i) => `<span class="${i < exercise.index ? 'passed' : i === exercise.index ? 'active' : ''}" ${i === exercise.index ? 'aria-current="step"' : ''}>${w}</span>`).join(' ')}</div><div class="entry-heading"><label class="eyebrow" for="typing">${retry ? 'SAME WORD. FRESH START.' : checking ? 'CHECKING THIS WORD' : 'YOUR WORD'}</label><span id="word-hint">${exercise.index === 0 ? 'Include punctuation. Space finishes the word.' : 'Finish the word, then press space.'}</span></div><div class="word-entry ${retry ? 'needs-retry' : ''}"><div class="target-word" aria-label="Current word">${word}</div><input id="typing" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type the current word" placeholder="type here" ${retry || checking ? 'readonly' : ''}/><span class="entry-indicator">${checking ? '<span class="spinner"></span>' : retry ? '↺' : '↵'}</span></div><div id="feedback" class="feedback ${retry ? 'mistake' : ''}" role="status">${retry ? `<div><strong>Let’s give that word another go.</strong><p>${escapeHtml(feedback(exercise.lastVerdict!, word))}</p></div><button class="primary" id="retry">Try this word again <span>Space</span></button>` : checking ? '<span class="spinner"></span> Matching camera evidence to your presses. Wait for the next word before typing.' : escapeHtml(message || 'Take your time. I’ll check your fingers when the word is finished.')}</div><p id="input-message" class="input-message" role="status"></p></section>`;
+    content.innerHTML = `<section class="practice"><div class="practice-top"><span class="eyebrow">Practice</span><div class="practice-metrics"><span><b>${exercise.index}</b> / ${WORDS.length} words</span><span><b>${stats.retries}</b> retries</span><button class="text-button" id="pause">Pause</button></div></div><div class="progress-track"><div style="width:${(exercise.index / WORDS.length) * 100}%"></div></div><div class="passage" aria-label="Practice passage">${WORDS.map((w, i) => `<span class="${i < exercise.index ? 'passed' : i === exercise.index ? 'active' : ''}" ${i === exercise.index ? 'aria-current="step"' : ''}>${w}</span>`).join(' ')}</div><div class="entry-heading"><label class="eyebrow" for="typing">${retry ? 'SAME WORD. FRESH START.' : checking ? 'CHECKING THIS WORD' : 'YOUR WORD'}</label><span id="word-hint">${exercise.index === 0 ? 'Include punctuation. Space finishes the word.' : 'Finish the word, then press space.'}</span></div><div class="word-entry ${retry ? 'needs-retry' : ''}"><div class="target-word" aria-label="Current word">${word}</div><input id="typing" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type the current word" placeholder="type here" ${retry || checking ? 'readonly' : ''}/><span class="entry-indicator">${checking ? '<span class="spinner"></span>' : retry ? '↺' : '↵'}</span></div><div id="feedback" class="feedback ${retry ? 'mistake' : ''}" role="status">${retry ? `<div><strong>Let’s give that word another go.</strong><p>${escapeHtml(feedback(exercise.lastVerdict!, word, exercise.attempt.mode))}</p></div><button class="primary" id="retry">Try this word again <span>Space</span></button>` : checking ? '<span class="spinner"></span> Matching camera evidence to your presses. Wait for the next word before typing.' : escapeHtml(message || 'Take your time. I’ll check your fingers when the word is finished.')}</div><p id="input-message" class="input-message" role="status"></p></section>`;
     const input = $<HTMLInputElement>('#typing');
     input.value = exercise.attempt.text;
     input.onkeydown = typing;
@@ -142,11 +187,11 @@ function render() {
     if (retry) $('#retry').onclick = retryWord;
   } else {
     const stats = exercise.stats(performance.now());
-    content.innerHTML = `<section class="results"><h2>PASSAGE COMPLETE</h2><p class="lede">Every word’s text matched with no wrong finger detected in its accepted attempt.</p><div class="result-grid"><div class="primary-stat"><strong>${stats.wpm.toFixed(1)}</strong><span>effective WPM</span></div><div><strong>${stats.wrongFingers}</strong><span>wrong-finger presses</span></div><div><strong>${stats.textMistakes}</strong><span>text-mismatch attempts</span></div><div><strong>${stats.uncertainPresses}</strong><span>unverified presses</span></div></div><p class="result-note">${WORDS.length} words · ${stats.attempts} submitted attempts · ${stats.retries} retries · ${formatTime(stats.elapsedMs)} elapsed<br/>Unverified presses remain unknown, including in accepted words. They do not cause retries.</p><details><summary>How these numbers work</summary><p>Effective WPM is the accepted passage characters, including one submitting space per word, divided by five and by elapsed minutes. Timing runs from your first character to the final submitting space and includes retries, reading feedback and pauses. Wrong-finger presses include erased characters. A text mistake is one submitted attempt with mismatched text. Unverified presses count all unknown observations in submitted attempts, including submitting spaces, erased characters and failed attempts. They are not verified correct fingers. An attempt can contain both mistakes and uncertainty.</p></details><div class="result-actions"><button class="primary" id="restart">Practise again <span>↻</span></button></div><p class="result-limit">Camera judgements can be wrong. Clear feedback is useful; it is not ground truth.</p></section>`;
+    content.innerHTML = `<section class="results"><h2>PASSAGE COMPLETE</h2><p class="lede">Every word’s text matched with no wrong finger detected in its accepted attempt.</p><div class="result-grid"><div class="primary-stat"><strong>${stats.wpm.toFixed(1)}</strong><span>effective WPM</span></div><div><strong>${stats.wrongFingers}</strong><span>wrong-finger presses</span></div><div><strong>${stats.textMistakes}</strong><span>text-mismatch attempts</span></div><div><strong>${stats.uncertainPresses}</strong><span>unverified presses</span></div></div><p class="result-note">Fingering: ${policyLabel(exercise.policies())}<br/>${WORDS.length} words · ${stats.attempts} submitted attempts · ${stats.retries} retries · ${formatTime(stats.elapsedMs)} elapsed<br/>Unverified presses remain unknown, including in accepted words. They do not cause retries.</p><details><summary>How these numbers work</summary><p>Effective WPM is the accepted passage characters, including one submitting space per word, divided by five and by elapsed minutes. Timing runs from your first character to the final submitting space and includes retries, reading feedback and pauses. Wrong-finger presses include erased characters. A text mistake is one submitted attempt with mismatched text. Unverified presses count all unknown observations in submitted attempts, including submitting spaces, erased characters and failed attempts. They are not verified correct fingers. An attempt can contain both mistakes and uncertainty.</p></details><div class="result-actions"><button class="primary" id="restart">Practise again <span>↻</span></button></div><p class="result-limit">Camera judgements can be wrong. Clear feedback is useful; it is not ground truth.</p></section>`;
     $('#restart').onclick = () => {
       disableAutoStart();
       resuming = false;
-      exercise = new Exercise(WORDS);
+      exercise = new Exercise(WORDS, fingeringMode);
       message = '';
       setPhase(camera.status === 'ready' ? 'verify' : 'setup');
     };
@@ -236,7 +281,7 @@ function renderSetup() {
       exercise.pause();
       resuming = true;
     } else {
-      exercise = new Exercise(WORDS);
+      exercise = new Exercise(WORDS, fingeringMode);
       resuming = false;
     }
     message = 'Adjust any dot in the camera image, or remap if the camera moved.';
@@ -254,7 +299,7 @@ function startPractice() {
   message = '';
   boundaryKeys = 0;
   if (resuming) exercise.retry();
-  else exercise = new Exercise(WORDS);
+  else exercise = new Exercise(WORDS, fingeringMode);
   setPhase('practice');
   $('#typing').scrollIntoView({ block: 'nearest' });
 }
@@ -538,7 +583,11 @@ $('#reset').onclick = () => {
     return;
   }
   camera.stop();
-  exercise = new Exercise(WORDS);
+  fingeringMode = 'standard';
+  modeControl.value = fingeringMode;
+  $('#policy-status').textContent = '';
+  $('#finger-map').innerHTML = keyboard();
+  exercise = new Exercise(WORDS, fingeringMode);
   saved = { results: [] };
   disconnectedDraft = undefined;
   autoStartPending = false;
@@ -619,6 +668,7 @@ function typing(event: KeyboardEvent) {
         ...exercise.stats(performance.now()),
         date: new Date().toISOString(),
         gradingPolicy: 'wrong-finger-veto',
+        fingeringModes: exercise.policies(),
       });
       store();
       setPhase('results');
@@ -639,7 +689,7 @@ function updateTyped() {
   const input = $<HTMLInputElement>('#typing');
   input.value = exercise.attempt.text;
   const next = WORDS[exercise.index]?.[exercise.attempt.text.length] ?? ' ';
-  $('#word-hint').textContent = `Next: ${keyName(next)} · ${intended(next)}`;
+  $('#word-hint').textContent = `Next: ${keyName(next)} · ${intended(next, fingeringMode)}`;
   document
     .querySelectorAll<HTMLElement>('[data-key]')
     .forEach((el) => el.classList.toggle('next-key', el.dataset.key === next));
@@ -664,11 +714,10 @@ function attemptDetails() {
       const cls =
         !o || o.kind === 'uncertain'
           ? 'unseen'
-          : o?.kind === 'finger' &&
-              (p.key === ' ' ? o.finger.endsWith('-thumb') : EXPECTED[p.key] === o.finger)
+          : o?.kind === 'finger' && isCorrectFinger(p.key, o.finger, a.mode)
             ? 'ok'
             : 'wrong';
-      return `<span class="press-result ${cls}" title="${escapeHtml(o?.kind === 'finger' ? `Saw ${fingerName(o.finger)}; use ${intended(p.key)}` : (o?.reason ?? 'No evidence'))}">${p.key === ' ' ? 'space' : p.key} <small>${cls === 'ok' ? '✓' : cls === 'wrong' ? '×' : '?'}</small></span>`;
+      return `<span class="press-result ${cls}" title="${escapeHtml(o?.kind === 'finger' ? `Saw ${fingerName(o.finger)}; use ${intended(p.key, a.mode)}` : (o?.reason ?? 'No evidence'))}">${p.key === ' ' ? 'space' : p.key} <small>${cls === 'ok' ? '✓' : cls === 'wrong' ? '×' : '?'}</small></span>`;
     })
     .join('')}</div>`;
 }
@@ -689,7 +738,7 @@ function diagnostic(event: KeyboardEvent) {
     if (phase === 'practice' || phase === 'results' || id !== diagnosticsId + 1) return;
     $('#diagnostic-result').textContent =
       o.kind === 'finger'
-        ? `${keyName(press.key)}: saw ${fingerName(o.finger)}. Intended: ${intended(press.key)}. Does that match what you did?`
+        ? `${keyName(press.key)}: saw ${fingerName(o.finger)}. Intended: ${intended(press.key, fingeringMode)}. Does that match what you did?`
         : `Could not verify ${keyName(press.key)}. ${o.reason}`;
   });
 }

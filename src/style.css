@@ -1,4 +1,12 @@
 :root {
+  --left-little: #f7b4c8;
+  --left-ring: #ffc383;
+  --left-middle: #f3e16f;
+  --left-index: #97d9a9;
+  --right-index: #87dce0;
+  --right-middle: #a8c8fa;
+  --right-ring: #c5b1ee;
+  --right-little: #edb5e7;
   font-family:
     system-ui,
     -apple-system,
@@ -226,7 +234,7 @@ main {
   margin: 0;
 }
 #finger-map {
-  height: 240px;
+  height: 285px;
   padding: 12px 0;
   border-top: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
@@ -253,7 +261,7 @@ main {
   justify-content: center;
   align-items: center;
   width: 88px;
-  height: 45px;
+  height: 60px;
   border: 1px solid currentColor;
   border-radius: 4px;
   color: #15202b;
@@ -264,30 +272,31 @@ main {
 .key small {
   font-size: 10px;
   line-height: 1.5;
+  text-align: center;
 }
 .finger-left-little {
-  background: #f7b4c8;
+  background: var(--left-little);
 }
 .finger-left-ring {
-  background: #ffc383;
+  background: var(--left-ring);
 }
 .finger-left-middle {
-  background: #f3e16f;
+  background: var(--left-middle);
 }
 .finger-left-index {
-  background: #97d9a9;
+  background: var(--left-index);
 }
 .finger-right-index {
-  background: #87dce0;
+  background: var(--right-index);
 }
 .finger-right-middle {
-  background: #a8c8fa;
+  background: var(--right-middle);
 }
 .finger-right-ring {
-  background: #c5b1ee;
+  background: var(--right-ring);
 }
 .finger-right-little {
-  background: #edb5e7;
+  background: var(--right-little);
 }
 .space-key {
   width: 360px;
@@ -626,4 +635,21 @@ footer {
 .input-message,
 .recent {
   text-align: center;
+}
+
+.fingering-control {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  flex-wrap: wrap;
+  font-size: 12px;
+}
+.fingering-control select {
+  width: auto;
+  padding: 5px 8px;
+}
+#policy-status {
+  width: 240px;
 }

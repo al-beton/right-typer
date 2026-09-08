@@ -278,7 +278,11 @@ describe('local persistence', () => {
     expect(load(storage).calibration).toEqual(calibration());
     expect(reset(storage)).toBe(true);
     expect(map.get('other')).toBe('untouched');
-    expect(load(storage)).toEqual({ results: [], calibration: undefined });
+    expect(load(storage)).toEqual({
+      results: [],
+      calibration: undefined,
+      fingeringMode: 'standard',
+    });
   });
   it('loads legacy counts without relabeling retries as presses and preserves calibration on resave', () => {
     const legacy = {
@@ -305,6 +309,7 @@ describe('local persistence', () => {
       ...new Exercise(['a']).stats(0),
       date: '2026-09-06',
       gradingPolicy: 'wrong-finger-veto',
+      fingeringModes: ['standard'],
     });
     expect(save(saved, storage)).toBe(true);
     expect(load(storage)).toEqual(saved);
@@ -315,6 +320,7 @@ describe('local persistence', () => {
       ...new Exercise(['a']).stats(0),
       date: '2026-09-06',
       gradingPolicy: 'wrong-finger-veto' as const,
+      fingeringModes: ['standard'],
     };
     const raw = JSON.stringify({
       results: [

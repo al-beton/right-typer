@@ -1,11 +1,12 @@
 import type { Observation, Press } from './types';
-import { intended, isCorrectFinger, keyName } from './keyboard';
+import { intended, isCorrectFinger, keyName, type FingeringMode } from './keyboard';
 export type Attempt = {
   id: number;
   wordIndex: number;
   text: string;
   presses: Press[];
   submittedAt?: number;
+  mode?: FingeringMode;
 };
 export type Verdict = { pass: boolean; textWrong: boolean; wrong: Press[]; uncertain: Press[] };
 export type Stats = {
@@ -20,7 +21,9 @@ export type Stats = {
 };
 export function grade(attempt: Attempt, word: string): Verdict {
   const wrong = attempt.presses.filter(
-    (p) => p.observation?.kind === 'finger' && !isCorrectFinger(p.key, p.observation.finger),
+    (p) =>
+      p.observation?.kind === 'finger' &&
+      !isCorrectFinger(p.key, p.observation.finger, attempt.mode),
   );
   const uncertain = attempt.presses.filter(
     (p) => !p.observation || p.observation.kind === 'uncertain',
@@ -28,14 +31,14 @@ export function grade(attempt: Attempt, word: string): Verdict {
   const textWrong = attempt.text !== word;
   return { pass: !textWrong && !wrong.length, textWrong, wrong, uncertain };
 }
-export function feedback(verdict: Verdict, word: string): string {
+export function feedback(verdict: Verdict, word: string, mode: FingeringMode = 'standard'): string {
   const parts: string[] = [];
   if (verdict.pass) parts.push('Word accepted.');
   if (verdict.textWrong) parts.push(`The text did not match “${word}”.`);
   if (verdict.wrong.length) {
     const p = verdict.wrong[0]!;
     const actual = p.observation?.kind === 'finger' ? p.observation.finger.replace('-', ' ') : '';
-    parts.push(`For ${keyName(p.key)}, I saw ${actual}. Use ${intended(p.key)}.`);
+    parts.push(`For ${keyName(p.key)}, I saw ${actual}. Use ${intended(p.key, mode)}.`);
   }
   if (verdict.uncertain.length)
     parts.push(
@@ -53,7 +56,24 @@ export class Exercise {
   startedAt?: number;
   endedAt?: number;
   lastVerdict?: Verdict;
-  constructor(public readonly words: string[]) {}
+  constructor(
+    public readonly words: string[],
+    public mode: FingeringMode = 'standard',
+  ) {
+    this.attempt.mode = mode;
+  }
+  changeMode(mode: FingeringMode) {
+    if (mode === this.mode) return;
+    this.mode = mode;
+    if (this.state === 'complete') return;
+    const paused = this.state === 'paused';
+    this.fresh();
+    this.lastVerdict = undefined;
+    if (paused) this.state = 'paused';
+  }
+  policies(): FingeringMode[] {
+    return [...new Set(this.history.map((h) => h.attempt.mode ?? 'standard'))];
+  }
   press(key: string, at: number): Press | null {
     if (this.state !== 'typing' || !/^[a-z,. ]$/.test(key)) return null;
     if (key === ' ' && !this.attempt.text.length && !this.attempt.presses.length) return null;
@@ -100,7 +120,13 @@ export class Exercise {
     }
   }
   private fresh() {
-    this.attempt = { id: ++this.nextAttemptId, wordIndex: this.index, text: '', presses: [] };
+    this.attempt = {
+      id: ++this.nextAttemptId,
+      wordIndex: this.index,
+      text: '',
+      presses: [],
+      mode: this.mode,
+    };
     this.state = 'typing';
   }
   stats(now: number): Stats {

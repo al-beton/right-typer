@@ -1,3 +1,4 @@
+import { isFingeringMode, type FingeringMode } from './keyboard';
 import { validCalibration } from './calibration';
 import type { Calibration } from './types';
 import type { Stats } from './exercise';
@@ -5,10 +6,12 @@ import { isCameraRotation, type CameraRotation } from '../view/rotation';
 const KEY = 'right-typer.v1';
 export type SavedResult = Stats & {
   date: string;
+  fingeringModes?: FingeringMode[];
   gradingPolicy: 'verified-only' | 'wrong-finger-veto';
 };
 export type Saved = {
   calibration?: Calibration;
+  fingeringMode?: FingeringMode;
   cameraRotation?: CameraRotation;
   cameraDeviceId?: string;
   practiceEnabled?: boolean;
@@ -45,10 +48,20 @@ export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
           )
           // Results without a policy predate ALO-181. Keep their original counts
           // and label the old rule; do not reinterpret uncertainty retries as presses.
-          .map((r: SavedResult) => ({ ...r, gradingPolicy: r.gradingPolicy ?? 'verified-only' }))
+          .map((r: SavedResult) => ({
+            ...r,
+            gradingPolicy: r.gradingPolicy ?? 'verified-only',
+            fingeringModes:
+              Array.isArray(r.fingeringModes) &&
+              r.fingeringModes.length &&
+              r.fingeringModes.every(isFingeringMode)
+                ? [...new Set(r.fingeringModes)]
+                : ['standard'],
+          }))
           .slice(-10)
       : [];
     return {
+      fingeringMode: isFingeringMode(parsed.fingeringMode) ? parsed.fingeringMode : 'standard',
       calibration: validCalibration(parsed.calibration) ? parsed.calibration : undefined,
       results,
       ...(typeof parsed.cameraDeviceId === 'string'
@@ -72,6 +85,7 @@ export function save(data: Saved, storage: Pick<Storage, 'setItem'> = localStora
       KEY,
       JSON.stringify({
         calibration: data.calibration,
+        fingeringMode: data.fingeringMode,
         cameraRotation: data.cameraRotation,
         cameraDeviceId: data.cameraDeviceId,
         practiceEnabled: data.practiceEnabled,
