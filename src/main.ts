@@ -113,8 +113,21 @@ function store() {
   $('#storage-warning').hidden = !storageWarning;
 }
 function keyboard() {
+  // Physical left-to-right order keeps split keys aligned with neighbouring colour bands.
+  const colourOrder = [
+    'left-little',
+    'left-ring',
+    'left-middle',
+    'left-index',
+    'right-index',
+    'right-middle',
+    'right-ring',
+    'right-little',
+  ];
   const key = (k: string) => {
-    const fingers = allowedFingers(k, fingeringMode);
+    const fingers = allowedFingers(k, fingeringMode).sort(
+      (a, b) => colourOrder.indexOf(a) - colourOrder.indexOf(b),
+    );
     const label = intended(k, fingeringMode);
     const names = fingers.map(fingerName);
     const [first, second] = fingers;
@@ -128,7 +141,7 @@ function keyboard() {
             : names.join('/');
     const background =
       fingers.length === 2 && k !== ' '
-        ? `--key-accent:linear-gradient(90deg,var(--${fingers[0]}) 50%,var(--${fingers[1]}) 50%)`
+        ? `background:linear-gradient(90deg,var(--${fingers[0]}) 50%,var(--${fingers[1]}) 50%)`
         : '';
     return `<span class="key ${k === ' ' ? 'space-key' : `finger-${fingers[0]}`}" style="${background}" title="${label}" aria-label="${keyName(k)}: ${label}" data-key="${k}"><b>${k === ' ' ? 'space' : k}</b><small>${compactLabel}</small></span>`;
   };
