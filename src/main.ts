@@ -1,4 +1,6 @@
 import './style.css';
+import { orderedFingers, fingerBackground, readFingerPalette } from './view/finger-colours';
+import { drawCalibrationDot } from './view/calibration-dot';
 import { unrotatePoint, isCameraRotation } from './view/rotation';
 import { Camera } from './tracking/camera';
 import { keyTime } from './tracking/timing';
@@ -76,6 +78,7 @@ $('#app').innerHTML = `
 const video = $<HTMLVideoElement>('#camera');
 const canvas = $<HTMLCanvasElement>('#overlay');
 const camera = new Camera(video, cameraChanged, drawFrame);
+const fingerPalette = readFingerPalette(getComputedStyle(document.documentElement));
 const content = $('#content');
 const rotationControl = $<HTMLSelectElement>('#camera-rotation');
 rotationControl.value = String(cameraRotation);
@@ -113,21 +116,8 @@ function store() {
   $('#storage-warning').hidden = !storageWarning;
 }
 function keyboard() {
-  // Physical left-to-right order keeps split keys aligned with neighbouring colour bands.
-  const colourOrder = [
-    'left-little',
-    'left-ring',
-    'left-middle',
-    'left-index',
-    'right-index',
-    'right-middle',
-    'right-ring',
-    'right-little',
-  ];
   const key = (k: string) => {
-    const fingers = allowedFingers(k, fingeringMode).sort(
-      (a, b) => colourOrder.indexOf(a) - colourOrder.indexOf(b),
-    );
+    const fingers = orderedFingers(allowedFingers(k, fingeringMode));
     const label = intended(k, fingeringMode);
     const names = fingers.map(fingerName);
     const [first, second] = fingers;
@@ -139,10 +129,7 @@ function keyboard() {
           : first && second && first.split('-')[1] === second.split('-')[1]
             ? `left/right ${first.split('-')[1]}`
             : names.join('/');
-    const background =
-      fingers.length === 2 && k !== ' '
-        ? `background:linear-gradient(90deg,var(--${fingers[0]}) 50%,var(--${fingers[1]}) 50%)`
-        : '';
+    const background = `background:${fingerBackground(fingers)}`;
     return `<span class="key ${k === ' ' ? 'space-key' : `finger-${fingers[0]}`}" style="${background}" title="${label}" aria-label="${keyName(k)}: ${label}" data-key="${k}"><b>${k === ' ' ? 'space' : k}</b><small>${compactLabel}</small></span>`;
   };
   return `<h2>Which finger?</h2><div class="keyboard">${ROWS.map((row, i) => `<div class="key-row row-${i}">${[...row].map(key).join('')}</div>`).join('')}<div class="key-row">${key(' ')}</div></div>`;
@@ -458,13 +445,15 @@ function drawOverlay(frame: Frame) {
   for (const [key, point] of Object.entries(points)) {
     const [x, y] = pxy(point);
     const selected = phase === 'calibrate' && key === CALIBRATION_KEYS[selectedKey];
-    ctx.beginPath();
-    ctx.arc(x, y, selected ? 9 : 5, 0, Math.PI * 2);
-    ctx.fillStyle = selected ? '#f6d68b' : '#e7efb9';
-    ctx.fill();
-    ctx.strokeStyle = '#183a30';
-    ctx.lineWidth = 2;
-    ctx.stroke();
+    drawCalibrationDot(
+      ctx,
+      x,
+      y,
+      allowedFingers(key === 'space-left' || key === 'space-right' ? ' ' : key, fingeringMode),
+      fingerPalette,
+      selected,
+      cameraRotation,
+    );
     uprightLabel(x, y, () => {
       ctx.fillStyle = '#0e251d';
       ctx.fillRect(-9, -25, key.startsWith('space') ? 28 : 19, 17);

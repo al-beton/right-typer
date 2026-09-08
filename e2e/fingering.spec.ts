@@ -36,9 +36,7 @@ test('policies update labels, hints, errors and preserve camera geometry; refres
       await expect(cell).toHaveAttribute('title', intended(key, value));
       await expect(cell).toHaveAttribute('aria-label', new RegExp(intended(key, value)));
       const split = await cell.evaluate((el) => getComputedStyle(el).backgroundImage);
-      expect(split.includes('linear-gradient')).toBe(
-        key !== ' ' && allowedFingers(key, value).length === 2,
-      );
+      expect(split.includes('linear-gradient')).toBe(allowedFingers(key, value).length === 2);
     }
     expect(await geometry()).toEqual(initial);
   }
