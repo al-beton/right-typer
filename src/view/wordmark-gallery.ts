@@ -26,7 +26,11 @@ const options = [
   ],
 ] as const;
 const icons = [
-  ['rt', 'RT underline', 'Clear ink initials, with the full keyboard sequence below.'],
+  [
+    'rt',
+    'RT underline',
+    'A matching Quiet underline favicon: five keyboard colours under R, five under T.',
+  ],
   ['split', 'Index pair', 'RT over two green and two turquoise columns.'],
   ['key', 'Quiet key', 'One compact key and a ten-column colour line.'],
 ] as const;
@@ -57,9 +61,10 @@ export function renderGallery() {
     <header class="topbar"><h1>Wordmark studies</h1><a href="./">Back to app</a></header>
     <main class="wm-review">
       <div class="wm-intro"><p class="eyebrow">ROUND 02 · TEN KEYBOARD COLUMNS</p>
-        <h2>Two greens. Two turquoises.</h2>
-        <p>A closer match to the keyboard, in sequential colour and quiet underlines.</p>
+        <h2>Quiet underline, with its favicon.</h2>
+        <p>Your preferred wordmark, paired with ink initials and matching colour underlines.</p>
       </div>
+      <section class="wm-approved" aria-label="Preferred Quiet underline pairing"><div><p class="eyebrow">YOUR CHOICE · QUIET UNDERLINE</p>${wordmark('Right Typer', 'ink', false)}</div><div class="wm-approved-icon"><img src="${iconPath('rt')}" width="64" height="64" alt="Matching RT underline favicon"><div><strong>RT underline</strong><p>Matching favicon · <a href="${iconPath('rt', 'ico')}" download>Download ICO</a></p></div></div></section>
       <div class="wm-controls"><label>Display text <select id="wm-name"><option>Right Typer</option><option>Bright Typer</option></select></label>
         <label><input id="wm-thumbs" type="checkbox"> Add thumb colours in the word gap</label></div>
       <section class="wm-pairing" aria-label="Selected header and tab preview">
@@ -135,7 +140,7 @@ export function renderGallery() {
     link.rel = 'icon';
     link.type = 'image/png';
     link.sizes.add('32x32');
-    link.href = iconPath(icon, '32.png');
+    link.href = `${iconPath(icon, '32.png')}?v=${import.meta.env.VITE_REVIEW_SHA}`;
     document.head.append(link);
   };
   select.addEventListener('change', () => {

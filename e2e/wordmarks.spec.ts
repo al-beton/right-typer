@@ -66,7 +66,7 @@ test('favicon selection updates the real icon, survives reload, and leaves norma
     await page.locator(`[data-icon="${id}"]`).click();
     await expect(page.locator('link[rel="icon"]')).toHaveAttribute(
       'href',
-      `./wordmarks/${id}.32.png`,
+      new RegExp(`/wordmarks/${id}\\.32\\.png\\?v=`),
     );
     await expect(page.locator(`[data-icon="${id}"]`)).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator(`[data-icon="${id}"]`)).toBeFocused();
@@ -88,7 +88,10 @@ test('favicon selection updates the real icon, survives reload, and leaves norma
   await expect(page.locator('#wm-chosen .wm-seq')).toBeVisible();
   await expect(page.locator('[data-style="seq"]')).toBeFocused();
   await page.reload();
-  await expect(page.locator('link[rel="icon"]')).toHaveAttribute('href', './wordmarks/key.32.png');
+  await expect(page.locator('link[rel="icon"]')).toHaveAttribute(
+    'href',
+    /\/wordmarks\/key\.32\.png\?v=/,
+  );
   await expect(page.locator('#wm-chosen .wm-seq')).toBeVisible();
   expect(
     await page.evaluate(

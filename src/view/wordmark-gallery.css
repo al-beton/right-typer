@@ -283,3 +283,29 @@
     -webkit-text-stroke: 0;
   }
 }
+
+.wm-approved {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 24px 64px;
+  padding: 24px 0 32px;
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--line);
+}
+.wm-approved .wordmark {
+  font-size: clamp(32px, 4vw, 48px);
+}
+.wm-approved .eyebrow {
+  color: #505862;
+  margin-bottom: 14px;
+}
+.wm-approved-icon {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  font-size: 13px;
+}
+.wm-approved-icon p {
+  font-size: 12px;
+}

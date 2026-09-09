@@ -23,10 +23,16 @@ const rail = columns
     (finger, i) => `<rect x="${6 + i * 2}" y="25" width="2" height="3" fill="${palette[finger]}"/>`,
   )
   .join('');
+const pairedRail = columns
+  .map(
+    (finger, i) =>
+      `<rect x="${i < 5 ? 5 + i * 2 : 18 + (i - 5) * 2}" y="25" width="2" height="3" fill="${palette[finger]}"/>`,
+  )
+  .join('');
 const rt =
   '<path d="M5 21V8h5a4 4 0 0 1 0 8H5m5 0 5 5M18 8h10m-5 0v13" fill="none" stroke="#20252b" stroke-width="2.8" stroke-linejoin="round"/>';
 const designs = {
-  rt: `<rect x="1" y="1" width="30" height="30" rx="5" fill="#fafafa"/>${rt}${rail}`,
+  rt: `<rect x="1" y="1" width="30" height="30" rx="5" fill="#fafafa"/>${rt}${pairedRail}`,
   split: `<rect x="1" y="1" width="30" height="30" rx="5" fill="#fafafa"/>${['left-index', 'left-index', 'right-index', 'right-index'].map((f, i) => `<rect x="${2 + i * 7}" y="3" width="7" height="26" fill="${palette[f]}"/>`).join('')}${rt}`,
   key: `<rect x="2" y="3" width="28" height="26" rx="4" fill="#fafafa" stroke="#20252b" stroke-width="2"/><path d="M9 10h14m-7 0v11" fill="none" stroke="#20252b" stroke-width="3"/>${rail}`,
 };
