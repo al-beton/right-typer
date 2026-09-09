@@ -47,3 +47,28 @@ it('retains old snapshots, custom geometry and edited saved maps across reloads'
   expect(load(storage).calibrations![retained.id]!.savedAt).toBe(999);
   expect(load(storage).customProfiles).toEqual(saved.customProfiles);
 });
+
+it('retains a full custom collection and does not reselect the old setup after choosing the corrected preset', () => {
+  const customProfiles = Array.from({ length: 20 }, (_, i) => ({
+    ...structuredClone(PRESETS[0]!),
+    id: `custom-${i}`,
+    name: `Custom ${i}`,
+  }));
+  let raw = JSON.stringify({ calibration: calibration(), customProfiles });
+  const storage = {
+    getItem: () => raw,
+    setItem: (_: string, v: string) => {
+      raw = v;
+    },
+  };
+  const s = load(storage);
+  expect(s.customProfiles).toHaveLength(21);
+  save(s, storage);
+  expect(load(storage).customProfiles).toEqual(s.customProfiles);
+  s.profileId = 'apple-gb-iso';
+  s.calibration = undefined;
+  save(s, storage);
+  expect(load(storage).profileId).toBe('apple-gb-iso');
+  expect(load(storage).calibration).toBeUndefined();
+  expect(load(storage).customProfiles).toEqual(s.customProfiles);
+});
