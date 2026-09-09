@@ -118,7 +118,7 @@ describe('keyboard profiles', () => {
       practiceEnabled: true,
     });
     const s = load(storage);
-    expect(s.profileId).toBe('saved-apple-gb-iso');
+    expect(s.profileId).toBe('apple-gb-iso');
     expect(s.legacyCalibration).toEqual(calibration());
     expect(s.calibration?.points.KeyQ).toEqual(calibration().points.q);
     expect(s).toMatchObject({

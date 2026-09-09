@@ -121,7 +121,7 @@ test('profile switching invalidates pending attempt and incompatible calibration
     );
   }, calibration());
   await page.goto('/');
-  await expect(page.locator('#keyboard-profile')).toHaveValue('saved-apple-gb-iso');
+  await expect(page.locator('#keyboard-profile')).toHaveValue('apple-gb-iso');
   await expect(page.locator('#camera-rotation')).toHaveValue('90');
   await expect(page.locator('#camera-badge')).toContainText('disconnected');
   await page.locator('#start-camera').click();
@@ -131,7 +131,7 @@ test('profile switching invalidates pending attempt and incompatible calibration
   await expect(page.locator('#typing')).toBeDisabled();
   await expect(page.locator('#practice')).toBeDisabled();
   await expect(page.locator('#profile-status')).toContainText('own key positions');
-  await page.locator('#keyboard-profile').selectOption('saved-apple-gb-iso');
+  await page.locator('#keyboard-profile').selectOption('apple-gb-iso');
   await expect(page.locator('#practice')).toBeEnabled();
   await expect(page.locator('#mapping-editor')).toBeHidden();
   await page.locator('#practice').click();
@@ -147,7 +147,7 @@ test('profile switching invalidates pending attempt and incompatible calibration
   await expect(page.locator('#mapping-editor')).toBeHidden();
   await page.locator('#disconnect-camera').click();
   await page.locator('#keyboard-profile').selectOption('fr-iso');
-  await page.locator('#keyboard-profile').selectOption('saved-apple-gb-iso');
+  await page.locator('#keyboard-profile').selectOption('apple-gb-iso');
   await page.locator('#start-camera').click();
   await expect(page.locator('#practice')).toBeEnabled();
   await page.locator('#practice').click();
