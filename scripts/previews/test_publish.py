@@ -143,7 +143,16 @@ class SecurityTests(unittest.TestCase):
             files["index.html"].index(b"</head>"),
         )
 
-    def test_separate_origin_required(self):
+    def test_personal_preview_path_allowed(self):
+        publisher = Publisher(
+            Mock(), Mock(), "al-beton/right-typer-previews",
+            "https://al-beton.github.io/right-typer-previews/",
+        )
+        self.assertEqual(publisher.url, "https://al-beton.github.io/right-typer-previews/")
+        with self.assertRaises(ValueError):
+            Publisher(Mock(), Mock(), "al-beton/right-typer", "https://al-beton.github.io/right-typer/")
+
+    def test_production_path_and_insecure_urls_rejected(self):
         for url in (
             "https://al-beton.github.io/another-repo/",
             "http://review.example/",

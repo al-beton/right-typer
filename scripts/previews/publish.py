@@ -258,12 +258,15 @@ class Publisher:
         if (
             parsed.scheme != "https"
             or not parsed.hostname
-            or parsed.hostname == "al-beton.github.io"
+            or (
+                parsed.hostname == "al-beton.github.io"
+                and parsed.path.rstrip("/") != "/right-typer-previews"
+            )
             or parsed.query
             or parsed.fragment
             or parsed.username
         ):
-            raise ValueError("Preview must use a separate HTTPS origin")
+            raise ValueError("Preview must use HTTPS and its dedicated path")
         self.source, self.target, self.repo, self.url = (
             source,
             target,
