@@ -72,3 +72,15 @@ it('retains a full custom collection and does not reselect the old setup after c
   expect(load(storage).calibration).toBeUndefined();
   expect(load(storage).customProfiles).toEqual(s.customProfiles);
 });
+
+it('does not conflate a custom profile with the retained snapshot even when its geometry matches', () => {
+  const custom = structuredClone(LEGACY_APPLE_BRITISH);
+  custom.id = 'saved-apple-gb-iso';
+  custom.keys[0]!.alternate = ['left-middle'];
+  const s = load({
+    getItem: () => JSON.stringify({ calibration: calibration(), customProfiles: [custom] }),
+  });
+  expect(s.profileId).toBe('saved-apple-gb-iso-2');
+  expect(s.customProfiles![0]).toEqual(custom);
+  expect(s.customProfiles![1]!.keys).toEqual(LEGACY_APPLE_BRITISH.keys);
+});

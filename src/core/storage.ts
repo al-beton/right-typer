@@ -126,7 +126,8 @@ export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
       let retained = customProfiles.find(
         (p) =>
           p.id.startsWith('saved-apple-gb-iso') &&
-          geometrySignature(p) === geometrySignature(snapshot),
+          p.geometry === snapshot.geometry &&
+          JSON.stringify(p.keys) === JSON.stringify(snapshot.keys),
       );
       if (!retained) {
         let id = 'saved-apple-gb-iso';
