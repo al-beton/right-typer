@@ -34,7 +34,8 @@ const icons = [
   ['split', 'Index pair', 'RT over two green and two turquoise columns.'],
   ['key', 'Quiet key', 'One compact key and a ten-column colour line.'],
 ] as const;
-const iconPath = (id: string, format = 'svg') => `./wordmarks/${id}.${format}`;
+const iconPath = (id: string, format = 'svg') =>
+  `./wordmarks/${id}.${format}?v=${import.meta.env.VITE_REVIEW_SHA}`;
 
 function wordmark(name: string, style: string, thumbs: boolean) {
   let index = 0;
@@ -140,7 +141,7 @@ export function renderGallery() {
     link.rel = 'icon';
     link.type = 'image/png';
     link.sizes.add('32x32');
-    link.href = `${iconPath(icon, '32.png')}?v=${import.meta.env.VITE_REVIEW_SHA}`;
+    link.href = iconPath(icon, '32.png');
     document.head.append(link);
   };
   select.addEventListener('change', () => {
