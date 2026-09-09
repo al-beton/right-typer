@@ -725,15 +725,43 @@ footer {
   padding: 2px;
 }
 .physical-position .key {
+  position: relative;
   width: 100%;
   height: 100%;
   min-width: 0;
   margin: 0;
 }
+/* Decorative ridges follow physical home positions, including custom labels. */
+.physical-position .key:is([data-key='KeyF'], [data-key='KeyJ'])::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 14%;
+  width: 18%;
+  max-width: 14px;
+  height: 2px;
+  transform: translateX(-50%);
+  border-radius: 2px;
+  background: currentColor;
+  opacity: 0.45;
+  pointer-events: none;
+}
 .physical-position .key small {
   font-size: clamp(6px, 0.85vw, 11px);
 }
 @media (max-width: 600px) {
+  .physical-position .key:is([data-key='KeyF'], [data-key='KeyJ']) > * {
+    position: relative;
+    top: -6%;
+  }
+  .physical-position .key:is([data-key='KeyF'], [data-key='KeyJ']) small {
+    padding: 0;
+    line-height: 1;
+  }
+  .physical-position .key:is([data-key='KeyF'], [data-key='KeyJ'])::after {
+    bottom: 10%;
+    height: 1px;
+  }
   .physical-position {
     padding: 1px;
   }
@@ -745,6 +773,26 @@ footer {
   }
   #profile-settings select {
     max-width: 220px;
+  }
+}
+@media (max-width: 440px) {
+  /* Keep the home labels clear of the ridge on the narrowest keyboards. */
+  .physical-position .key:is([data-key='KeyF'], [data-key='KeyJ']) b {
+    font-size: 10px;
+    line-height: 1;
+  }
+  .physical-position .key:is([data-key='KeyF'], [data-key='KeyJ']) small {
+    padding: 0;
+    font-size: 5px;
+    line-height: 1;
+  }
+}
+@media (max-width: 360px) {
+  .physical-position .key:is([data-key='KeyF'], [data-key='KeyJ']) b {
+    font-size: 8px;
+  }
+  .physical-position .key:is([data-key='KeyF'], [data-key='KeyJ']) small {
+    font-size: 4px;
   }
 }
 @media (max-width: 760px) {
