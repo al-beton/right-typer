@@ -27,6 +27,12 @@ test('visible MacBook spacebar edges match C–M on desktop and mobile; PC/custo
       await page.locator('#keyboard-profile').selectOption(p.id);
       const rect = async (code: string) =>
         (await page.locator(`[data-key="${code}"]`).boundingBox())!;
+      await expect(page.locator('[data-key=Space] b')).toHaveText('');
+      await expect(page.locator('[data-key=KeyC] b')).toHaveText(
+        p.id === 'fr-iso'
+          ? 'C'
+          : p.keys.find((k) => k.code === 'KeyC')!.outputs[0]!.text.toUpperCase(),
+      );
       const space = await rect('Space'),
         c = await rect('KeyC'),
         m = await rect('KeyM');
