@@ -75,7 +75,7 @@ function preset(
   return { version: 1, id, name, geometry, keys };
 }
 export const PRESETS = [
-  preset('us-ansi', 'US QWERTY — ANSI', 'ANSI'),
+  preset('us-ansi', 'US QWERTY — ANSI (PC)', 'ANSI'),
   preset('gb-iso', 'British QWERTY — ISO (PC)', 'ISO'),
   preset('apple-gb-iso', 'Apple British QWERTY — ISO', 'ISO'),
   preset('de-iso', 'German QWERTZ — ISO (PC)', 'ISO', ['qwertzuiop', 'asdfghjklö', 'yxcvbnm,.-']),
@@ -85,6 +85,18 @@ export const PRESETS = [
     'wxcvbn,;:!',
   ]),
 ];
+// Keep the original geometry for profile-less calibration migration.
+export const LEGACY_APPLE_BRITISH = structuredClone(PRESETS[2]!);
+PRESETS[2]!.name = 'MacBook British QWERTY — ISO';
+PRESETS.push(preset('apple-us-ansi', 'MacBook US QWERTY — ANSI', 'ANSI'));
+for (const p of PRESETS.filter((p) => ['apple-gb-iso', 'apple-us-ansi'].includes(p.id))) {
+  const c = p.keys.find((k) => k.code === 'KeyC')!;
+  const m = p.keys.find((k) => k.code === 'KeyM')!;
+  const space = p.keys.find((k) => k.code === 'Space')!;
+  // Cells include their gutters. Equal outer insets give equal visible edges.
+  space.x = c.x;
+  space.width = m.x + m.width - c.x;
+}
 // Dedicated regional letter keys, at their physical positions. They are shown
 // even though the current English passage does not require them for calibration.
 function regionalKey(
