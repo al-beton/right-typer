@@ -742,10 +742,8 @@ footer {
   height: 2px;
   transform: translateX(-50%);
   border-radius: 2px;
-  background: #15202b30;
-  box-shadow:
-    0 -1px 0 #ffffffa6,
-    0 1px 0 #15202b66;
+  background: currentColor;
+  opacity: 0.45;
   pointer-events: none;
 }
 .physical-position .key small {
