@@ -71,7 +71,7 @@ export function renderGallery() {
         <p>The requested red / orange / yellow / green / lilac / blue / purple / pink order follows the eight fingers. Current tokens render rose at “red” and cyan at “lilac”; these examples preserve the actual keyboard colours.</p>
         <p>Pastel fills alone have low contrast on the app’s #fafafa background. Options 01, 02 and 04 use an ink outline; 03 keeps the text in ink and the colours as decoration.</p>
       </section>
-      <footer><span>Review only · Editable CSS typography</span><span id="build-version" aria-label="App version">Build · <a href="https://github.com/al-beton/right-typer/commit/${import.meta.env.VITE_BUILD_SHA}">${import.meta.env.VITE_BUILD_SHA.slice(0, 7)}</a></span></footer>
+      <footer><span>Review only · Editable CSS typography</span><span id="build-version" aria-label="App version">Build · <a href="https://github.com/al-beton/right-typer/commit/${import.meta.env.VITE_REVIEW_SHA}">${import.meta.env.VITE_REVIEW_SHA.slice(0, 7)}</a></span></footer>
     </main>`;
   const select = app.querySelector<HTMLSelectElement>('#wm-name')!;
   const render = () => {
