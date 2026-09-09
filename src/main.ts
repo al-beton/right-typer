@@ -11,6 +11,8 @@ import {
 } from './core/profile';
 import { profileControls } from './view/profiles';
 import './style.css';
+import './view/brand.css';
+import { brandWordmark } from './view/brand';
 import { orderedFingers, fingerBackground, readFingerPalette } from './view/finger-colours';
 import { drawCalibrationDot } from './view/calibration-dot';
 import { unrotatePoint, isCameraRotation } from './view/rotation';
@@ -76,7 +78,7 @@ let cameraErrorHandled = false;
 let resetArmed = false;
 
 $('#app').innerHTML = `
-  <header class="topbar"><h1>Right Typer</h1><a href="https://github.com/al-beton/right-typer" target="_blank" rel="noreferrer">Source on GitHub</a></header>
+  <header class="topbar"><h1 class="brand" aria-label="Right Typer"><span aria-hidden="true">${brandWordmark()}</span></h1><a href="https://github.com/al-beton/right-typer" target="_blank" rel="noreferrer">Source on GitHub</a></header>
   <main>
     <div id="content" aria-label="Typing practice"></div>
     <section id="finger-map" aria-label="Intended finger map"></section>

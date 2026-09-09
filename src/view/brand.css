@@ -1,0 +1,16 @@
+.brand {
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  line-height: 1.25;
+}
+.brand span[style] {
+  text-decoration: underline;
+  text-decoration-color: var(--brand-colour);
+  text-decoration-thickness: 0.085em;
+  text-underline-offset: 0.18em;
+}
+
+.brand-gap {
+  display: inline-block;
+  width: 0.32em;
+}
