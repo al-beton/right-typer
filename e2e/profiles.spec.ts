@@ -11,6 +11,12 @@ test('presets update physical labels; French shifted punctuation completes passa
   await syntheticCamera(page);
   await page.goto('/');
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
+  await expect(page.locator('[data-key="Space"]')).toHaveAttribute(
+    'aria-label',
+    'Space: either thumb',
+  );
+  await expect(page.locator('[data-key="Space"] small')).toHaveText('either thumb');
+  await expect(page.locator('[data-key="KeyA"] b')).toHaveText('A');
   for (const p of PRESETS) {
     await page.locator('#keyboard-profile').selectOption(p.id);
     for (const k of p.keys) {
@@ -18,10 +24,10 @@ test('presets update physical labels; French shifted punctuation completes passa
       if (k.code === 'Space' || k.outputs.some((o) => /^[\p{L},.]$/u.test(o.text)))
         await expect(shown).toHaveText(
           k.code === 'Space'
-            ? 'space'
-            : [
-                ...new Set(k.outputs.filter((o) => /^[\p{L},.]$/u.test(o.text)).map((o) => o.text)),
-              ].join(' / '),
+            ? ''
+            : [...new Set(k.outputs.filter((o) => /^[\p{L},.]$/u.test(o.text)).map((o) => o.text))]
+                .map((text) => (/^[a-z]$/.test(text) ? text.toUpperCase() : text))
+                .join(' / '),
         );
       else await expect(shown).toHaveCount(0);
     }
@@ -75,6 +81,7 @@ test('custom edit/export/import validates and persists safely with literal label
   await page.locator('#capture-key').press('q');
   await page.locator('#alternate-finger').selectOption('left-middle');
   await page.locator('#save-profile').click();
+  await expect(page.locator('[data-key="KeyQ"] b')).toHaveText('Q');
   await expect(page.locator('#profile-status')).toContainText('saved locally');
   const id = await page.locator('#keyboard-profile').inputValue();
   await page.reload();

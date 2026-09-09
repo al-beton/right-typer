@@ -269,7 +269,11 @@ main {
   color: #15202b;
 }
 .key b {
-  font: 19px var(--mono);
+  font:
+    400 19px -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
 }
 .key small {
   font-size: 10px;
@@ -748,6 +752,10 @@ footer {
 }
 .physical-position .key small {
   font-size: clamp(6px, 0.85vw, 11px);
+}
+.physical-position .space-key small {
+  position: absolute;
+  bottom: 18%;
 }
 @media (max-width: 600px) {
   .physical-position .key:is([data-key='KeyF'], [data-key='KeyJ']) > * {
