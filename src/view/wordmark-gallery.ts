@@ -58,7 +58,7 @@ export function renderGallery() {
   const params = new URLSearchParams(location.search);
   let name = params.get('name') === 'bright' ? 'Bright Typer' : 'Right Typer';
   app.innerHTML = `
-    <header class="topbar"><h1>Wordmark studies</h1><a href="${location.pathname}">Back to app</a></header>
+    <header class="topbar"><h1>Wordmark studies</h1><a href="./">Back to app</a></header>
     <main class="wm-review">
       <div class="wm-intro"><p class="eyebrow">ALO-259 · DESIGN REVIEW</p>
       <h2>One name. Four small variations.</h2>
@@ -71,7 +71,7 @@ export function renderGallery() {
         <p>The requested red / orange / yellow / green / lilac / blue / purple / pink order follows the eight fingers. Current tokens render rose at “red” and cyan at “lilac”; these examples preserve the actual keyboard colours.</p>
         <p>Pastel fills alone have low contrast on the app’s #fafafa background. Options 01, 02 and 04 use an ink outline; 03 keeps the text in ink and the colours as decoration.</p>
       </section>
-      <footer><span>Review only · Editable CSS typography</span><span id="build-version" aria-label="App version">${import.meta.env.VITE_BUILD_LABEL} · <a href="https://github.com/al-beton/right-typer/commit/${import.meta.env.VITE_BUILD_SHA}">${import.meta.env.VITE_BUILD_SHA.slice(0, 7)}</a></span></footer>
+      <footer><span>Review only · Editable CSS typography</span><span id="build-version" aria-label="App version">Build · <a href="https://github.com/al-beton/right-typer/commit/${import.meta.env.VITE_BUILD_SHA}">${import.meta.env.VITE_BUILD_SHA.slice(0, 7)}</a></span></footer>
     </main>`;
   const select = app.querySelector<HTMLSelectElement>('#wm-name')!;
   const render = () => {

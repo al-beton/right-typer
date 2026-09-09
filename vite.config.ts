@@ -11,5 +11,6 @@ export default defineConfig({
     ),
   },
   base: './',
+  build: { rollupOptions: { input: ['index.html', 'wordmarks.html'] } },
   test: { include: ['tests/**/*.test.ts'] },
 });
