@@ -57,9 +57,7 @@ test('visible MacBook spacebar edges match C–M on desktop and mobile; PC/custo
   }
 });
 
-test('old camera setup stays usable; corrected preset requires a fresh map and old setup remains selectable', async ({
-  page,
-}) => {
+test('old camera setup uses corrected MacBook geometry without remapping', async ({ page }) => {
   await syntheticCamera(page);
   await page.addInitScript(
     (c) =>
@@ -73,10 +71,10 @@ test('old camera setup stays usable; corrected preset requires a fresh map and o
     calibration(),
   );
   await page.goto('/');
-  await expect(page.locator('#keyboard-profile')).toHaveValue('saved-apple-gb-iso');
+  await expect(page.locator('#keyboard-profile')).toHaveValue('apple-gb-iso');
   await expect(page.locator('#typing')).toBeEnabled();
   await page.locator('#keyboard-profile').selectOption('apple-gb-iso');
-  await expect(page.locator('#practice')).toBeDisabled();
-  await page.locator('#keyboard-profile').selectOption('saved-apple-gb-iso');
+  await expect(page.locator('#practice')).toBeEnabled();
+  await page.locator('#keyboard-profile').selectOption('apple-gb-iso');
   await expect(page.locator('#practice')).toBeEnabled();
 });

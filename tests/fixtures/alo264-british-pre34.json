@@ -1,0 +1,1363 @@
+{
+  "calibration": {
+    "version": 1,
+    "profile": {
+      "version": 1,
+      "id": "apple-gb-iso",
+      "name": "Apple British QWERTY — ISO",
+      "geometry": "ISO",
+      "keys": [
+        {
+          "code": "KeyQ",
+          "label": "q",
+          "x": 0,
+          "y": 0,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "q",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["left-little"],
+          "alternate": ["left-little"]
+        },
+        {
+          "code": "KeyW",
+          "label": "w",
+          "x": 1,
+          "y": 0,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "w",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["left-ring"],
+          "alternate": ["left-little"]
+        },
+        {
+          "code": "KeyE",
+          "label": "e",
+          "x": 2,
+          "y": 0,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "e",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["left-middle"],
+          "alternate": ["left-ring"]
+        },
+        {
+          "code": "KeyR",
+          "label": "r",
+          "x": 3,
+          "y": 0,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "r",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["left-index"],
+          "alternate": ["left-middle"]
+        },
+        {
+          "code": "KeyT",
+          "label": "t",
+          "x": 4,
+          "y": 0,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "t",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["left-index"],
+          "alternate": ["left-index"]
+        },
+        {
+          "code": "KeyY",
+          "label": "y",
+          "x": 5,
+          "y": 0,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "y",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["right-index"],
+          "alternate": ["left-index"]
+        },
+        {
+          "code": "KeyU",
+          "label": "u",
+          "x": 6,
+          "y": 0,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "u",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["right-index"],
+          "alternate": ["right-index"]
+        },
+        {
+          "code": "KeyI",
+          "label": "i",
+          "x": 7,
+          "y": 0,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "i",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["right-middle"],
+          "alternate": ["right-index"]
+        },
+        {
+          "code": "KeyO",
+          "label": "o",
+          "x": 8,
+          "y": 0,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "o",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["right-ring"],
+          "alternate": ["right-middle"]
+        },
+        {
+          "code": "KeyP",
+          "label": "p",
+          "x": 9,
+          "y": 0,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "p",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["right-little"],
+          "alternate": ["right-ring"]
+        },
+        {
+          "code": "KeyA",
+          "label": "a",
+          "x": 0.25,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "a",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["left-little"],
+          "alternate": ["left-little"]
+        },
+        {
+          "code": "KeyS",
+          "label": "s",
+          "x": 1.25,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "s",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["left-ring"],
+          "alternate": ["left-ring"]
+        },
+        {
+          "code": "KeyD",
+          "label": "d",
+          "x": 2.25,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "d",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["left-middle"],
+          "alternate": ["left-middle"]
+        },
+        {
+          "code": "KeyF",
+          "label": "f",
+          "x": 3.25,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "f",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["left-index"],
+          "alternate": ["left-index"]
+        },
+        {
+          "code": "KeyG",
+          "label": "g",
+          "x": 4.25,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "g",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["left-index"],
+          "alternate": ["left-index"]
+        },
+        {
+          "code": "KeyH",
+          "label": "h",
+          "x": 5.25,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "h",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["right-index"],
+          "alternate": ["right-index"]
+        },
+        {
+          "code": "KeyJ",
+          "label": "j",
+          "x": 6.25,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "j",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["right-index"],
+          "alternate": ["right-index"]
+        },
+        {
+          "code": "KeyK",
+          "label": "k",
+          "x": 7.25,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "k",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["right-middle"],
+          "alternate": ["right-middle"]
+        },
+        {
+          "code": "KeyL",
+          "label": "l",
+          "x": 8.25,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "l",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["right-ring"],
+          "alternate": ["right-ring"]
+        },
+        {
+          "code": "Semicolon",
+          "label": ";",
+          "x": 9.25,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": ";",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["right-little"],
+          "alternate": ["right-little"]
+        },
+        {
+          "code": "KeyZ",
+          "label": "z",
+          "x": 0.75,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "z",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["left-little"],
+          "alternate": ["left-ring"]
+        },
+        {
+          "code": "KeyX",
+          "label": "x",
+          "x": 1.75,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "x",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["left-ring"],
+          "alternate": ["left-middle"]
+        },
+        {
+          "code": "KeyC",
+          "label": "c",
+          "x": 2.75,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "c",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["left-middle"],
+          "alternate": ["left-index"]
+        },
+        {
+          "code": "KeyV",
+          "label": "v",
+          "x": 3.75,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "v",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["left-index"],
+          "alternate": ["left-index"]
+        },
+        {
+          "code": "KeyB",
+          "label": "b",
+          "x": 4.75,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "b",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["left-index"],
+          "alternate": ["right-index"]
+        },
+        {
+          "code": "KeyN",
+          "label": "n",
+          "x": 5.75,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "n",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["right-index"],
+          "alternate": ["right-index"]
+        },
+        {
+          "code": "KeyM",
+          "label": "m",
+          "x": 6.75,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "m",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["right-index"],
+          "alternate": ["right-middle"]
+        },
+        {
+          "code": "Comma",
+          "label": ",",
+          "x": 7.75,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": ",",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["right-middle"],
+          "alternate": ["right-ring"]
+        },
+        {
+          "code": "Period",
+          "label": ".",
+          "x": 8.75,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": ".",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["right-ring"],
+          "alternate": ["right-ring"]
+        },
+        {
+          "code": "Slash",
+          "label": "/",
+          "x": 9.75,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "outputs": [
+            {
+              "text": "/",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["right-little"],
+          "alternate": ["right-little"]
+        },
+        {
+          "code": "Space",
+          "label": "space",
+          "x": 2,
+          "y": 3,
+          "width": 6,
+          "height": 1,
+          "outputs": [
+            {
+              "text": " ",
+              "shift": false,
+              "altGr": false
+            }
+          ],
+          "standard": ["left-thumb", "right-thumb"],
+          "alternate": ["left-thumb", "right-thumb"]
+        },
+        {
+          "code": "IntlBackslash",
+          "label": "`",
+          "x": -0.25,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "outputs": [],
+          "standard": ["left-little"],
+          "alternate": ["left-little"]
+        }
+      ]
+    },
+    "points": {
+      "KeyQ": {
+        "x": 0.11944444444444445,
+        "y": 0.31851851851851853
+      },
+      "KeyW": {
+        "x": 0.19444444444444445,
+        "y": 0.31851851851851853
+      },
+      "KeyE": {
+        "x": 0.26944444444444443,
+        "y": 0.31851851851851853
+      },
+      "KeyR": {
+        "x": 0.34444444444444444,
+        "y": 0.31851851851851853
+      },
+      "KeyT": {
+        "x": 0.41944444444444445,
+        "y": 0.31851851851851853
+      },
+      "KeyY": {
+        "x": 0.49444444444444446,
+        "y": 0.31851851851851853
+      },
+      "KeyU": {
+        "x": 0.5694444444444444,
+        "y": 0.31851851851851853
+      },
+      "KeyI": {
+        "x": 0.6444444444444445,
+        "y": 0.31851851851851853
+      },
+      "KeyO": {
+        "x": 0.7194444444444444,
+        "y": 0.31851851851851853
+      },
+      "KeyP": {
+        "x": 0.7944444444444444,
+        "y": 0.31851851851851853
+      },
+      "KeyA": {
+        "x": 0.14166666666666666,
+        "y": 0.47962962962962963
+      },
+      "KeyS": {
+        "x": 0.21666666666666667,
+        "y": 0.47962962962962963
+      },
+      "KeyD": {
+        "x": 0.2916666666666667,
+        "y": 0.47962962962962963
+      },
+      "KeyF": {
+        "x": 0.36666666666666664,
+        "y": 0.47962962962962963
+      },
+      "KeyG": {
+        "x": 0.44166666666666665,
+        "y": 0.47962962962962963
+      },
+      "KeyH": {
+        "x": 0.5166666666666667,
+        "y": 0.47962962962962963
+      },
+      "KeyJ": {
+        "x": 0.5916666666666667,
+        "y": 0.47962962962962963
+      },
+      "KeyK": {
+        "x": 0.6666666666666666,
+        "y": 0.47962962962962963
+      },
+      "KeyL": {
+        "x": 0.7416666666666667,
+        "y": 0.47962962962962963
+      },
+      "KeyZ": {
+        "x": 0.1638888888888889,
+        "y": 0.6388888888888888
+      },
+      "KeyX": {
+        "x": 0.2388888888888889,
+        "y": 0.6388888888888888
+      },
+      "KeyC": {
+        "x": 0.3138888888888889,
+        "y": 0.6388888888888888
+      },
+      "KeyV": {
+        "x": 0.3888888888888889,
+        "y": 0.6388888888888888
+      },
+      "KeyB": {
+        "x": 0.4638888888888889,
+        "y": 0.6388888888888888
+      },
+      "KeyN": {
+        "x": 0.5388888888888889,
+        "y": 0.6388888888888888
+      },
+      "KeyM": {
+        "x": 0.6138888888888889,
+        "y": 0.6388888888888888
+      },
+      "Comma": {
+        "x": 0.6888888888888889,
+        "y": 0.6388888888888888
+      },
+      "Period": {
+        "x": 0.7638888888888888,
+        "y": 0.6388888888888888
+      },
+      "space-left": {
+        "x": 0.3,
+        "y": 0.8388888888888889
+      },
+      "space-right": {
+        "x": 0.7,
+        "y": 0.8388888888888889
+      }
+    },
+    "deviceId": "synthetic-macbook-camera",
+    "width": 960,
+    "height": 720,
+    "swapHands": false,
+    "savedAt": 1788969828895
+  },
+  "profileId": "apple-gb-iso",
+  "customProfiles": [],
+  "calibrations": {
+    "apple-gb-iso": {
+      "version": 1,
+      "profile": {
+        "version": 1,
+        "id": "apple-gb-iso",
+        "name": "Apple British QWERTY — ISO",
+        "geometry": "ISO",
+        "keys": [
+          {
+            "code": "KeyQ",
+            "label": "q",
+            "x": 0,
+            "y": 0,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "q",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["left-little"],
+            "alternate": ["left-little"]
+          },
+          {
+            "code": "KeyW",
+            "label": "w",
+            "x": 1,
+            "y": 0,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "w",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["left-ring"],
+            "alternate": ["left-little"]
+          },
+          {
+            "code": "KeyE",
+            "label": "e",
+            "x": 2,
+            "y": 0,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "e",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["left-middle"],
+            "alternate": ["left-ring"]
+          },
+          {
+            "code": "KeyR",
+            "label": "r",
+            "x": 3,
+            "y": 0,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "r",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["left-index"],
+            "alternate": ["left-middle"]
+          },
+          {
+            "code": "KeyT",
+            "label": "t",
+            "x": 4,
+            "y": 0,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "t",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["left-index"],
+            "alternate": ["left-index"]
+          },
+          {
+            "code": "KeyY",
+            "label": "y",
+            "x": 5,
+            "y": 0,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "y",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["right-index"],
+            "alternate": ["left-index"]
+          },
+          {
+            "code": "KeyU",
+            "label": "u",
+            "x": 6,
+            "y": 0,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "u",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["right-index"],
+            "alternate": ["right-index"]
+          },
+          {
+            "code": "KeyI",
+            "label": "i",
+            "x": 7,
+            "y": 0,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "i",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["right-middle"],
+            "alternate": ["right-index"]
+          },
+          {
+            "code": "KeyO",
+            "label": "o",
+            "x": 8,
+            "y": 0,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "o",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["right-ring"],
+            "alternate": ["right-middle"]
+          },
+          {
+            "code": "KeyP",
+            "label": "p",
+            "x": 9,
+            "y": 0,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "p",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["right-little"],
+            "alternate": ["right-ring"]
+          },
+          {
+            "code": "KeyA",
+            "label": "a",
+            "x": 0.25,
+            "y": 1,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "a",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["left-little"],
+            "alternate": ["left-little"]
+          },
+          {
+            "code": "KeyS",
+            "label": "s",
+            "x": 1.25,
+            "y": 1,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "s",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["left-ring"],
+            "alternate": ["left-ring"]
+          },
+          {
+            "code": "KeyD",
+            "label": "d",
+            "x": 2.25,
+            "y": 1,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "d",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["left-middle"],
+            "alternate": ["left-middle"]
+          },
+          {
+            "code": "KeyF",
+            "label": "f",
+            "x": 3.25,
+            "y": 1,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "f",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["left-index"],
+            "alternate": ["left-index"]
+          },
+          {
+            "code": "KeyG",
+            "label": "g",
+            "x": 4.25,
+            "y": 1,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "g",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["left-index"],
+            "alternate": ["left-index"]
+          },
+          {
+            "code": "KeyH",
+            "label": "h",
+            "x": 5.25,
+            "y": 1,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "h",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["right-index"],
+            "alternate": ["right-index"]
+          },
+          {
+            "code": "KeyJ",
+            "label": "j",
+            "x": 6.25,
+            "y": 1,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "j",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["right-index"],
+            "alternate": ["right-index"]
+          },
+          {
+            "code": "KeyK",
+            "label": "k",
+            "x": 7.25,
+            "y": 1,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "k",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["right-middle"],
+            "alternate": ["right-middle"]
+          },
+          {
+            "code": "KeyL",
+            "label": "l",
+            "x": 8.25,
+            "y": 1,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "l",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["right-ring"],
+            "alternate": ["right-ring"]
+          },
+          {
+            "code": "Semicolon",
+            "label": ";",
+            "x": 9.25,
+            "y": 1,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": ";",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["right-little"],
+            "alternate": ["right-little"]
+          },
+          {
+            "code": "KeyZ",
+            "label": "z",
+            "x": 0.75,
+            "y": 2,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "z",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["left-little"],
+            "alternate": ["left-ring"]
+          },
+          {
+            "code": "KeyX",
+            "label": "x",
+            "x": 1.75,
+            "y": 2,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "x",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["left-ring"],
+            "alternate": ["left-middle"]
+          },
+          {
+            "code": "KeyC",
+            "label": "c",
+            "x": 2.75,
+            "y": 2,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "c",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["left-middle"],
+            "alternate": ["left-index"]
+          },
+          {
+            "code": "KeyV",
+            "label": "v",
+            "x": 3.75,
+            "y": 2,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "v",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["left-index"],
+            "alternate": ["left-index"]
+          },
+          {
+            "code": "KeyB",
+            "label": "b",
+            "x": 4.75,
+            "y": 2,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "b",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["left-index"],
+            "alternate": ["right-index"]
+          },
+          {
+            "code": "KeyN",
+            "label": "n",
+            "x": 5.75,
+            "y": 2,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "n",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["right-index"],
+            "alternate": ["right-index"]
+          },
+          {
+            "code": "KeyM",
+            "label": "m",
+            "x": 6.75,
+            "y": 2,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "m",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["right-index"],
+            "alternate": ["right-middle"]
+          },
+          {
+            "code": "Comma",
+            "label": ",",
+            "x": 7.75,
+            "y": 2,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": ",",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["right-middle"],
+            "alternate": ["right-ring"]
+          },
+          {
+            "code": "Period",
+            "label": ".",
+            "x": 8.75,
+            "y": 2,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": ".",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["right-ring"],
+            "alternate": ["right-ring"]
+          },
+          {
+            "code": "Slash",
+            "label": "/",
+            "x": 9.75,
+            "y": 2,
+            "width": 1,
+            "height": 1,
+            "outputs": [
+              {
+                "text": "/",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["right-little"],
+            "alternate": ["right-little"]
+          },
+          {
+            "code": "Space",
+            "label": "space",
+            "x": 2,
+            "y": 3,
+            "width": 6,
+            "height": 1,
+            "outputs": [
+              {
+                "text": " ",
+                "shift": false,
+                "altGr": false
+              }
+            ],
+            "standard": ["left-thumb", "right-thumb"],
+            "alternate": ["left-thumb", "right-thumb"]
+          },
+          {
+            "code": "IntlBackslash",
+            "label": "`",
+            "x": -0.25,
+            "y": 2,
+            "width": 1,
+            "height": 1,
+            "outputs": [],
+            "standard": ["left-little"],
+            "alternate": ["left-little"]
+          }
+        ]
+      },
+      "points": {
+        "KeyQ": {
+          "x": 0.11944444444444445,
+          "y": 0.31851851851851853
+        },
+        "KeyW": {
+          "x": 0.19444444444444445,
+          "y": 0.31851851851851853
+        },
+        "KeyE": {
+          "x": 0.26944444444444443,
+          "y": 0.31851851851851853
+        },
+        "KeyR": {
+          "x": 0.34444444444444444,
+          "y": 0.31851851851851853
+        },
+        "KeyT": {
+          "x": 0.41944444444444445,
+          "y": 0.31851851851851853
+        },
+        "KeyY": {
+          "x": 0.49444444444444446,
+          "y": 0.31851851851851853
+        },
+        "KeyU": {
+          "x": 0.5694444444444444,
+          "y": 0.31851851851851853
+        },
+        "KeyI": {
+          "x": 0.6444444444444445,
+          "y": 0.31851851851851853
+        },
+        "KeyO": {
+          "x": 0.7194444444444444,
+          "y": 0.31851851851851853
+        },
+        "KeyP": {
+          "x": 0.7944444444444444,
+          "y": 0.31851851851851853
+        },
+        "KeyA": {
+          "x": 0.14166666666666666,
+          "y": 0.47962962962962963
+        },
+        "KeyS": {
+          "x": 0.21666666666666667,
+          "y": 0.47962962962962963
+        },
+        "KeyD": {
+          "x": 0.2916666666666667,
+          "y": 0.47962962962962963
+        },
+        "KeyF": {
+          "x": 0.36666666666666664,
+          "y": 0.47962962962962963
+        },
+        "KeyG": {
+          "x": 0.44166666666666665,
+          "y": 0.47962962962962963
+        },
+        "KeyH": {
+          "x": 0.5166666666666667,
+          "y": 0.47962962962962963
+        },
+        "KeyJ": {
+          "x": 0.5916666666666667,
+          "y": 0.47962962962962963
+        },
+        "KeyK": {
+          "x": 0.6666666666666666,
+          "y": 0.47962962962962963
+        },
+        "KeyL": {
+          "x": 0.7416666666666667,
+          "y": 0.47962962962962963
+        },
+        "KeyZ": {
+          "x": 0.1638888888888889,
+          "y": 0.6388888888888888
+        },
+        "KeyX": {
+          "x": 0.2388888888888889,
+          "y": 0.6388888888888888
+        },
+        "KeyC": {
+          "x": 0.3138888888888889,
+          "y": 0.6388888888888888
+        },
+        "KeyV": {
+          "x": 0.3888888888888889,
+          "y": 0.6388888888888888
+        },
+        "KeyB": {
+          "x": 0.4638888888888889,
+          "y": 0.6388888888888888
+        },
+        "KeyN": {
+          "x": 0.5388888888888889,
+          "y": 0.6388888888888888
+        },
+        "KeyM": {
+          "x": 0.6138888888888889,
+          "y": 0.6388888888888888
+        },
+        "Comma": {
+          "x": 0.6888888888888889,
+          "y": 0.6388888888888888
+        },
+        "Period": {
+          "x": 0.7638888888888888,
+          "y": 0.6388888888888888
+        },
+        "space-left": {
+          "x": 0.3,
+          "y": 0.8388888888888889
+        },
+        "space-right": {
+          "x": 0.7,
+          "y": 0.8388888888888889
+        }
+      },
+      "deviceId": "synthetic-macbook-camera",
+      "width": 960,
+      "height": 720,
+      "swapHands": false,
+      "savedAt": 1788969828895
+    }
+  },
+  "fingeringMode": "standard",
+  "cameraDeviceId": "synthetic-macbook-camera",
+  "practiceEnabled": true,
+  "cameraDisconnected": false,
+  "results": []
+}

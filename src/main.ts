@@ -4,7 +4,7 @@ import {
   characterKey,
   coverage,
   displayCharacters,
-  geometrySignature,
+  calibrationGeometrySignature,
   profileFingers,
   resolveEvent,
   type KeyboardProfile,
@@ -286,7 +286,7 @@ function sameCamera(c: Calibration) {
   const s = camera.settings();
   return (
     !!c.profile &&
-    geometrySignature(c.profile) === geometrySignature(profile) &&
+    calibrationGeometrySignature(c.profile) === calibrationGeometrySignature(profile) &&
     s?.deviceId === c.deviceId &&
     video.videoWidth === c.width &&
     video.videoHeight === c.height

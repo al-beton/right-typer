@@ -4,6 +4,7 @@ import {
   LEGACY_CODES,
   LEGACY_APPLE_BRITISH,
   geometrySignature,
+  calibrationGeometrySignature,
   type KeyboardProfile,
 } from './profile';
 import { isFingeringMode, type FingeringMode } from './keyboard';
@@ -22,6 +23,7 @@ export type Saved = {
   customProfiles?: KeyboardProfile[];
   calibrations?: Record<string, Calibration>;
   legacyCalibration?: unknown;
+  calibrationHistory?: Record<string, Calibration>;
   migrationNotice?: string;
   calibration?: Calibration;
   fingeringMode?: FingeringMode;
@@ -115,46 +117,58 @@ export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
         else migrationNotice += ' Remap positions before practice.';
       } else if (parsed.calibration) migrationNotice += ' Remap positions before practice.';
     }
-    // Preserve calibrated geometry as a separate selectable setup. Never rewrite
-    // camera points or the original snapshot to match a revised built-in preset.
-    const old =
-      parsed.profileId === 'apple-gb-iso' && validCalibration(parsed.calibration)
-        ? (parsed.calibration as Calibration)
-        : calibrations['apple-gb-iso'];
-    if (old?.profile && geometrySignature(old.profile) !== geometrySignature(PRESETS[2]!)) {
-      const snapshot = old.profile;
-      let retained = customProfiles.find(
-        (p) =>
-          p.id.startsWith('saved-apple-gb-iso') &&
-          p.geometry === snapshot.geometry &&
-          JSON.stringify(p.keys) === JSON.stringify(snapshot.keys),
-      );
-      if (!retained) {
-        let id = 'saved-apple-gb-iso';
-        for (let suffix = 2; profiles.some((p) => p.id === id); suffix++)
-          id = `saved-apple-gb-iso-${suffix}`;
-        retained = { ...structuredClone(snapshot), id, name: 'MacBook British — saved geometry' };
-        customProfiles.push(retained);
+    const calibrationHistory: Record<string, Calibration> = Object.create(null);
+    for (const [id, c] of Object.entries(parsed.calibrationHistory ?? {}).slice(0, 28))
+      if (validCalibration(c)) calibrationHistory[id] = c;
+    // PR34 generated this exact stock copy. Upgrade it back to the built-in;
+    // user-created/edited custom profiles are not inferred from names alone.
+    const generated = customProfiles.find(
+      (p) =>
+        /^saved-apple-gb-iso(?:-[0-9]+)?$/.test(p.id) &&
+        p.name === 'MacBook British — saved geometry' &&
+        p.geometry === LEGACY_APPLE_BRITISH.geometry &&
+        JSON.stringify(p.keys) === JSON.stringify(LEGACY_APPLE_BRITISH.keys),
+    );
+    if (generated && profileId === generated.id) profileId = 'apple-gb-iso';
+    if (generated) {
+      const c =
+        calibrations[generated.id] ??
+        (parsed.profileId === generated.id ? parsed.calibration : undefined);
+      if (validCalibration(c)) {
+        calibrationHistory[generated.id] ??= structuredClone(c);
+        calibrations['apple-gb-iso'] ??= structuredClone(c);
       }
-      calibrations[retained.id] ??= structuredClone(old);
-      delete calibrations['apple-gb-iso'];
-      if (profileId === 'apple-gb-iso') {
-        profileId = retained.id;
-        migrationNotice =
-          'Your saved MacBook geometry and camera map are kept. Choose MacBook British QWERTY — ISO and remap to use the corrected spacebar.';
-      }
+      customProfiles.splice(customProfiles.indexOf(generated), 1);
     }
+    let activeCalibration =
+      parsed.profileId && validCalibration(parsed.calibration)
+        ? (parsed.calibration as Calibration)
+        : calibrations[profileId];
+    const upgrade = (c: Calibration | undefined, id: string): Calibration | undefined => {
+      const current = PRESETS.find((p) => p.id === id);
+      if (
+        !c?.profile ||
+        !current ||
+        geometrySignature(c.profile) === geometrySignature(current) ||
+        calibrationGeometrySignature(c.profile) !== calibrationGeometrySignature(current)
+      )
+        return c;
+      calibrationHistory[id] ??= structuredClone(c);
+      // Original snapshot is archived, camera points and timing remain exact.
+      return { ...structuredClone(c), profile: structuredClone(current) };
+    };
+    for (const id of Object.keys(calibrations)) calibrations[id] = upgrade(calibrations[id], id)!;
+    activeCalibration = upgrade(activeCalibration, profileId);
+    if (migrationNotice?.includes('corrected spacebar')) migrationNotice = undefined;
     return {
       profileId,
       customProfiles,
       calibrations,
       legacyCalibration,
+      calibrationHistory,
       migrationNotice,
       fingeringMode: isFingeringMode(parsed.fingeringMode) ? parsed.fingeringMode : 'standard',
-      calibration:
-        parsed.profileId && validCalibration(parsed.calibration)
-          ? parsed.calibration
-          : calibrations[profileId],
+      calibration: activeCalibration,
       results,
       ...(typeof parsed.cameraDeviceId === 'string'
         ? { cameraDeviceId: parsed.cameraDeviceId }
@@ -181,6 +195,7 @@ export function save(data: Saved, storage: Pick<Storage, 'setItem'> = localStora
         customProfiles: data.customProfiles,
         calibrations: data.calibrations,
         legacyCalibration: data.legacyCalibration,
+        calibrationHistory: data.calibrationHistory,
         migrationNotice: data.migrationNotice,
         fingeringMode: data.fingeringMode,
         cameraRotation: data.cameraRotation,
