@@ -26,12 +26,12 @@ test('selected wordmark and favicon are the normal app defaults', async ({ page 
   }
   await expect(page.locator('link[rel="icon"][type="image/svg+xml"]')).toHaveAttribute(
     'href',
-    './favicon.svg?v=quiet-underline',
+    './favicon.svg?v=quiet-underline-type',
   );
-  const svg = await page.request.get('favicon.svg?v=quiet-underline');
+  const svg = await page.request.get('favicon.svg?v=quiet-underline-type');
   expect(svg.ok()).toBe(true);
   expect(await svg.text()).toContain('Right Typer rt favicon');
-  const ico = await page.request.get('favicon.ico?v=quiet-underline');
+  const ico = await page.request.get('favicon.ico?v=quiet-underline-type');
   expect(ico.ok()).toBe(true);
   const bytes = await ico.body();
   expect(bytes.readUInt16LE(2)).toBe(1);
