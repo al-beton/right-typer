@@ -1,0 +1,154 @@
+.wm-review {
+  padding-top: 30px;
+}
+.wm-intro {
+  max-width: 620px;
+  margin-bottom: 24px;
+}
+.wm-intro h2 {
+  font-size: 28px;
+  letter-spacing: -0.6px;
+  margin: 8px 0 12px;
+}
+.wm-switch {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  font-size: 14px;
+}
+.wm-note {
+  font-size: 12px;
+  color: #505862;
+  margin: 10px 0 28px;
+}
+.wm-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+.wm-card {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: 22px;
+  min-width: 0;
+}
+.wm-card-title {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+}
+.wm-card-title > span,
+.wm-size {
+  font: 11px var(--mono);
+  color: #505862;
+}
+.wm-large {
+  padding: 32px 0;
+  font-size: clamp(30px, 3.7vw, 48px);
+}
+.wordmark {
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  line-height: 1.25;
+}
+.wm-letter {
+  color: var(--wm-colour);
+  -webkit-text-stroke: 1.4px #20252b;
+  paint-order: stroke fill;
+}
+.wm-gap {
+  display: inline-block;
+  width: 0.32em;
+  position: relative;
+}
+.wm-space {
+  font-family: var(--mono);
+  font-weight: 600;
+  letter-spacing: -0.075em;
+}
+.wm-space .wm-gap {
+  width: 0.65em;
+  margin: 0 0.07em;
+}
+.wm-space .wm-gap::after,
+.wm-ink .wm-gap::after {
+  content: '';
+  position: absolute;
+  height: 0.09em;
+  left: 0;
+  right: 0;
+  bottom: -0.12em;
+  background: linear-gradient(90deg, var(--left-thumb) 50%, var(--right-thumb) 50%);
+  border: 1px solid #505862;
+  border-radius: 1px;
+}
+.wm-ink .wm-letter {
+  color: #20252b;
+  -webkit-text-stroke: 0;
+  text-decoration: underline;
+  text-decoration-color: var(--wm-colour);
+  text-decoration-thickness: 0.09em;
+  text-underline-offset: 0.18em;
+}
+.wm-header {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border-top: 1px solid var(--line);
+  padding: 16px 0 20px;
+  font-size: 22px;
+}
+.wm-card p {
+  font-size: 13px;
+  line-height: 1.6;
+  max-width: 46ch;
+}
+.wm-palette {
+  margin-top: 32px;
+}
+.wm-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 20px;
+  margin: 20px 0;
+}
+.wm-swatches span {
+  font-size: 11px;
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.wm-swatches i {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #505862;
+  border-radius: 3px;
+}
+.wm-palette p {
+  max-width: 82ch;
+  font-size: 13px;
+}
+@media (max-width: 680px) {
+  .wm-grid {
+    grid-template-columns: 1fr;
+  }
+  .wm-card {
+    padding: 18px;
+  }
+  .wm-large {
+    font-size: clamp(28px, 8.3vw, 44px);
+  }
+  .wm-intro h2 {
+    font-size: 24px;
+  }
+  .wm-review {
+    padding-top: 20px;
+  }
+}
+@media (forced-colors: active) {
+  .wm-letter {
+    color: CanvasText;
+    -webkit-text-stroke: 0;
+  }
+}
