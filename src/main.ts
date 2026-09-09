@@ -161,7 +161,15 @@ function keyboard() {
             ? `left/right ${first.split('-')[1]}`
             : names.join('/');
     const background = `background:${fingerBackground(fingers)}`;
-    return `<span class="key ${k === 'Space' ? 'space-key' : `finger-${fingers[0]}`}" style="${background}" title="${label}" aria-label="${escapeHtml(physicalLabel(k))}: ${label}" data-key="${k}"><b>${escapeHtml(physicalLabel(k))}</b><small>${compactLabel}</small></span>`;
+    // Hardware legends only: regional letters/symbols and output semantics stay intact.
+    const legend =
+      k === 'Space'
+        ? ''
+        : physicalLabel(k)
+            .split(' / ')
+            .map((text) => (/^[a-z]$/.test(text) ? text.toUpperCase() : text))
+            .join(' / ');
+    return `<span class="key ${k === 'Space' ? 'space-key' : `finger-${fingers[0]}`}" style="${background}" title="${label}" aria-label="${escapeHtml(k === 'Space' ? 'Space' : physicalLabel(k))}: ${label}" data-key="${k}"><b aria-hidden="true">${escapeHtml(legend)}</b><small>${compactLabel}</small></span>`;
   };
   const visibleKeys = profile.keys.filter(
     (k) => k.code === 'Space' || displayCharacters(k).length > 0,
