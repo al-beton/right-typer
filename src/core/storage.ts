@@ -1,4 +1,11 @@
-import { PRESETS, parseProfile, LEGACY_CODES, type KeyboardProfile } from './profile';
+import {
+  PRESETS,
+  parseProfile,
+  LEGACY_CODES,
+  LEGACY_APPLE_BRITISH,
+  geometrySignature,
+  type KeyboardProfile,
+} from './profile';
 import { isFingeringMode, type FingeringMode } from './keyboard';
 import { validCalibration } from './calibration';
 import type { Calibration } from './types';
@@ -69,7 +76,7 @@ export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
       : [];
     const customProfiles: KeyboardProfile[] = [];
     for (const p of Array.isArray(parsed.customProfiles)
-      ? parsed.customProfiles.slice(0, 20)
+      ? parsed.customProfiles.slice(0, 21)
       : []) {
       try {
         const valid = parseProfile(JSON.stringify(p));
@@ -83,13 +90,13 @@ export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
       }
     }
     const profiles = [...PRESETS, ...customProfiles];
-    const profileId = profiles.some((p) => p.id === parsed.profileId)
+    let profileId = profiles.some((p) => p.id === parsed.profileId)
       ? parsed.profileId
       : raw
         ? 'apple-gb-iso'
         : 'us-ansi';
     const calibrations: Record<string, Calibration> = Object.create(null);
-    for (const [id, c] of Object.entries(parsed.calibrations ?? {}).slice(0, 25))
+    for (const [id, c] of Object.entries(parsed.calibrations ?? {}).slice(0, 28))
       if (validCalibration(c)) calibrations[id] = c;
     let legacyCalibration = parsed.legacyCalibration;
     let migrationNotice =
@@ -103,10 +110,38 @@ export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
         c.points = Object.fromEntries(
           Object.entries(c.points).map(([k, v]) => [LEGACY_CODES[k] ?? k, v]),
         );
-        c.profile = structuredClone(PRESETS[2]!);
+        c.profile = structuredClone(LEGACY_APPLE_BRITISH);
         if (validCalibration(c)) calibrations['apple-gb-iso'] = c;
         else migrationNotice += ' Remap positions before practice.';
       } else if (parsed.calibration) migrationNotice += ' Remap positions before practice.';
+    }
+    // Preserve calibrated geometry as a separate selectable setup. Never rewrite
+    // camera points or the original snapshot to match a revised built-in preset.
+    const old =
+      parsed.profileId === 'apple-gb-iso' && validCalibration(parsed.calibration)
+        ? (parsed.calibration as Calibration)
+        : calibrations['apple-gb-iso'];
+    if (old?.profile && geometrySignature(old.profile) !== geometrySignature(PRESETS[2]!)) {
+      const snapshot = old.profile;
+      let retained = customProfiles.find(
+        (p) =>
+          p.id.startsWith('saved-apple-gb-iso') &&
+          geometrySignature(p) === geometrySignature(snapshot),
+      );
+      if (!retained) {
+        let id = 'saved-apple-gb-iso';
+        for (let suffix = 2; profiles.some((p) => p.id === id); suffix++)
+          id = `saved-apple-gb-iso-${suffix}`;
+        retained = { ...structuredClone(snapshot), id, name: 'MacBook British — saved geometry' };
+        customProfiles.push(retained);
+      }
+      calibrations[retained.id] ??= structuredClone(old);
+      delete calibrations['apple-gb-iso'];
+      if (profileId === 'apple-gb-iso') {
+        profileId = retained.id;
+        migrationNotice =
+          'Your saved MacBook geometry and camera map are kept. Choose MacBook British QWERTY — ISO and remap to use the corrected spacebar.';
+      }
     }
     return {
       profileId,
