@@ -1,5 +1,7 @@
 # Hardware geometry and saved camera maps
 
+For the comprehensive six-preset hardware/legend audit and current renders, see [Keyboard fidelity](keyboard-fidelity.md). The original migration evidence below records PR35.
+
 MacBook British ISO and MacBook US ANSI Space spans physical C's left edge to M's right edge: x=2.75, width=5 key pitches, relative to Q at x=0. Equal key-cell padding makes the visible edges coincide, including mobile gutters. PC presets use the conventional 6.25-pitch bottom row: x=2.25, width=6.25. Language or ANSI/ISO alone cannot identify a bottom row; arbitrary custom coordinates remain untouched.
 
 ## Hardware evidence (checked 2026-09-09)

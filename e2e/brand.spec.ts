@@ -9,7 +9,9 @@ test('selected wordmark and favicon are the normal app defaults', async ({ page 
     .locator('.physical-position')
     .evaluateAll((positions) =>
       positions
-        .filter((p) => (p as HTMLElement).style.top === '0%')
+        .filter((p) =>
+          'QWERTYUIOP'.split('').some((letter) => p.querySelector(`[data-key=Key${letter}]`)),
+        )
         .map((p) => getComputedStyle(p.firstElementChild!).backgroundColor),
     );
   const letters = heading.locator('span[style]');

@@ -75,11 +75,15 @@ function preset(
   return { version: 1, id, name, geometry, keys };
 }
 export const PRESETS = [
-  preset('us-ansi', 'US QWERTY — ANSI (PC)', 'ANSI'),
-  preset('gb-iso', 'British QWERTY — ISO (PC)', 'ISO'),
+  preset('us-ansi', 'US QWERTY — Keychron V6 ANSI (Windows)', 'ANSI'),
+  preset('gb-iso', 'British QWERTY — Keychron V6 ISO (Windows)', 'ISO'),
   preset('apple-gb-iso', 'Apple British QWERTY — ISO', 'ISO'),
-  preset('de-iso', 'German QWERTZ — ISO (PC)', 'ISO', ['qwertzuiop', 'asdfghjklö', 'yxcvbnm,.-']),
-  preset('fr-iso', 'French Legacy AZERTY — ISO (PC)', 'ISO', [
+  preset('de-iso', 'German QWERTZ — Keychron V6 ISO (Windows)', 'ISO', [
+    'qwertzuiop',
+    'asdfghjklö',
+    'yxcvbnm,.-',
+  ]),
+  preset('fr-iso', 'French Legacy AZERTY — Keychron V6 ISO (Windows)', 'ISO', [
     'azertyuiop',
     'qsdfghjklm',
     'wxcvbn,;:!',
