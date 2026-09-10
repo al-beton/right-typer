@@ -814,6 +814,29 @@ footer {
     flex-wrap: wrap;
   }
 }
+#sample-panel {
+  margin: 1.5rem auto;
+  padding: 1rem;
+  max-width: 850px;
+  border: 1px solid #6b7a72;
+  border-radius: 12px;
+}
+#sample-panel.is-recording {
+  border: 2px solid #d57c58;
+}
+.sample-fields,
+.sample-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 12px 0;
+}
+.sample-fields label {
+  display: grid;
+  gap: 6px;
+  flex: 1;
+  min-width: 150px;
+}
 
 /* Full typing block; surrounding hardware is quiet, practiced positions retain
    their finger colors. Legends are independent from the exercise's outputs. */
@@ -898,4 +921,13 @@ footer {
 }
 .hardware-block .legend-1:empty {
   display: none;
+}
+
+#debugging {
+  margin: 1.5rem auto;
+  max-width: 850px;
+}
+#debugging > summary {
+  cursor: pointer;
+  color: var(--muted);
 }

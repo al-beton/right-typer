@@ -48,9 +48,16 @@ Any static HTTPS host can serve the same folder. Do not use `file://`: camera ac
 ## Privacy and limitations
 
 - Inference runs in a worker on this device. No analytics, CDN, font service, upload, audio access or cloud inference. Runtime requests are same-origin; a content security policy restricts connections. The host still receives ordinary requests for static files.
-- Camera frames are transient, closed after inference and never recorded or persisted. Only calibration, camera preferences, the Go preference and small aggregate results are saved locally.
+- During normal practice, camera frames are transient and closed after inference. Explicitly starting a debugging sample records video and tracking inputs in memory for local download. Only calibration, camera preferences, the Go preference and small aggregate results are saved locally.
 - Recognition takes the capture-timestamped frame nearest each keypress (within ±500 ms) and names the fingertip nearest the calibrated key on any visible hand. There are no proximity, separation, confidence or frame-agreement gates: a press always gets the best available answer. Occlusion, depth/perspective error, crossed hands or slow frames can therefore produce a wrong finger rather than an unknown. It cannot prove physical key contact from 2D landmarks.
 - Missing capture timestamps or no hands around a press leave its finger unknown; these do not block matching text. Setup repair remains available. Attribution accuracy on real hardware is unmeasured; the rule is chosen for simplicity and coverage, not proven precision.
 - Correct-finger usability and deliberate wrong-finger detection need Al’s complete-passage hardware check. Faster learning is also a hypothesis, not an established result.
 
 Architecture and metric definitions: [docs/architecture.md](docs/architecture.md). Passage data: [src/passage.ts](src/passage.ts). Licensed under [Apache 2.0](LICENSE); [third-party notices](public/THIRD_PARTY_NOTICES.txt) are included in the static distribution.
+
+## Debugging samples
+
+Open **Debugging** below the camera for opt-in camera/keymap/keypress sample export.
+The section is collapsed by default, and recording starts only when you click
+**Start sample (fresh passage)**. The `?record=1` shortcut opens the same section. See
+[the recording and replay guide](docs/samples.md) before collecting a pilot.

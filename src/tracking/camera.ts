@@ -3,6 +3,18 @@ import type { Frame } from '../core/types';
 import { frameTime } from './timing';
 export type CameraStatus = 'off' | 'loading' | 'ready' | 'error';
 export class Camera {
+  // Optional local recorder; pixels are copied before the production bitmap is transferred.
+  recordInput?: (
+    bitmap: ImageBitmap,
+    metadata: {
+      id: number;
+      at: number;
+      clock: Frame['clock'];
+      mediaTime: number;
+      presentedFrames: number;
+    },
+  ) => void;
+  recordSkip?: (reason: string, metadata: { mediaTime: number; presentedFrames: number }) => void;
   stream?: MediaStream;
   status: CameraStatus = 'off';
   error = '';
@@ -129,7 +141,10 @@ export class Camera {
     this.callbackId = this.video.requestVideoFrameCallback((_now, metadata) => {
       if (generation !== this.generation || this.status !== 'ready') return;
       this.capture();
-      if (this.busy || document.hidden) return;
+      if (this.busy || document.hidden) {
+        this.recordSkip?.(document.hidden ? 'hidden' : 'worker-busy', metadata);
+        return;
+      }
       // rVFC's `now` can be the earlier render-tick timestamp, even before captureTime.
       // Validate against the clock sampled here, not that scheduling timestamp.
       const callbackTime = performance.now();
@@ -148,6 +163,13 @@ export class Camera {
             bitmap.close();
             return;
           }
+          this.recordInput?.(bitmap, {
+            id,
+            at,
+            clock: captureTime === null ? 'unavailable' : 'capture',
+            mediaTime: metadata.mediaTime,
+            presentedFrames: metadata.presentedFrames,
+          });
           this.worker?.postMessage(
             {
               type: 'frame',
