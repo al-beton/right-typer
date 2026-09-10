@@ -814,3 +814,64 @@ footer {
     flex-wrap: wrap;
   }
 }
+
+/* Full typing block; surrounding hardware is quiet, practiced positions retain
+   their finger colors. Legends are independent from the exercise's outputs. */
+.hardware-block .key.context-key {
+  background: #e7e8e5;
+  color: #555c59;
+}
+.hardware-block .key b {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25em;
+  font-size: clamp(11px, 1.5vw, 20px);
+}
+.hardware-block .key b:has(.legend-1) {
+  flex-direction: column-reverse;
+  gap: 0;
+  line-height: 1.05;
+  font-size: clamp(9px, 1.2vw, 16px);
+}
+.hardware-block .legend-2 {
+  position: absolute;
+  right: -0.8em;
+  bottom: 0;
+  font-size: 0.65em;
+}
+.hardware-block .key.iso-return {
+  clip-path: polygon(0 0, 100% 0, 100% 100%, var(--notch) 100%, var(--notch) 50%, 0 50%);
+}
+.hardware-block .key small {
+  font-size: clamp(5px, 0.65vw, 9px);
+}
+@media (max-width: 600px) {
+  .hardware-block .key {
+    border-radius: 3px;
+  }
+  .hardware-block .key small {
+    display: none;
+  }
+  .hardware-block .space-key small {
+    display: block;
+    font-size: 8px;
+    bottom: 25%;
+  }
+  .hardware-block .key b {
+    font-size: 10px;
+    line-height: 1;
+  }
+  .hardware-block .key b:has(.legend-1) {
+    font-size: 8px;
+  }
+  .hardware-block .context-key b {
+    font-size: 8px;
+  }
+}
+@media (max-width: 600px) {
+  #finger-map:has(.hardware-block) {
+    min-height: 0;
+  }
+}

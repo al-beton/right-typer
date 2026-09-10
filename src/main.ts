@@ -1,3 +1,4 @@
+import { hardwareKeys, HARDWARE, type HardwareKey } from './view/hardware';
 import {
   PRESETS,
   calibrationCodes,
@@ -144,7 +145,9 @@ function store() {
   $('#storage-warning').hidden = !storageWarning;
 }
 function keyboard() {
-  const key = (k: string) => {
+  const key = (draw: HardwareKey) => {
+    const k = draw.code;
+    const contextual = !profile.keys.some((key) => key.code === k);
     const fingers = orderedFingers(profileFingers(profile, k, fingeringMode));
     const label =
       k === 'Space'
@@ -162,23 +165,17 @@ function keyboard() {
             : names.join('/');
     const background = `background:${fingerBackground(fingers)}`;
     // Hardware legends only: regional letters/symbols and output semantics stay intact.
-    const legend =
-      k === 'Space'
-        ? ''
-        : physicalLabel(k)
-            .split(' / ')
-            .map((text) => (/^[a-z]$/.test(text) ? text.toUpperCase() : text))
-            .join(' / ');
-    return `<span class="key ${k === 'Space' ? 'space-key' : `finger-${fingers[0]}`}" style="${background}" title="${label}" aria-label="${escapeHtml(k === 'Space' ? 'Space' : physicalLabel(k))}: ${label}" data-key="${k}"><b aria-hidden="true">${escapeHtml(legend)}</b><small>${compactLabel}</small></span>`;
+    const legend = draw.legends
+      .map((text, i) => `<span class="legend-${i}">${escapeHtml(text)}</span>`)
+      .join('');
+    return `<span class="key ${contextual ? 'context-key' : k === 'Space' ? 'space-key' : `finger-${fingers[0]}`} ${draw.isoReturn ? 'iso-return' : ''}" style="${contextual ? '' : background};--notch:${25 / draw.width}%" title="${escapeHtml(contextual ? draw.legends.join(' / ') : label)}" aria-label="${escapeHtml(k === 'Space' ? 'Space' : draw.legends.join(' / '))}${contextual ? '' : ': ' + label}" data-key="${k}"><b aria-hidden="true">${legend}</b>${contextual ? '' : `<small>${compactLabel}</small>`}</span>`;
   };
-  const visibleKeys = profile.keys.filter(
-    (k) => k.code === 'Space' || displayCharacters(k).length > 0,
-  );
+  const visibleKeys = hardwareKeys(profile);
   const minX = Math.min(...visibleKeys.map((k) => k.x)),
     minY = Math.min(...visibleKeys.map((k) => k.y));
   const width = Math.max(...visibleKeys.map((k) => k.x + k.width)) - minX;
   const height = Math.max(...visibleKeys.map((k) => k.y + k.height)) - minY;
-  return `<div class="keyboard physical-keyboard" style="aspect-ratio:${width}/${height}">${visibleKeys.map((k) => `<div class="physical-position" style="left:${((k.x - minX) / width) * 100}%;top:${((k.y - minY) / height) * 100}%;width:${(k.width / width) * 100}%;height:${(k.height / height) * 100}%">${key(k.code)}</div>`).join('')}</div>`;
+  return `<div class="keyboard physical-keyboard ${HARDWARE[profile.id] ? 'hardware-block' : ''}" style="aspect-ratio:${width}/${height}">${visibleKeys.map((k) => `<div class="physical-position" style="left:${((k.x - minX) / width) * 100}%;top:${((k.y - minY) / height) * 100}%;width:${(k.width / width) * 100}%;height:${(k.height / height) * 100}%">${key(k)}</div>`).join('')}</div>`;
 }
 const modeControl = $<HTMLSelectElement>('#fingering-mode');
 modeControl.value = fingeringMode;

@@ -1,3 +1,4 @@
+import { HARDWARE } from './hardware';
 import {
   PRESETS,
   parseProfile,
@@ -15,15 +16,35 @@ export function profileControls(
 ) {
   let selected = initial,
     draft: KeyboardProfile | undefined;
-  root.innerHTML = `<div class="profile-toolbar"><label>Keyboard <select id="keyboard-profile"></select></label><button id="detect-layout">Detect layout</button><button id="custom-layout">Custom…</button><button id="export-profile">Export</button><label class="import-label">Import JSON <input id="import-profile" type="file" accept="application/json,.json"></label></div><p id="profile-status" role="status"></p><div id="profile-editor" hidden><label>Profile name <input id="profile-name" maxlength="80"></label><label>Physical key <select id="edit-key"></select></label><label>Mapping <input id="capture-key" placeholder="Focus here and press a key" readonly></label><p>Press the selected position, with Shift or AltGr if needed. That modifier mapping is replaced; others are kept.</p><label>Standard finger <select id="standard-finger"></select></label><label>Alternate finger <select id="alternate-finger"></select></label><button id="save-profile">Save & select</button><button id="delete-profile">Delete custom</button><button id="cancel-profile">Cancel</button><p id="edit-status" role="status"></p></div>`;
+  root.innerHTML = `<div class="profile-toolbar"><label>Keyboard <select id="keyboard-profile"></select></label><button id="detect-layout">Detect layout</button><button id="custom-layout">Custom…</button><button id="export-profile">Export</button><label class="import-label">Import JSON <input id="import-profile" type="file" accept="application/json,.json"></label></div><p id="hardware-description"></p><p id="profile-status" role="status"></p><div id="profile-editor" hidden><label>Profile name <input id="profile-name" maxlength="80"></label><label>Physical key <select id="edit-key"></select></label><label>Mapping <input id="capture-key" placeholder="Focus here and press a key" readonly></label><p>Press the selected position, with Shift or AltGr if needed. That modifier mapping is replaced; others are kept.</p><label>Standard finger <select id="standard-finger"></select></label><label>Alternate finger <select id="alternate-finger"></select></label><button id="save-profile">Save & select</button><button id="delete-profile">Delete custom</button><button id="cancel-profile">Cancel</button><p id="edit-status" role="status"></p></div>`;
   const el = <T extends HTMLElement>(id: string) => root.querySelector<T>(`#${id}`)!;
   const status = (s: string) => {
     el('profile-status').textContent = s;
   };
   const select = el<HTMLSelectElement>('keyboard-profile');
   const refresh = () => {
-    select.replaceChildren(...[...PRESETS, ...customs].map((p) => new Option(p.name, p.id)));
+    const groups = ['mac', 'pc', 'custom'].map((family) => {
+      const group = document.createElement('optgroup');
+      group.label =
+        family === 'mac'
+          ? 'MacBook Air M2 / Pro 2021+'
+          : family === 'pc'
+            ? 'Keychron V6 · PC reference'
+            : 'Custom hardware';
+      const profiles = [...PRESETS, ...customs].filter(
+        (p) => (HARDWARE[p.id]?.family ?? 'custom') === family,
+      );
+      group.replaceChildren(
+        ...profiles.map((p) => new Option(HARDWARE[p.id]?.language ?? p.name, p.id)),
+      );
+      return group;
+    });
+    select.replaceChildren(...groups);
     select.value = selected.id;
+    const reference = HARDWARE[selected.id];
+    el('hardware-description').textContent = reference
+      ? `Typing block · ${reference.model}. Match both your physical keyboard and input language. Other hardware: use Custom.`
+      : 'Custom keyboard · your saved geometry and mappings.';
   };
   const commit = (p: KeyboardProfile) => {
     selected = p;

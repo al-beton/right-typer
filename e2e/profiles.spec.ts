@@ -1,3 +1,4 @@
+import { hardwareKeys } from '../src/view/hardware';
 import { test, expect } from '@playwright/test';
 import { syntheticCamera, setup } from './helpers';
 import { PRESETS, calibrationCodes, characterKey } from '../src/core/profile';
@@ -9,7 +10,7 @@ test('presets update physical labels; French shifted punctuation completes passa
 }) => {
   test.setTimeout(120000);
   await syntheticCamera(page);
-  await page.goto('/');
+  await page.goto('./');
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
   await expect(page.locator('[data-key="Space"]')).toHaveAttribute(
     'aria-label',
@@ -19,17 +20,8 @@ test('presets update physical labels; French shifted punctuation completes passa
   await expect(page.locator('[data-key="KeyA"] b')).toHaveText('A');
   for (const p of PRESETS) {
     await page.locator('#keyboard-profile').selectOption(p.id);
-    for (const k of p.keys) {
-      const shown = page.locator(`[data-key="${k.code}"] b`);
-      if (k.code === 'Space' || k.outputs.some((o) => /^[\p{L},.]$/u.test(o.text)))
-        await expect(shown).toHaveText(
-          k.code === 'Space'
-            ? ''
-            : [...new Set(k.outputs.filter((o) => /^[\p{L},.]$/u.test(o.text)).map((o) => o.text))]
-                .map((text) => (/^[a-z]$/.test(text) ? text.toUpperCase() : text))
-                .join(' / '),
-        );
-      else await expect(shown).toHaveCount(0);
+    for (const k of hardwareKeys(p)) {
+      await expect(page.locator(`[data-key="${k.code}"] b`)).toHaveText(k.legends.join(''));
     }
   }
   const p = PRESETS[4]!;
@@ -74,7 +66,7 @@ test('custom edit/export/import validates and persists safely with literal label
   page,
 }) => {
   await syntheticCamera(page);
-  await page.goto('/');
+  await page.goto('./');
   await page.locator('#custom-layout').click();
   await page.locator('#profile-name').fill('<img src=x onerror=alert(1)>');
   await page.locator('#edit-key').selectOption('KeyQ');
@@ -120,7 +112,7 @@ test('profile switching invalidates pending attempt and incompatible calibration
       }),
     );
   }, calibration());
-  await page.goto('/');
+  await page.goto('./');
   await expect(page.locator('#keyboard-profile')).toHaveValue('apple-gb-iso');
   await expect(page.locator('#camera-rotation')).toHaveValue('90');
   await expect(page.locator('#camera-badge')).toContainText('disconnected');
@@ -178,7 +170,7 @@ for (const variant of ['success', 'ambiguous', 'absent', 'denied'] as const)
       },
       { variant, presets: PRESETS },
     );
-    await page.goto('/');
+    await page.goto('./');
     await page.locator('#keyboard-profile').selectOption('de-iso');
     await page.locator('#detect-layout').click();
     await expect(page.locator('#profile-status')).toContainText(
@@ -196,7 +188,7 @@ for (const variant of ['success', 'ambiguous', 'absent', 'denied'] as const)
 test('narrow layout remains centered and keyboard settings are accessible', async ({ page }) => {
   await syntheticCamera(page);
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/');
+  await page.goto('./');
   await page.locator('#keyboard-profile').focus();
   await expect(page.locator('#keyboard-profile')).toBeFocused();
   const widths = await page.evaluate(() => ({
@@ -212,7 +204,7 @@ test('German and French physical presses use the calibrated position and resolve
   page,
 }) => {
   await syntheticCamera(page);
-  await page.goto('/');
+  await page.goto('./');
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
   for (const [id, code, text, finger, shift] of [
     ['de-iso', 'KeyZ', 'y', 'left-little', false],
