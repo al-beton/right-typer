@@ -75,16 +75,39 @@ function preset(
   return { version: 1, id, name, geometry, keys };
 }
 export const PRESETS = [
-  preset('us-ansi', 'US QWERTY — ANSI', 'ANSI'),
-  preset('gb-iso', 'British QWERTY — ISO (PC)', 'ISO'),
+  preset('us-ansi', 'US QWERTY — Keychron V6 ANSI (Windows)', 'ANSI'),
+  preset('gb-iso', 'British QWERTY — Keychron V6 ISO (Windows)', 'ISO'),
   preset('apple-gb-iso', 'Apple British QWERTY — ISO', 'ISO'),
-  preset('de-iso', 'German QWERTZ — ISO (PC)', 'ISO', ['qwertzuiop', 'asdfghjklö', 'yxcvbnm,.-']),
-  preset('fr-iso', 'French Legacy AZERTY — ISO (PC)', 'ISO', [
+  preset('de-iso', 'German QWERTZ — Keychron V6 ISO (Windows)', 'ISO', [
+    'qwertzuiop',
+    'asdfghjklö',
+    'yxcvbnm,.-',
+  ]),
+  preset('fr-iso', 'French Legacy AZERTY — Keychron V6 ISO (Windows)', 'ISO', [
     'azertyuiop',
     'qsdfghjklm',
     'wxcvbn,;:!',
   ]),
 ];
+// Keep the original geometry for profile-less calibration migration.
+export const LEGACY_APPLE_BRITISH = structuredClone(PRESETS[2]!);
+PRESETS[2]!.name = 'MacBook British QWERTY — ISO';
+PRESETS.push(preset('apple-us-ansi', 'MacBook US QWERTY — ANSI', 'ANSI'));
+for (const p of PRESETS.filter((p) => ['apple-gb-iso', 'apple-us-ansi'].includes(p.id))) {
+  const c = p.keys.find((k) => k.code === 'KeyC')!;
+  const m = p.keys.find((k) => k.code === 'KeyM')!;
+  const space = p.keys.find((k) => k.code === 'Space')!;
+  // Cells include their gutters. Equal outer insets give equal visible edges.
+  space.x = c.x;
+  space.width = m.x + m.width - c.x;
+}
+// Conventional PC bottom row, evidenced by Keychron V6 ANSI/ISO QMK layouts.
+// The reference uses Q x=1.5 and Space x=3.75, width=6.25.
+for (const p of PRESETS.filter((p) => !p.id.startsWith('apple-'))) {
+  const space = p.keys.find((k) => k.code === 'Space')!;
+  space.x = 2.25;
+  space.width = 6.25;
+}
 // Dedicated regional letter keys, at their physical positions. They are shown
 // even though the current English passage does not require them for calibration.
 function regionalKey(
@@ -145,6 +168,19 @@ export function geometrySignature(p: KeyboardProfile): string {
       .map((k) => [k.code, k.x, k.y, k.width, k.height])
       .sort((a, b) => String(a[0]).localeCompare(String(b[0]))),
     targets: calibrationCodes(p).sort(),
+  });
+}
+// Only these coordinates affect keyAxes/keyDistance. Space uses the two
+// independently clicked camera endpoints; its drawing rectangle is irrelevant.
+// ANSI/ISO names are metadata, not camera transforms.
+export function calibrationGeometrySignature(p: KeyboardProfile): string {
+  const targets = calibrationCodes(p).sort();
+  return JSON.stringify({
+    keys: p.keys
+      .filter((k) => targets.includes(k.code))
+      .map((k) => [k.code, k.x, k.y, k.width, k.height])
+      .sort((a, b) => String(a[0]).localeCompare(String(b[0]))),
+    targets,
   });
 }
 const finger = (f: unknown): f is Finger =>

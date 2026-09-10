@@ -151,7 +151,7 @@ describe('keyboard profiles', () => {
     expect(s.calibration).toBeUndefined();
   });
   it('does not conflate hardware geometry, required positions or profile text', () => {
-    expect(geometrySignature(PRESETS[1]!)).toBe(geometrySignature(PRESETS[2]!));
+    expect(geometrySignature(PRESETS[1]!)).not.toBe(geometrySignature(PRESETS[2]!));
     expect(geometrySignature(PRESETS[0]!)).not.toBe(geometrySignature(PRESETS[1]!));
     expect(geometrySignature(PRESETS[3]!)).not.toBe(geometrySignature(PRESETS[4]!));
   });
@@ -164,7 +164,7 @@ describe('keyboard profiles', () => {
         ]),
       );
     expect(suggestProfiles(map(4)).map((p) => p.id)).toEqual(['fr-iso']);
-    expect(suggestProfiles(map(0))).toHaveLength(3);
+    expect(suggestProfiles(map(0))).toHaveLength(4);
     expect(suggestProfiles(new Map())).toEqual([]);
   });
   it('rejects oversized, duplicate-key, malformed, missing-finger profiles', () => {

@@ -1,10 +1,11 @@
+import { hardwareKeys, HARDWARE, type HardwareKey } from './view/hardware';
 import {
   PRESETS,
   calibrationCodes,
   characterKey,
   coverage,
   displayCharacters,
-  geometrySignature,
+  calibrationGeometrySignature,
   profileFingers,
   resolveEvent,
   type KeyboardProfile,
@@ -78,7 +79,7 @@ let diagnosticsId = -1;
 let cameraErrorHandled = false;
 let resetArmed = false;
 let sample: SampleRecorder | undefined;
-const sampleMode = new URLSearchParams(location.search).get('record') === '1';
+const openDebugging = new URLSearchParams(location.search).get('record') === '1';
 
 $('#app').innerHTML = `
   <header class="topbar"><h1 class="brand" aria-label="Right Typer"><span aria-hidden="true">${brandWordmark()}</span></h1><a href="https://github.com/al-beton/right-typer" target="_blank" rel="noreferrer">Source on GitHub</a></header>
@@ -103,7 +104,7 @@ $('#app').innerHTML = `
         </aside>
       </div>
     </section>
-    <section id="sample-panel" hidden aria-label="Developer sample recording"></section>
+    <details id="debugging"><summary>Debugging</summary><section id="sample-panel" aria-label="Debug sample recording"></section></details>
     <div id="storage-warning" class="storage-alert" role="status" hidden></div>
     <footer><span>Local processing · Keyboard profiles · Chrome</span><button class="text-button" id="reset">Reset local data</button><span id="build-version" aria-label="App version">${import.meta.env.VITE_BUILD_LABEL} · <a href="https://github.com/al-beton/right-typer/commit/${import.meta.env.VITE_BUILD_SHA}" title="${import.meta.env.VITE_BUILD_SHA}">${import.meta.env.VITE_BUILD_SHA.slice(0, 7)}</a></span></footer>
   </main>`;
@@ -149,7 +150,9 @@ function store() {
   $('#storage-warning').hidden = !storageWarning;
 }
 function keyboard() {
-  const key = (k: string) => {
+  const key = (draw: HardwareKey) => {
+    const k = draw.code;
+    const contextual = !profile.keys.some((key) => key.code === k);
     const fingers = orderedFingers(profileFingers(profile, k, fingeringMode));
     const label =
       k === 'Space'
@@ -166,16 +169,18 @@ function keyboard() {
             ? `left/right ${first.split('-')[1]}`
             : names.join('/');
     const background = `background:${fingerBackground(fingers)}`;
-    return `<span class="key ${k === 'Space' ? 'space-key' : `finger-${fingers[0]}`}" style="${background}" title="${label}" aria-label="${escapeHtml(physicalLabel(k))}: ${label}" data-key="${k}"><b>${escapeHtml(physicalLabel(k))}</b><small>${compactLabel}</small></span>`;
+    // Hardware legends only: regional letters/symbols and output semantics stay intact.
+    const legend = draw.legends
+      .map((text, i) => `<span class="legend-${i}">${escapeHtml(text)}</span>`)
+      .join('');
+    return `<span class="key ${contextual ? 'context-key' : k === 'Space' ? 'space-key' : `finger-${fingers[0]}`} ${draw.isoReturn ? 'iso-return' : ''}" style="${contextual ? '' : background};--notch:${25 / draw.width}%" title="${escapeHtml(contextual ? draw.legends.join(' / ') : label)}" aria-label="${escapeHtml(k === 'Space' ? 'Space' : draw.legends.join(' / '))}${contextual ? '' : ': ' + label}" data-key="${k}"><b aria-hidden="true">${legend}</b>${contextual ? '' : `<small${fingers.length > 1 && k !== 'Space' ? ' data-multiple' : ''}>${compactLabel}</small>`}</span>`;
   };
-  const visibleKeys = profile.keys.filter(
-    (k) => k.code === 'Space' || displayCharacters(k).length > 0,
-  );
+  const visibleKeys = hardwareKeys(profile);
   const minX = Math.min(...visibleKeys.map((k) => k.x)),
     minY = Math.min(...visibleKeys.map((k) => k.y));
   const width = Math.max(...visibleKeys.map((k) => k.x + k.width)) - minX;
   const height = Math.max(...visibleKeys.map((k) => k.y + k.height)) - minY;
-  return `<div class="keyboard physical-keyboard" style="aspect-ratio:${width}/${height}">${visibleKeys.map((k) => `<div class="physical-position" style="left:${((k.x - minX) / width) * 100}%;top:${((k.y - minY) / height) * 100}%;width:${(k.width / width) * 100}%;height:${(k.height / height) * 100}%">${key(k.code)}</div>`).join('')}</div>`;
+  return `<div class="keyboard physical-keyboard ${HARDWARE[profile.id] ? 'hardware-block' : ''}" style="aspect-ratio:${width}/${height}">${visibleKeys.map((k) => `<div class="physical-position" style="left:${((k.x - minX) / width) * 100}%;top:${((k.y - minY) / height) * 100}%;width:${(k.width / width) * 100}%;height:${(k.height / height) * 100}%">${key(k)}</div>`).join('')}</div>`;
 }
 const modeControl = $<HTMLSelectElement>('#fingering-mode');
 modeControl.value = fingeringMode;
@@ -287,7 +292,7 @@ function sameCamera(c: Calibration) {
   const s = camera.settings();
   return (
     !!c.profile &&
-    geometrySignature(c.profile) === geometrySignature(profile) &&
+    calibrationGeometrySignature(c.profile) === calibrationGeometrySignature(profile) &&
     s?.deviceId === c.deviceId &&
     video.videoWidth === c.width &&
     video.videoHeight === c.height
@@ -1069,7 +1074,7 @@ function recordKey(event: KeyboardEvent, action: 'keydown' | 'keyup') {
   });
 }
 function updateSampleControls() {
-  if (!sampleMode || !document.querySelector('#sample-start')) return;
+  if (!document.querySelector('#sample-start')) return;
   const active = sample && sample.state !== 'discarded';
   $<HTMLButtonElement>('#sample-start').disabled = !!active || !ready();
   $<HTMLButtonElement>('#sample-stop').disabled = sample?.state !== 'recording';
@@ -1078,11 +1083,18 @@ function updateSampleControls() {
   $('#sample-status').textContent =
     sample?.message ?? 'Map your keys, choose a fingering mode, then start a sample.';
   $('#sample-panel').classList.toggle('is-recording', sample?.state === 'recording');
+  $('#debugging > summary').textContent =
+    sample?.state === 'recording'
+      ? 'Debugging · Recording sample'
+      : active
+        ? 'Debugging · Sample retained'
+        : 'Debugging';
 }
-if (sampleMode) {
+{
+  $<HTMLDetailsElement>('#debugging').open = openDebugging;
   const panel = $('#sample-panel');
   panel.hidden = false;
-  panel.innerHTML = `<h2>Developer sample recording</h2>
+  panel.innerHTML = `<h2>Record a debugging sample</h2>
     <p>Records camera video, key positions and practice keys locally. No audio or upload. Start begins a fresh passage. Stop and download before leaving.</p>
     <div class="sample-fields"><label>Anonymous person ID<input id="sample-person" value="p01" maxlength="40" /></label><label>Setup ID<input id="sample-setup" value="s01" maxlength="40" /></label><label>Setup / issue notes<input id="sample-notes" maxlength="500" placeholder="Keyboard, camera angle, lighting, issue" /></label></div>
     <div class="sample-actions"><button id="sample-start">Start sample (fresh passage)</button><button id="sample-stop" disabled>Stop sample</button><button id="sample-download" disabled>Download sample</button><button id="sample-discard" disabled>Discard sample</button></div>

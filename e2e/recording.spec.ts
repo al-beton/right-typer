@@ -42,11 +42,17 @@ for (const mode of ['standard', 'alternate', 'either'] as FingeringMode[]) {
     await syntheticCamera(page);
     await setup(page);
     await expect(page.locator('#sample-panel')).toBeHidden();
-    await page.goto('/?record=1');
+    await page.locator('#debugging > summary').click();
     await expect(page.locator('#sample-start')).toBeEnabled();
+    await expect(page.locator('#sample-stop')).toBeDisabled();
+    await expect(page.locator('#sample-download')).toBeDisabled();
     await page.locator('#fingering-mode').selectOption(mode);
     await page.locator('#sample-start').click();
     await expect(page.locator('#sample-status')).toContainText('Recording');
+    await page.locator('#debugging > summary').click();
+    await expect(page.locator('#sample-panel')).toBeHidden();
+    await expect(page.locator('#debugging > summary')).toHaveText('Debugging · Recording sample');
+    await page.locator('#debugging > summary').click();
     await press(page, 'w', 'left-ring');
     await press(page, ' ', 'right-thumb');
     await expect(page.locator('#retry')).toBeVisible();

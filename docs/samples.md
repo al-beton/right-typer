@@ -1,7 +1,8 @@
 # Record a sample
 
-Open the recording build with `?record=1` appended to its URL (for example,
-`http://127.0.0.1:5173/?record=1`). The developer controls sit below the camera.
+Open **Debugging** below the camera, then choose **Start sample (fresh passage)**
+when your setup is ready. Debugging is collapsed by default; opening it does not
+start recording. The optional `?record=1` URL shortcut opens the same controls.
 Normal practice does not record anything.
 
 1. Choose your keyboard layout, map the keys, and choose **Standard**, **Alternate diagonal** or **Either**.
