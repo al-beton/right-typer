@@ -70,6 +70,9 @@ const legends: Record<string, Record<string, string[]>> = {
   },
   'apple-gb-iso': { ...us, Backquote: ['§', '±'], Digit3: ['3', '£'], IntlBackslash: ['`', '~'] },
   'de-iso': {
+    KeyQ: ['Q', '', '@'],
+    KeyE: ['E', '', '€'],
+    KeyM: ['M', '', 'µ'],
     Backquote: ['^', '°'],
     Digit1: ['1', '!'],
     Digit2: ['2', '"', '²'],

@@ -19,6 +19,16 @@ describe('hardware illustrations remain independent of camera mappings', () => {
       expect(drawn.find((k) => k.code === 'Backspace')).toBeDefined();
       expect(p.keys.find((k) => k.code === 'Backspace')).toBeUndefined();
     });
+  it('retains German Windows AltGr keycap legends without lowercasing the main letter', () => {
+    const drawn = hardwareKeys(PRESETS.find((p) => p.id === 'de-iso')!);
+    for (const [code, letter, symbol] of [
+      ['KeyQ', 'Q', '@'],
+      ['KeyE', 'E', '€'],
+      ['KeyM', 'M', 'µ'],
+    ]) {
+      expect(drawn.find((k) => k.code === code)!.legends).toEqual([letter, '', symbol]);
+    }
+  });
   it('uses custom coordinates and outputs without attaching a stock hardware frame', () => {
     const p = structuredClone(PRESETS[0]!);
     p.id = 'custom-test';

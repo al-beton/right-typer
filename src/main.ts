@@ -168,7 +168,7 @@ function keyboard() {
     const legend = draw.legends
       .map((text, i) => `<span class="legend-${i}">${escapeHtml(text)}</span>`)
       .join('');
-    return `<span class="key ${contextual ? 'context-key' : k === 'Space' ? 'space-key' : `finger-${fingers[0]}`} ${draw.isoReturn ? 'iso-return' : ''}" style="${contextual ? '' : background};--notch:${25 / draw.width}%" title="${escapeHtml(contextual ? draw.legends.join(' / ') : label)}" aria-label="${escapeHtml(k === 'Space' ? 'Space' : draw.legends.join(' / '))}${contextual ? '' : ': ' + label}" data-key="${k}"><b aria-hidden="true">${legend}</b>${contextual ? '' : `<small>${compactLabel}</small>`}</span>`;
+    return `<span class="key ${contextual ? 'context-key' : k === 'Space' ? 'space-key' : `finger-${fingers[0]}`} ${draw.isoReturn ? 'iso-return' : ''}" style="${contextual ? '' : background};--notch:${25 / draw.width}%" title="${escapeHtml(contextual ? draw.legends.join(' / ') : label)}" aria-label="${escapeHtml(k === 'Space' ? 'Space' : draw.legends.join(' / '))}${contextual ? '' : ': ' + label}" data-key="${k}"><b aria-hidden="true">${legend}</b>${contextual ? '' : `<small${fingers.length > 1 && k !== 'Space' ? ' data-multiple' : ''}>${compactLabel}</small>`}</span>`;
   };
   const visibleKeys = hardwareKeys(profile);
   const minX = Math.min(...visibleKeys.map((k) => k.x)),

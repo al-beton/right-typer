@@ -90,6 +90,29 @@ for (const [
         expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
           true,
         );
+        if (id === 'de-iso')
+          for (const [code, symbol] of [
+            ['KeyQ', '@'],
+            ['KeyE', '€'],
+            ['KeyM', 'µ'],
+          ]) {
+            await expect(page.locator(`[data-key=${code}] .legend-0`)).toHaveText(code!.slice(3));
+            await expect(page.locator(`[data-key=${code}] .legend-2`)).toHaveText(symbol!);
+          }
+        if (width === 1440)
+          for (const key of ['KeyF', 'KeyJ']) {
+            const gap = await page.locator(`[data-key=${key}]`).evaluate((e) => {
+              const rect = e.getBoundingClientRect(),
+                ridge = getComputedStyle(e, '::after');
+              return (
+                rect.bottom -
+                parseFloat(ridge.bottom) -
+                parseFloat(ridge.height) -
+                e.querySelector('small')!.getBoundingClientRect().bottom
+              );
+            });
+            expect(gap).toBeGreaterThan(4);
+          }
         fs.mkdirSync('/tmp/alo265/evidence', { recursive: true });
         await page
           .locator('#finger-map')

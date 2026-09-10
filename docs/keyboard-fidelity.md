@@ -6,7 +6,7 @@ The six presets now draw the complete **typing block**, from the number row thro
 
 Previously the renderer filtered physical keys through the passage's letter/comma/period outputs. This hid punctuation, ISO's extra key, Return and modifiers, and left German/French regional keys floating above the letters. All six presets now have a continuous number row, punctuation legends, correct left Shift and Return silhouettes, and a complete bottom row. MacBook's right edge is half a key pitch narrower than the V6's; Delete, Return and right Shift follow their own hardware reference.
 
-`src/view/hardware.ts` separates illustration geometry and printed legends from `KeyboardProfile` practice outputs. Numbers, modifiers and secondary legends are context, not new exercises or camera targets. Existing finger colors, uppercase letter legends, blank Space/either-thumb annotation, and flat F/J ridges remain. On narrow screens finger captions yield to readable legends; colors, accessible names and Space's annotation remain.
+`src/view/hardware.ts` separates illustration geometry and printed legends from `KeyboardProfile` practice outputs. Numbers, modifiers and secondary legends are context, not new exercises or camera targets. Modifier symbols are simplified teaching labels, not a keycap facsimile. Existing finger colors, uppercase letter legends, blank Space/either-thumb annotation, and flat F/J ridges remain. On narrow screens finger captions yield to readable legends; colors, accessible names and Space's annotation remain.
 
 ## Primary references, checked 10 September 2026
 

@@ -829,7 +829,7 @@ footer {
   gap: 0.25em;
   font-size: clamp(11px, 1.5vw, 20px);
 }
-.hardware-block .key b:has(.legend-1) {
+.hardware-block .key b:has(.legend-1:not(:empty)) {
   flex-direction: column-reverse;
   gap: 0;
   line-height: 1.05;
@@ -843,9 +843,6 @@ footer {
 }
 .hardware-block .key.iso-return {
   clip-path: polygon(0 0, 100% 0, 100% 100%, var(--notch) 100%, var(--notch) 50%, 0 50%);
-}
-.hardware-block .key small {
-  font-size: clamp(5px, 0.65vw, 9px);
 }
 @media (max-width: 600px) {
   .hardware-block .key {
@@ -863,7 +860,7 @@ footer {
     font-size: 10px;
     line-height: 1;
   }
-  .hardware-block .key b:has(.legend-1) {
+  .hardware-block .key b:has(.legend-1:not(:empty)) {
     font-size: 8px;
   }
   .hardware-block .context-key b {
@@ -874,4 +871,31 @@ footer {
   #finger-map:has(.hardware-block) {
     min-height: 0;
   }
+}
+
+/* Keep captions on a consistent line, with a separate physical ridge below. */
+.hardware-block .key small {
+  font-size: clamp(5px, 0.55vw, 8px);
+  white-space: nowrap;
+  padding: 0;
+  line-height: 1.2;
+}
+.hardware-block .key:has(small[data-multiple]) small {
+  font-size: clamp(4px, 0.42vw, 6px);
+}
+.hardware-block .key:is([data-key='KeyF'], [data-key='KeyJ'])::after {
+  bottom: 7%;
+}
+@media (min-width: 601px) {
+  .hardware-block .key:is([data-key='KeyF'], [data-key='KeyJ']) > * {
+    transform: translateY(-3px);
+  }
+}
+@media (max-width: 600px) {
+  .hardware-block .space-key small {
+    font-size: 8px;
+  }
+}
+.hardware-block .legend-1:empty {
+  display: none;
 }
