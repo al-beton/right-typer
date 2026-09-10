@@ -15,7 +15,7 @@ declare global {
 }
 // Test-only replacement at the worker boundary. Production code exposes no simulation mode.
 // A real browser fake camera still supplies rVFC capture timestamps and pixels.
-export async function syntheticCamera(page: Page) {
+export async function syntheticCamera(page: Page, initialHands = handsAt('f', 'left-index')) {
   await page.addInitScript(
     ({ hands }) => {
       // Incognito fake cameras rotate their opaque IDs on reload. Supply a stable
@@ -98,7 +98,7 @@ export async function syntheticCamera(page: Page) {
       }
       window.Worker = SyntheticWorker as unknown as typeof Worker;
     },
-    { hands: handsAt('f', 'left-index') },
+    { hands: initialHands },
   );
 }
 export async function setup(page: Page, saved = false) {

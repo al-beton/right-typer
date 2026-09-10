@@ -68,7 +68,10 @@ test('pause preserves progress, rejects detached input and keeps mapping out of 
 test('boundary completion preserves focus in controls and editor keys never enter practice', async ({
   page,
 }) => {
-  await syntheticCamera(page);
+  // This test exercises focus ownership, not finger grading. The default F pose
+  // can confidently fail A/Space depending on which frame reaches the boundary.
+  // Start with unknown evidence before any camera frames are captured.
+  await syntheticCamera(page, []);
   await setup(page);
   await page.evaluate(() => {
     window.__inferenceDelay = 2000;
@@ -79,6 +82,7 @@ test('boundary completion preserves focus in controls and editor keys never ente
   await expect(page.locator('#camera-rotation')).toBeFocused();
   await page.locator('#camera-rotation').press('a');
   await expect(page.locator('#typing')).toHaveValue('');
+  await expect(page.locator('#camera-rotation')).toBeFocused();
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
   await page.evaluate(() => {
     const editor = document.createElement('div');
