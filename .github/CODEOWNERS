@@ -1,0 +1,7 @@
+# Al owns merge policy, deployment workflows, and the configuration they execute.
+/.github/ @al-beton
+/package.json @al-beton
+/pnpm-lock.yaml @al-beton
+/eslint.config.* @al-beton
+/.prettier* @al-beton
+/.gitleaks* @al-beton
