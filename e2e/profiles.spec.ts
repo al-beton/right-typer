@@ -1,6 +1,6 @@
 import { hardwareKeys } from '../src/view/hardware';
 import { test, expect } from '@playwright/test';
-import { syntheticCamera, setup } from './helpers';
+import { syntheticCamera } from './helpers';
 import { PRESETS, calibrationCodes, characterKey } from '../src/core/profile';
 import { WORDS } from '../src/passage';
 import { calibration } from '../tests/fixtures';

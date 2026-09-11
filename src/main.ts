@@ -8,7 +8,6 @@ import {
   calibrationGeometrySignature,
   profileFingers,
   resolveEvent,
-  type KeyboardProfile,
 } from './core/profile';
 import { profileControls } from './view/profiles';
 import './style.css';

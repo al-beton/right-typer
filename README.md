@@ -28,6 +28,8 @@ Calibration, camera selection, rotation, whether you started practice, and the l
 ## Verify and build
 
 ```sh
+pnpm format:check                  # Prettier formatting
+pnpm lint                          # ESLint recommended JS/TypeScript rules
 pnpm check                         # TypeScript + deterministic rules/timing tests
 pnpm exec playwright install chromium
 pnpm test:e2e                      # builds and tests the production app
@@ -37,11 +39,34 @@ pnpm preview                      # production build on localhost
 
 Linux CI installs the browser with `pnpm exec playwright install --with-deps chromium`. See [verification results and hardware protocol](docs/verification.md). Synthetic tests use a test-only worker replacement; the shipped app has no bypass or simulated-practice mode. The separate real-model smoke test uses Chrome’s fake camera and verifies local model execution and network requests.
 
+## Required merge checks
+
+The single required GitHub status is `blocking-checks`, defined in
+[the orchestrator](.github/workflows/blocking-checks.yml). It requires verification
+(types, unit/infrastructure tests, production build and browser tests), formatting,
+ESLint, actionlint workflow validation, and Gitleaks secret scanning. Failed,
+cancelled, or skipped prerequisites block merging. To add a check, wire its reusable
+workflow into the orchestrator and include its job in the final gate's `needs` list.
+
+Gitleaks scans all committed history reachable from the checked-out PR merge commit,
+including credentials added and later removed within the branch. Findings are
+redacted. Gitleaks and actionlint use pinned versions and verified download hashes.
+Run `actionlint` (1.7.12) and `gitleaks git --redact --no-banner --log-opts="HEAD" .`
+(8.30.1) locally to reproduce these checks.
+
+[CODEOWNERS](.github/CODEOWNERS) assigns `@al-beton` ownership of GitHub configuration
+and the package, lint, formatting and secret-scanning configuration. Branch protection
+requires code-owner review, dismisses stale approvals after changes, and applies to
+admins. Unowned application files do not require an approval. GitHub identifies actors
+by account: an agent using Al's credentials is also `al-beton`, not an independent
+reviewer. Use a separate author identity when a distinct approval from Al is required.
+Repository administrators can still edit the protection settings themselves.
+
 ## Deploy to GitHub Pages
 
 The output is entirely static. `pnpm build` puts HTML, scripts, styles, model, WASM and notices in `dist/`. Paths are relative, so the app supports the repository subdirectory `/right-typer/`. The model is checked into this repository and verified by SHA-256; WASM is copied from the pinned package during build. Builds do not download model assets.
 
-Every push to `main` runs **Deploy static app to Pages**, which checks, builds and publishes `dist/` to `https://al-beton.github.io/right-typer/`. Pages is configured with GitHub Actions as its source. The workflow can also be run manually from the Actions tab for a redeploy without a new commit. Pull requests run the Verify workflow only and never deploy.
+Every push to `main` runs **Deploy static app to Pages**, which checks, builds and publishes `dist/` to `https://al-beton.github.io/right-typer/`. Pages is configured with GitHub Actions as its source. The workflow can also be run manually from the Actions tab for a redeploy without a new commit. Pull requests run Blocking Checks and the separate preview workflows; they never deploy to production.
 
 Any static HTTPS host can serve the same folder. Do not use `file://`: camera access needs HTTPS or localhost. Serve `.wasm` as `application/wasm`. No API server, environment secrets, account or database is needed.
 

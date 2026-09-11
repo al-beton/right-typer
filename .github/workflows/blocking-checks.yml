@@ -1,0 +1,33 @@
+# The only required status check is blocking-checks. Every prerequisite must succeed.
+name: Blocking Checks
+on:
+  pull_request:
+  merge_group:
+  push:
+    branches: [main]
+permissions:
+  contents: read
+jobs:
+  verify:
+    uses: ./.github/workflows/check.yml
+  quality:
+    uses: ./.github/workflows/check-quality.yml
+  workflows:
+    uses: ./.github/workflows/check-workflows.yml
+  secrets:
+    uses: ./.github/workflows/check-secrets.yml
+  blocking-checks:
+    if: always()
+    needs: [verify, quality, workflows, secrets]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Require every check to succeed
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+        run: |
+          jq -r 'to_entries[] | "\(.key): \(.value.result)"' <<< "$NEEDS_JSON"
+          if ! jq -e 'all(.[]; .result == "success")' <<< "$NEEDS_JSON" > /dev/null; then
+            echo "A required check failed, was cancelled, or was skipped."
+            exit 1
+          fi
