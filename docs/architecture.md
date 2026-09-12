@@ -9,6 +9,7 @@
 - `src/core/observation.ts`: camera evidence buffer and actual-finger attribution. It does not import the intended finger map.
 - `src/core/exercise.ts`: word/attempt state, expected-finger comparison and statistics. It has no camera dependency.
 - `src/core/calibration.ts` and `storage.ts`: normalized key geometry, validation and versioned local state.
+- `src/curriculum/`: deterministic focus/review rounds, bounded accepted-press evidence and a separate versioned progress store guarded by an exclusive Web Lock. [ALO-282](https://linear.app/advantagegroup/issue/ALO-282) defines the curriculum.
 - `src/main.ts`: guided setup, live overlays, exercise UI and device-local results. No framework, backend or remote font dependency.
 
 ## One timeline, immutable ownership

@@ -1385,7 +1385,7 @@ function updateSampleControls() {
         {
           calibration: makeCalibration(),
           mode: fingeringMode,
-          words: exercise.words,
+          words: roundWords(currentRound(progress.cohort, profile)),
           rotation: cameraRotation,
           participantId: $<HTMLInputElement>('#sample-person').value,
           setupId: $<HTMLInputElement>('#sample-setup').value,
