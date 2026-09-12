@@ -1406,3 +1406,31 @@ label[for='diagnostic'] {
     flex-basis: 100%;
   }
 }
+
+#daily-goal {
+  color: #505b68;
+}
+#daily-goal[hidden] {
+  display: none;
+}
+#daily-goal-settings {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 18px;
+}
+#daily-goal-minutes {
+  display: block;
+  width: 110px;
+  max-width: 100%;
+  margin-top: 8px;
+}
+#daily-goal-validation:empty {
+  display: none;
+}
+#daily-goal-validation {
+  color: #9c322c;
+}
+#daily-goal-help {
+  font-size: 12px;
+  color: #505b68;
+}

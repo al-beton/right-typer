@@ -44,6 +44,7 @@ import {
   keyDetail,
   legend,
 } from './view/heatmap';
+import { dailyGoal, isDailyGoal } from './view/daily-goal';
 import { progressMarkup } from './view/progress';
 import { currentRound, completeRound, roundWords, missingOutputs } from './curriculum/selection';
 import { ProgressStore } from './curriculum/storage';
@@ -72,6 +73,7 @@ const hintForText = (text: string) =>
   text === ' ' ? 'either thumb' : fingersForText(text).map(fingerName).join(' or ');
 let fingeringMode = saved.fingeringMode ?? 'standard';
 let keyboardView = saved.keyboardView ?? 'fingers';
+let goalMinutes = saved.dailyGoalMinutes ?? 10;
 let detailKey = 'KeyE';
 let cameraRotation = saved.cameraRotation ?? 0;
 let autoStartPending = saved.practiceEnabled ?? !!saved.calibration;
@@ -87,7 +89,10 @@ const makeProgress = (cohort: Cohort) =>
   new Progress(
     cohort,
     () => progressStore.schedule(),
-    (ms, start, end) => recordActivity(progressStore.data.activity, ms, start, end),
+    (ms, start, end, calendarChanged) => {
+      recordActivity(progressStore.data.activity, ms, start, end, calendarChanged);
+      renderGoal();
+    },
   );
 const progressSeed = () => crypto.getRandomValues(new Uint32Array(1))[0]!;
 let progress = makeProgress(
@@ -156,7 +161,7 @@ $('#app').innerHTML = `
       .join('')}</select><span id="policy-status" role="status"></span></div>
     <section id="profile-settings" aria-label="Keyboard settings"></section>
 </details>
-    <details id="history-group"><summary>Practice & history</summary><section id="key-inspector" aria-labelledby="key-inspector-title"><h3 id="key-inspector-title">Keyboard key details</h3><label for="heatmap-key">Physical key</label><select id="heatmap-key"></select><div id="heatmap-detail" aria-live="polite"></div></section><section id="progress-view" aria-labelledby="progress-title"></section><div id="history-list"></div></details>
+    <details id="history-group"><summary>Practice & history</summary><section id="daily-goal-settings" aria-labelledby="daily-goal-title"><h3 id="daily-goal-title">Daily practice goal</h3><label for="daily-goal-minutes">Minutes per local day (0 turns the goal off)</label><input id="daily-goal-minutes" type="number" min="0" max="120" step="1" inputmode="numeric" aria-describedby="daily-goal-help daily-goal-validation"><p id="daily-goal-validation" role="status"></p><p id="daily-goal-detail"></p><p id="daily-goal-help">Whole minutes, 0–120. Active time counts focused actions up to 5 seconds apart, including meaningful Backspace. Idle, setup, checking and pauses do not count. You can keep practising after the goal. Progress reset clears time but keeps this goal; full local reset restores 10 minutes.</p></section><section id="key-inspector" aria-labelledby="key-inspector-title"><h3 id="key-inspector-title">Keyboard key details</h3><label for="heatmap-key">Physical key</label><select id="heatmap-key"></select><div id="heatmap-detail" aria-live="polite"></div></section><section id="progress-view" aria-labelledby="progress-title"></section><div id="history-list"></div></details>
     <details id="debugging"><summary>Debugging</summary><section id="sample-panel" aria-label="Debug sample recording"></section></details>
     <details id="about-group"><summary>Local data & about</summary><p id="data-notice"></p><a href="https://github.com/al-beton/right-typer">Source on GitHub</a>
     <footer><span>Local processing · Keyboard profiles · Chrome</span><button class="text-button" id="reset">Reset local data</button><span id="build-version" aria-label="App version">${import.meta.env.VITE_BUILD_LABEL} · <a href="https://github.com/al-beton/right-typer/commit/${import.meta.env.VITE_BUILD_SHA}" title="${import.meta.env.VITE_BUILD_SHA}">${import.meta.env.VITE_BUILD_SHA.slice(0, 7)}</a></span></footer>
@@ -330,6 +335,30 @@ function keyboard() {
   const height = Math.max(...visibleKeys.map((k) => k.y + k.height)) - minY;
   return `<div class="keyboard physical-keyboard ${HARDWARE[profile.id] ? 'hardware-block' : ''}" style="aspect-ratio:${width}/${height}">${visibleKeys.map((k) => `<div class="physical-position" style="left:${((k.x - minX) / width) * 100}%;top:${((k.y - minY) / height) * 100}%;width:${(k.width / width) * 100}%;height:${(k.height / height) * 100}%">${key(k)}</div>`).join('')}</div>`;
 }
+const goalControl = $<HTMLInputElement>('#daily-goal-minutes');
+goalControl.value = String(goalMinutes);
+goalControl.oninput = () => {
+  const value = goalControl.valueAsNumber;
+  const valid = isDailyGoal(value);
+  goalControl.setAttribute('aria-invalid', String(!valid));
+  $('#daily-goal-validation').textContent = valid ? '' : 'Enter a whole number from 0 to 120.';
+  if (!valid) return;
+  goalMinutes = value;
+  saved.dailyGoalMinutes = value;
+  store();
+  renderGoal();
+};
+function renderGoal() {
+  const status = dailyGoal(progressStore.data.activity, goalMinutes);
+  const label = document.querySelector<HTMLElement>('#daily-goal');
+  if (label) {
+    label.hidden = goalMinutes === 0;
+    if (label.textContent !== status.label) label.textContent = status.label;
+    label.title = status.detail;
+  }
+  const detail = document.querySelector<HTMLElement>('#daily-goal-detail');
+  if (detail && detail.textContent !== status.detail) detail.textContent = status.detail;
+}
 const viewControl = $<HTMLSelectElement>('#keyboard-view');
 viewControl.value = keyboardView;
 viewControl.onchange = () => {
@@ -495,7 +524,7 @@ function render() {
           ? message || 'Type the whole word, then Space.'
           : flowMessage();
   content.innerHTML = `<section class="practice${complete ? ' results' : ''}">
-    <div class="practice-top"><span class="practice-metrics">Practice · <span>${exercise.index} / ${exercise.words.length} words</span><span>${stats.retries} retries</span></span>${action}</div>
+    <div class="practice-top"><span class="practice-metrics">Practice · <span>${exercise.index} / ${exercise.words.length} words</span><span>${stats.retries} retries</span><span id="daily-goal"></span></span>${action}</div>
     <p id="round-focus" class="recent">${escapeHtml(focusText)}${displayedRound.diagnostic ? ` ${escapeHtml(displayedRound.diagnostic)}` : ''}</p>
     ${passageMarkup()}
     <div class="entry-heading"><label for="typing">${complete ? 'Completed' : retry ? 'Try again' : 'Your word'}</label><span id="word-hint">Space finishes each word.</span></div>
@@ -577,6 +606,7 @@ function render() {
   renderHistory();
   renderProgress();
   renderHeatmap();
+  renderGoal();
   if (!practicing)
     document
       .querySelectorAll<HTMLElement>('[data-key]')
@@ -1146,6 +1176,10 @@ $('#reset').onclick = () => {
   camera.stop();
   abandonProgress();
   const progressReset = progressStore.reset();
+  goalMinutes = 10;
+  goalControl.value = '10';
+  goalControl.removeAttribute('aria-invalid');
+  $('#daily-goal-validation').textContent = '';
   keyboardView = 'fingers';
   viewControl.value = keyboardView;
   profile = PRESETS[0]!;
@@ -1619,3 +1653,8 @@ if (saved.cameraDisconnected) cameraChanged();
 else restartCamera();
 moveCamera();
 if (openDebugging) openSettings('debugging');
+
+// Refresh local-day/timezone presentation only; never accumulate time on a timer.
+setInterval(renderGoal, 1000);
+window.addEventListener('focus', renderGoal);
+document.addEventListener('visibilitychange', renderGoal);
