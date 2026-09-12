@@ -51,7 +51,9 @@ test('inspect exact target/actual counters, export, reload and reset progress wi
   await expect(page.locator('#retry')).toBeVisible();
   await openSettings(page, 'history-group');
   await expect(page.locator('#progress-view')).toContainText('75.0% (3/4)');
-  await page.locator('#progress-title').scrollIntoViewIfNeeded();
+  await page
+    .locator('#progress-title')
+    .evaluate((element) => element.scrollIntoView({ block: 'start' }));
   await page.screenshot({ path: '/tmp/alo280-summary.png' });
   const expected = page.getByRole('region', { name: 'Expected target keys', exact: true });
   await page.getByText('Expected target keys', { exact: true }).click();
@@ -90,7 +92,9 @@ test('inspect exact target/actual counters, export, reload and reset progress wi
     .evaluateAll((details) =>
       details.forEach((detail) => ((detail as HTMLDetailsElement).open = false)),
     );
-  await page.locator('#progress-title').scrollIntoViewIfNeeded();
+  await page
+    .locator('#progress-title')
+    .evaluate((element) => element.scrollIntoView({ block: 'start' }));
   await page.screenshot({ path: '/tmp/alo280-reset-390.png' });
   expect(errors).toEqual([]);
   expect(external).toEqual([]);
