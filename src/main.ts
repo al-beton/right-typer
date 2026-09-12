@@ -36,6 +36,14 @@ import { load, reset, save } from './core/storage';
 import type { Calibration, Frame, Point, Press } from './core/types';
 import { Progress, getCohort, signature, type Cohort } from './curriculum/progress';
 import { recordActivity } from './curriculum/activity';
+import {
+  VIEWS,
+  isKeyboardView,
+  keyMetric,
+  summarizedOutput,
+  keyDetail,
+  legend,
+} from './view/heatmap';
 import { progressMarkup } from './view/progress';
 import { currentRound, completeRound, roundWords, missingOutputs } from './curriculum/selection';
 import { ProgressStore } from './curriculum/storage';
@@ -63,6 +71,8 @@ const fingersForText = (text: string) =>
 const hintForText = (text: string) =>
   text === ' ' ? 'either thumb' : fingersForText(text).map(fingerName).join(' or ');
 let fingeringMode = saved.fingeringMode ?? 'standard';
+let keyboardView = saved.keyboardView ?? 'fingers';
+let detailKey = 'KeyE';
 let cameraRotation = saved.cameraRotation ?? 0;
 let autoStartPending = saved.practiceEnabled ?? !!saved.calibration;
 let selectedCamera = saved.cameraDeviceId ?? saved.calibration?.deviceId ?? '';
@@ -115,7 +125,13 @@ $('#app').innerHTML = `
   <header class="topbar"><h1 class="brand" aria-label="Right Typer"><span aria-hidden="true">${brandWordmark()}</span></h1><nav aria-label="App"><a href="https://github.com/al-beton/right-typer" target="_blank" rel="noreferrer">Source</a><button id="settings-open" class="text-button">Settings & progress</button></nav></header>
   <main>
     <div id="content" aria-label="Typing practice"></div>
-    <section id="finger-map" aria-label="Intended finger map"></section><p id="keyboard-caption"></p>
+    <section id="finger-map" aria-label="Intended finger map"></section><div class="keyboard-caption-row"><p id="keyboard-caption"></p><label for="keyboard-view">View</label><select id="keyboard-view">${Object.entries(
+      VIEWS,
+    )
+      .map(([value, title]) => `<option value="${value}">${title}</option>`)
+      .join(
+        '',
+      )}</select><button id="key-details-open" class="text-button">Key details</button></div><p id="heatmap-legend"></p>
     <section id="camera-section" aria-label="Live camera and finger tracking">
       <div id="camera-preview"></div><div class="camera-strip-info"><span id="camera-badge">Camera off</span><p>Frames stay in this browser.</p><button id="camera-settings" class="text-button">Camera settings</button><button id="sample-indicator" class="text-button" hidden></button></div>
     </section>
@@ -140,7 +156,7 @@ $('#app').innerHTML = `
       .join('')}</select><span id="policy-status" role="status"></span></div>
     <section id="profile-settings" aria-label="Keyboard settings"></section>
 </details>
-    <details id="history-group"><summary>Practice & history</summary><section id="progress-view" aria-labelledby="progress-title"></section><div id="history-list"></div></details>
+    <details id="history-group"><summary>Practice & history</summary><section id="key-inspector" aria-labelledby="key-inspector-title"><h3 id="key-inspector-title">Keyboard key details</h3><label for="heatmap-key">Physical key</label><select id="heatmap-key"></select><div id="heatmap-detail" aria-live="polite"></div></section><section id="progress-view" aria-labelledby="progress-title"></section><div id="history-list"></div></details>
     <details id="debugging"><summary>Debugging</summary><section id="sample-panel" aria-label="Debug sample recording"></section></details>
     <details id="about-group"><summary>Local data & about</summary><p id="data-notice"></p><a href="https://github.com/al-beton/right-typer">Source on GitHub</a>
     <footer><span>Local processing · Keyboard profiles · Chrome</span><button class="text-button" id="reset">Reset local data</button><span id="build-version" aria-label="App version">${import.meta.env.VITE_BUILD_LABEL} · <a href="https://github.com/al-beton/right-typer/commit/${import.meta.env.VITE_BUILD_SHA}" title="${import.meta.env.VITE_BUILD_SHA}">${import.meta.env.VITE_BUILD_SHA.slice(0, 7)}</a></span></footer>
@@ -314,6 +330,102 @@ function keyboard() {
   const height = Math.max(...visibleKeys.map((k) => k.y + k.height)) - minY;
   return `<div class="keyboard physical-keyboard ${HARDWARE[profile.id] ? 'hardware-block' : ''}" style="aspect-ratio:${width}/${height}">${visibleKeys.map((k) => `<div class="physical-position" style="left:${((k.x - minX) / width) * 100}%;top:${((k.y - minY) / height) * 100}%;width:${(k.width / width) * 100}%;height:${(k.height / height) * 100}%">${key(k)}</div>`).join('')}</div>`;
 }
+const viewControl = $<HTMLSelectElement>('#keyboard-view');
+viewControl.value = keyboardView;
+viewControl.onchange = () => {
+  if (!isKeyboardView(viewControl.value)) return;
+  keyboardView = viewControl.value;
+  saved.keyboardView = keyboardView;
+  store();
+  renderHeatmap();
+};
+$('#key-details-open').onclick = () => {
+  openSettings('history-group');
+  $('#heatmap-key').focus({ preventScroll: true });
+  $('#key-inspector').scrollIntoView({ block: 'start' });
+};
+$('#heatmap-key').onkeydown = (event) => {
+  if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+  event.preventDefault();
+  const select = event.currentTarget as HTMLSelectElement;
+  const index =
+    event.key === 'Home'
+      ? 0
+      : event.key === 'End'
+        ? select.options.length - 1
+        : select.selectedIndex + (event.key === 'ArrowDown' ? 1 : -1);
+  select.selectedIndex = Math.max(0, Math.min(select.options.length - 1, index));
+  detailKey = select.value;
+  renderKeyDetail();
+};
+$('#heatmap-key').onchange = (event) => {
+  detailKey = (event.target as HTMLSelectElement).value;
+  renderKeyDetail();
+};
+function heatmapNext() {
+  return exercise.words[exercise.index]?.[exercise.attempt.text.length] ?? ' ';
+}
+function renderKeyDetail() {
+  const select = $<HTMLSelectElement>('#heatmap-key');
+  if (!profile.keys.some((k) => k.code === detailKey)) detailKey = profile.keys[0]!.code;
+  const options = profile.keys
+    .map(
+      (k) =>
+        `<option value="${escapeHtml(k.code)}">${escapeHtml(k.label)} · ${escapeHtml(k.code)}</option>`,
+    )
+    .join('');
+  if (select.innerHTML !== options) select.innerHTML = options;
+  select.value = detailKey;
+  $('#heatmap-detail').innerHTML = keyDetail(
+    progress.cohort,
+    profile,
+    detailKey,
+    heatmapNext(),
+    keyboardView,
+    fingeringMode,
+    progressStore.data.cohorts.indexOf(progress.cohort) + 1,
+  );
+}
+function renderHeatmap() {
+  const host = $('#finger-map');
+  host.classList.toggle('heatmap-active', keyboardView !== 'fingers');
+  for (const el of host.querySelectorAll<HTMLElement>('[data-key]')) {
+    const key = profile.keys.find((k) => k.code === el.dataset.key);
+    if (!key) continue;
+    const output = summarizedOutput(key, profile, progress.cohort, heatmapNext());
+    const metric = keyMetric(progress.cohort, key.code, output, keyboardView);
+    const fingers = profileFingers(profile, key.code, fingeringMode);
+    el.style.setProperty('--finger-strip', fingerBackground(orderedFingers(fingers)));
+    el.style.background =
+      keyboardView === 'fingers' ? fingerBackground(orderedFingers(fingers)) : metric.color;
+    el.dataset.evidence = keyboardView === 'fingers' ? '' : metric.state;
+    el.dataset.guideTitle ??= el.title;
+    el.dataset.guideLabel ??= el.getAttribute('aria-label') ?? key.label;
+    const guide = el.dataset.guideLabel;
+    const text =
+      keyboardView === 'fingers'
+        ? guide
+        : `${guide}. ${VIEWS[keyboardView]} · ${output === ' ' ? 'Space' : (output ?? 'no curriculum output')}: ${metric.amount}. ${metric.status}. ${metric.evidence}. ${metric.pending} pending.`;
+    el.setAttribute('aria-label', text);
+    el.title = keyboardView === 'fingers' ? el.dataset.guideTitle : text;
+    let badge = el.querySelector<HTMLElement>('.heat-value');
+    if (!badge) {
+      badge = document.createElement('span');
+      badge.className = 'heat-value';
+      badge.setAttribute('aria-hidden', 'true');
+      el.append(badge);
+    }
+    const outputLabel =
+      new Set(key.outputs.map((o) => o.text)).size > 1
+        ? `${output === ' ' ? 'Space' : (output ?? '')} `
+        : '';
+    badge.textContent =
+      outputLabel +
+      (metric.state === 'none' ? '—' : `${metric.state === 'limited' ? '◌ ' : ''}${metric.amount}`);
+  }
+  $('#heatmap-legend').innerHTML = legend(keyboardView);
+  renderKeyDetail();
+}
 const modeControl = $<HTMLSelectElement>('#fingering-mode');
 modeControl.value = fingeringMode;
 modeControl.onchange = () => {
@@ -464,6 +576,7 @@ function render() {
     'Reset clears calibration, preferences, custom profiles, adaptive progress and result history on this device.';
   renderHistory();
   renderProgress();
+  renderHeatmap();
   if (!practicing)
     document
       .querySelectorAll<HTMLElement>('[data-key]')
@@ -1033,6 +1146,8 @@ $('#reset').onclick = () => {
   camera.stop();
   abandonProgress();
   const progressReset = progressStore.reset();
+  keyboardView = 'fingers';
+  viewControl.value = keyboardView;
   profile = PRESETS[0]!;
   CALIBRATION_KEYS = calibrationCodes(profile);
   saved.profileId = profile.id;
@@ -1175,6 +1290,7 @@ function typing(event: KeyboardEvent) {
   const owner = exercise;
   void camera.evidence.request(press, calibration!).then((observation) => {
     progressOwner.observe(progressPress, observation);
+    renderHeatmap();
     if (owner !== exercise) return;
     const accepted = exercise.observe(press.id, press.attemptId, observation);
     sample?.event({
@@ -1230,6 +1346,7 @@ function typing(event: KeyboardEvent) {
   });
 }
 function updateTyped() {
+  renderHeatmap();
   const input = $<HTMLInputElement>('#typing');
   input.value = exercise.attempt.text;
   const next = exercise.words[exercise.index]?.[exercise.attempt.text.length] ?? ' ';
