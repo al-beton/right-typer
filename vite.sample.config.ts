@@ -1,8 +1,11 @@
 import { defineConfig } from 'vite';
 export default defineConfig({
   build: {
-    ssr: 'scripts/sample.ts',
+    ssr: true,
     outDir: '.sample-cli',
-    rollupOptions: { output: { entryFileNames: 'sample.mjs' } },
+    rollupOptions: {
+      input: { sample: 'scripts/sample.ts', 'sample-suite': 'scripts/sample-suite.ts' },
+      output: { entryFileNames: '[name].mjs' },
+    },
   },
 });
