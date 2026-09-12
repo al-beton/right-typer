@@ -1,6 +1,7 @@
 import { type KeyboardProfile, profileFingers } from '../core/profile';
 import { type FingeringMode } from '../core/keyboard';
 import type { Observation, Finger } from '../core/types';
+import type { ActivityLedger } from './activity';
 
 export const WINDOW = 32;
 export const ORDER = [...'enarit', ' ', ...'osldhcumfpgwybvkxjqz', ',', '.'];
@@ -50,10 +51,23 @@ export type Cohort = {
   total: number;
   correct: number;
   corrections: number;
+  activeMs: number;
+  excludedActivity: number;
+  space: { left: number; right: number; other: number; unclassified: number };
   course: Course;
 };
-export type ProgressData = { version: 1; corpus: typeof CORPUS_ID; cohorts: Cohort[] };
-export const emptyData = (): ProgressData => ({ version: 1, corpus: CORPUS_ID, cohorts: [] });
+export type ProgressData = {
+  version: 2;
+  corpus: typeof CORPUS_ID;
+  cohorts: Cohort[];
+  activity: ActivityLedger;
+};
+export const emptyData = (): ProgressData => ({
+  version: 2,
+  corpus: CORPUS_ID,
+  cohorts: [],
+  activity: { days: [], clockAnomalies: 0, undatedMs: 0 },
+});
 export function signature(profile: KeyboardProfile, mode: FingeringMode) {
   // Names, ids, camera coordinates and calibration dates are deliberately absent.
   return JSON.stringify({
@@ -86,6 +100,9 @@ export function getCohort(data: ProgressData, identity: string, seed: number): C
       total: 0,
       correct: 0,
       corrections: 0,
+      activeMs: 0,
+      excludedActivity: 0,
+      space: { left: 0, right: 0, other: 0, unclassified: 0 },
       course: {
         included: 7,
         qualified: [],
@@ -120,6 +137,7 @@ export type InputSnapshot = {
   word: string;
   round: number;
   at: number;
+  wall?: number;
 };
 export type PendingPress = {
   cohort: Cohort;
@@ -127,16 +145,20 @@ export type PendingPress = {
   outcome: { outcome: FingerOutcome };
   allowed: Finger[];
   closed: boolean;
+  space: boolean;
 };
 export class Progress {
   private pending = new Set<PendingPress>();
   private previous?: { at: number; correctPrefix: boolean };
+  private action?: { at: number; wall: number };
   constructor(
     public cohort: Cohort,
     private changed: () => void = () => {},
+    private activity: (ms: number, start: number, end: number) => void = () => {},
   ) {}
   accept(input: InputSnapshot): PendingPress {
     const c = this.cohort;
+    this.actionTime(input.at, input.wall ?? Date.now());
     c.total++;
     if (input.correct) c.correct++;
     let target: TargetProgress | undefined;
@@ -172,7 +194,14 @@ export class Progress {
     actual.total++;
     const outcome = { outcome: 'pending' as FingerOutcome };
     recent(actual.recent, outcome);
-    const handle = { cohort: c, actual, outcome, allowed: [...input.allowed], closed: false };
+    const handle = {
+      cohort: c,
+      actual,
+      outcome,
+      allowed: [...input.allowed],
+      closed: false,
+      space: input.code === 'Space',
+    };
     this.pending.add(handle);
     this.changed();
     return handle;
@@ -186,6 +215,15 @@ export class Progress {
       const compliant = handle.allowed.includes(observation.finger);
       const hand = handle.allowed.some((f) => f.split('-')[0] === observation.finger.split('-')[0]);
       a.observed++;
+      if (handle.space) {
+        const side =
+          observation.finger === 'left-thumb'
+            ? 'left'
+            : observation.finger === 'right-thumb'
+              ? 'right'
+              : 'other';
+        handle.cohort.space[side]++;
+      }
       if (compliant) a.compliant++;
       if (hand) a.handCompliant++;
       handle.outcome.outcome = compliant ? 'compliant' : hand ? 'same-hand' : 'wrong-hand';
@@ -196,13 +234,26 @@ export class Progress {
     this.changed();
     return true;
   }
-  correction() {
+  private actionTime(at: number, wall: number) {
+    if (this.action) {
+      const ms = at - this.action.at;
+      if (ms > 0 && ms <= 5000) {
+        this.cohort.activeMs += ms;
+        this.activity(ms, this.action.wall, wall);
+      } else this.cohort.excludedActivity++;
+    }
+    this.action = { at, wall };
+  }
+  correction(at?: number, wall = Date.now(), meaningful = true) {
     this.cohort.corrections++;
-    this.breakTiming();
+    if (at !== undefined && meaningful) this.actionTime(at, wall);
+    else this.action = undefined;
+    this.previous = undefined;
     this.changed();
   }
   breakTiming() {
     this.previous = undefined;
+    this.action = undefined;
   }
   abandon() {
     for (const handle of this.pending)

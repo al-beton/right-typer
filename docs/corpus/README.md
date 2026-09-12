@@ -6,4 +6,4 @@ The adaptive curriculum ships 1,474 everyday words from pinned ESDB/SCOWL, with 
 
 Runtime content lives in `src/curriculum/corpus.json`; `fallback-pools.json` supplies finite, same-level target pools. Punctuation uses the same base word ID. Selection persists IDs and bounded evidence, not typed transcripts or camera data. Curriculum tests validate every prefix and review rotation.
 
-The shared progress foundation intentionally omits the follow-on metrics inspector, export controls and daily active-time ledger (ALO-280).
+The shared progress foundation also supplies the metrics inspector, export controls and daily active-time ledger described in [progress accounting](../progress.md) (ALO-280).

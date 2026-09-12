@@ -29,6 +29,8 @@ Practice starts with **e n a r i t + Space** in 12-word rounds from 1,474 curate
 
 Calibration, preferences, the last ten completed results and bounded adaptive progress stay in local storage. Refresh repeats the saved current/prepared round; completed words within an interrupted round stay only in memory. Resume retains those completed words and starts the current word afresh. Compatible profiles share progress; changed output/finger mappings have separate histories. Only one tab writes progress; other tabs explain that practice is in memory. **Local data & about → Reset local data** clears calibration, preferences, results and progress after a second confirming click.
 
+**Settings & progress → Practice & history** shows lifetime and recent per-key metrics, observation coverage, thumb usage and focused active time. It labels empty denominators “No data” and fewer than 20 samples “Limited evidence.” Export downloads progress JSON; **Reset progress only** clears curriculum and metric histories while retaining calibration, profiles, preferences and completed results. See [progress accounting and storage](docs/progress.md).
+
 ## Verify and build
 
 ```sh

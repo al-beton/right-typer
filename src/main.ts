@@ -34,7 +34,9 @@ import { validCalibration } from './core/calibration';
 import { Exercise, feedback } from './core/exercise';
 import { load, reset, save } from './core/storage';
 import type { Calibration, Frame, Point, Press } from './core/types';
-import { Progress, getCohort, signature } from './curriculum/progress';
+import { Progress, getCohort, signature, type Cohort } from './curriculum/progress';
+import { recordActivity } from './curriculum/activity';
+import { progressMarkup } from './view/progress';
 import { currentRound, completeRound, roundWords, missingOutputs } from './curriculum/selection';
 import { ProgressStore } from './curriculum/storage';
 
@@ -71,20 +73,24 @@ let points: Record<string, Point> = {};
 let selectedKey = 0;
 let swapHands = saved.calibration?.swapHands ?? false;
 const progressStore = new ProgressStore(showStorageWarning);
+const makeProgress = (cohort: Cohort) =>
+  new Progress(
+    cohort,
+    () => progressStore.schedule(),
+    (ms, start, end) => recordActivity(progressStore.data.activity, ms, start, end),
+  );
 const progressSeed = () => crypto.getRandomValues(new Uint32Array(1))[0]!;
-let progress = new Progress(
+let progress = makeProgress(
   getCohort(progressStore.data, signature(profile, fingeringMode), progressSeed()),
-  () => progressStore.schedule(),
 );
 let round = currentRound(progress.cohort, profile);
 let exercise = new Exercise(roundWords(round), fingeringMode);
 function selectCourse() {
   const identity = signature(profile, fingeringMode);
   if (identity === progress.cohort.signature) return;
-  progress.abandon();
-  progress = new Progress(getCohort(progressStore.data, identity, progressSeed()), () =>
-    progressStore.schedule(),
-  );
+  abandonProgress();
+  progress = makeProgress(getCohort(progressStore.data, identity, progressSeed()));
+  selectedProgress = identity;
   round = currentRound(progress.cohort, profile);
   exercise = new Exercise(roundWords(round), fingeringMode);
   resuming = false;
@@ -99,6 +105,9 @@ let boundaryKeys = 0;
 let diagnosticsId = -1;
 let cameraErrorHandled = false;
 let resetArmed = false;
+let progressResetArmed = false;
+let selectedProgress = '';
+let progressResetTimer: ReturnType<typeof setTimeout> | undefined;
 let sample: SampleRecorder | undefined;
 const openDebugging = new URLSearchParams(location.search).get('record') === '1';
 
@@ -131,7 +140,7 @@ $('#app').innerHTML = `
       .join('')}</select><span id="policy-status" role="status"></span></div>
     <section id="profile-settings" aria-label="Keyboard settings"></section>
 </details>
-    <details id="history-group"><summary>Practice & history</summary><div id="history-list"></div></details>
+    <details id="history-group"><summary>Practice & history</summary><section id="progress-view" aria-labelledby="progress-title"></section><div id="history-list"></div></details>
     <details id="debugging"><summary>Debugging</summary><section id="sample-panel" aria-label="Debug sample recording"></section></details>
     <details id="about-group"><summary>Local data & about</summary><p id="data-notice"></p><a href="https://github.com/al-beton/right-typer">Source on GitHub</a>
     <footer><span>Local processing · Keyboard profiles · Chrome</span><button class="text-button" id="reset">Reset local data</button><span id="build-version" aria-label="App version">${import.meta.env.VITE_BUILD_LABEL} · <a href="https://github.com/al-beton/right-typer/commit/${import.meta.env.VITE_BUILD_SHA}" title="${import.meta.env.VITE_BUILD_SHA}">${import.meta.env.VITE_BUILD_SHA.slice(0, 7)}</a></span></footer>
@@ -313,7 +322,7 @@ modeControl.onchange = () => {
   fingeringMode = modeControl.value;
   saved.fingeringMode = fingeringMode;
   selectCourse();
-  progress.abandon();
+  abandonProgress();
   exercise.changeMode(fingeringMode);
   diagnosticsId--;
   boundaryKeys = 0;
@@ -454,6 +463,7 @@ function render() {
     saved.migrationNotice ||
     'Reset clears calibration, preferences, custom profiles, adaptive progress and result history on this device.';
   renderHistory();
+  renderProgress();
   if (!practicing)
     document
       .querySelectorAll<HTMLElement>('[data-key]')
@@ -462,6 +472,77 @@ function render() {
   if (!settings.open && focusedControl)
     document.getElementById(focusedControl)?.focus({ preventScroll: true });
   else if (complete && ownedTypingFocus) $('#restart').focus({ preventScroll: true });
+}
+function abandonProgress() {
+  progress.abandon();
+  progressStore.flush();
+}
+function renderProgress() {
+  const host = document.querySelector<HTMLElement>('#progress-view');
+  if (!host) return;
+  const focused = document.activeElement as HTMLElement | null;
+  const focusId = host.contains(focused) ? focused?.id : undefined;
+  const opened = [...host.querySelectorAll<HTMLDetailsElement>('details')].map(
+    (detail) => detail.open,
+  );
+  host.innerHTML = progressMarkup(
+    progressStore.data,
+    progress.cohort,
+    selectedProgress,
+    progressResetArmed,
+    progressStore.notice,
+  );
+  host
+    .querySelectorAll<HTMLDetailsElement>('details')
+    .forEach((detail, i) => (detail.open = opened[i] ?? false));
+  $('#progress-cohort').onchange = (event) => {
+    selectedProgress =
+      progressStore.data.cohorts[Number((event.target as HTMLSelectElement).value)]?.signature ??
+      '';
+    renderProgress();
+  };
+  $('#progress-export').onclick = () => {
+    const blob = new Blob([JSON.stringify(progressStore.data, null, 2)], {
+      type: 'application/json',
+    });
+    const url = URL.createObjectURL(blob),
+      link = document.createElement('a');
+    link.href = url;
+    link.download = 'right-typer-progress-v2.json';
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  };
+  $('#progress-reset').onclick = () => {
+    if (!progressResetArmed) {
+      progressResetArmed = true;
+      progressResetTimer = setTimeout(() => {
+        progressResetArmed = false;
+        renderProgress();
+      }, 7000);
+      renderProgress();
+      return;
+    }
+    clearTimeout(progressResetTimer);
+    progressResetArmed = false;
+    void sample?.stop('progress-reset');
+    abandonProgress();
+    const cleared = progressStore.reset();
+    progress = makeProgress(
+      getCohort(progressStore.data, signature(profile, fingeringMode), progressSeed()),
+    );
+    round = currentRound(progress.cohort, profile);
+    exercise = new Exercise(roundWords(round), fingeringMode);
+    selectedProgress = '';
+    resuming = false;
+    camera.evidence.reset();
+    if (cleared) progressStore.flush();
+    else
+      progressStore.notice =
+        'Progress reset in memory only. Saved progress could not be cleared; close the other writing tab or check browser storage, then reload and reset there.';
+    showStorageWarning();
+    setPhase(camera.status === 'ready' ? 'verify' : 'setup');
+  };
+  if (focusId) document.getElementById(focusId)?.focus({ preventScroll: true });
 }
 function renderHistory() {
   const opened = [...$('#history-list').querySelectorAll('details')].map((el) => el.open);
@@ -551,7 +632,7 @@ function editSetup() {
   void sample?.stop('edit-setup');
   disableAutoStart();
   if (phase === 'practice') {
-    progress.abandon();
+    abandonProgress();
     exercise.pause();
     resuming = true;
   } else if (phase === 'results') {
@@ -628,7 +709,7 @@ function startPractice() {
   saved.practiceEnabled = true;
   autoStartPending = false;
   store();
-  progress.abandon();
+  abandonProgress();
   camera.evidence.reset();
   message = '';
   boundaryKeys = 0;
@@ -709,7 +790,7 @@ function cameraChanged() {
     if (!cameraErrorHandled && ['practice', 'verify', 'calibrate'].includes(phase)) {
       cameraErrorHandled = true;
       if (phase === 'practice') {
-        progress.abandon();
+        abandonProgress();
         exercise.pause();
         resuming = true;
       }
@@ -950,7 +1031,7 @@ $('#reset').onclick = () => {
   }
   void sample?.stop('local-data-reset');
   camera.stop();
-  progress.abandon();
+  abandonProgress();
   const progressReset = progressStore.reset();
   profile = PRESETS[0]!;
   CALIBRATION_KEYS = calibrationCodes(profile);
@@ -958,9 +1039,8 @@ $('#reset').onclick = () => {
   profilesUI.reset();
   fingeringMode = 'standard';
   modeControl.value = fingeringMode;
-  progress = new Progress(
+  progress = makeProgress(
     getCohort(progressStore.data, signature(profile, fingeringMode), progressSeed()),
-    () => progressStore.schedule(),
   );
   round = currentRound(progress.cohort, profile);
   $('#policy-status').textContent = '';
@@ -1031,7 +1111,11 @@ function typing(event: KeyboardEvent) {
     return;
   }
   if (event.key === 'Backspace') {
-    progress.correction();
+    progress.correction(
+      keyTime(event, performance.now(), performance.timeOrigin),
+      Date.now(),
+      exercise.attempt.text.length > 0,
+    );
     exercise.backspace();
     updateTyped();
     return;
@@ -1083,6 +1167,7 @@ function typing(event: KeyboardEvent) {
     word: round.slots[exercise.index]!.word,
     round: round.sequence,
     at: press.at,
+    wall: Date.now(),
   });
   if (event.key === ' ') progressOwner.breakTiming();
   if (event.key === ' ') render();
@@ -1102,6 +1187,7 @@ function typing(event: KeyboardEvent) {
     if (!accepted) return;
     const verdict = exercise.settle();
     if (!verdict) return;
+    progressStore.flush();
     if (sample?.state === 'recording') {
       const attempt = structuredClone(exercise.history.at(-1)!.attempt);
       for (const p of attempt.presses) p.at -= sample.origin;
@@ -1160,7 +1246,7 @@ function updateTyped() {
     );
 }
 function retryWord() {
-  progress.abandon();
+  abandonProgress();
   sample?.event({ type: 'lifecycle', name: 'retry' });
   exercise.retry();
   message = 'Type the whole word, then space.';
@@ -1170,7 +1256,7 @@ function retryWord() {
 function pause(remember = true) {
   void sample?.stop('practice-paused');
   if (remember) disableAutoStart();
-  progress.abandon();
+  abandonProgress();
   exercise.pause();
   resuming = true;
   setupOpen = false;
@@ -1259,7 +1345,7 @@ const profilesUI = profileControls(
   (next, customs) => {
     void sample?.stop('keyboard-profile-changed');
     disableAutoStart();
-    progress.abandon();
+    abandonProgress();
     exercise.pause();
     resuming = phase === 'practice' || resuming;
     diagnosticsId--;
@@ -1311,7 +1397,7 @@ document.addEventListener('visibilitychange', () => {
 });
 window.addEventListener('blur', () => progress.breakTiming());
 window.addEventListener('pagehide', () => {
-  progress.abandon();
+  abandonProgress();
   progressStore.flush();
   sample?.discard();
   camera.stop();
