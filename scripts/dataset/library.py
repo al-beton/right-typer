@@ -160,15 +160,15 @@ def cases(root):
         directory = root / record['path']
         manifest = read(directory / 'manifest.json')
         calibration = read(directory / 'calibration.json')
-        frames = lines(directory / 'frames.jsonl')
+        frames = sorted(lines(directory / 'frames.jsonl'), key=lambda frame: frame['at'])
         for event in lines(directory / 'events.jsonl'):
             if event['type'] != 'evidence' or event['event']['type'] != 'request':
                 continue
             press = event['event']['press']
-            code = press['code']
+            code = press.get('code', press['key'])
             points = calibration['points']
             point = points.get(code)
-            if code == 'Space' and 'space-left' in points and 'space-right' in points:
+            if press['key'] == ' ' and 'space-left' in points and 'space-right' in points:
                 point = {axis: (points['space-left'][axis] + points['space-right'][axis]) / 2 for axis in ('x', 'y')}
             selected = [{'id': f['id'], 'at': f['at'], 'url': '/media/' + record['sessionId'] + '/' + f['file'], 'file': f['file']} for f in frames if abs(f['at'] - press['at']) <= 650]
             result.append({'id': record['sessionId'] + '/' + str(press['attemptId']) + '/' + str(press['id']),

@@ -55,6 +55,21 @@ class LibraryTests(unittest.TestCase):
         self.assertEqual([c['id'] for c in cases], ['session1/1/1', 'session1/2/1'])
         self.assertEqual(cases[1]['frames'], [])
 
+    def test_legacy_presses_without_physical_codes_and_unsorted_frames(self):
+        self.fixture()
+        directory = self.root / 'recordings/session1'
+        events = lib.lines(directory / 'events.jsonl')
+        for event in events:
+            del event['event']['press']['code']
+        (directory / 'events.jsonl').write_text('\n'.join(json.dumps(e) for e in events))
+        lib.write(directory / 'calibration.json', {'points': {'c': {'x': .2, 'y': .3}}})
+        (directory / 'frames.jsonl').write_text('\n'.join(json.dumps(f) for f in [
+            {'id': 4, 'at': 150, 'file': 'inputs/4.png'},
+            {'id': 3, 'at': 80, 'file': 'inputs/3.png'}]))
+        case = lib.cases(self.root)[0]
+        self.assertEqual(case['keyPoint'], {'x': .2, 'y': .3})
+        self.assertEqual([f['id'] for f in case['frames']], [3, 4])
+
     def test_vote_history_and_snapshot_exclusions(self):
         first, second = self.fixture()
         lib.append_vote(self.root, 'al', first, 'left-index', 'human visual review')
