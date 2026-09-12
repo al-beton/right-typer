@@ -944,7 +944,8 @@ main {
 }
 #content {
   height: auto;
-  min-height: 340px;
+  /* Reserve the focus caption alongside retry and completed-round feedback. */
+  min-height: 380px;
   overflow: visible;
   padding-top: 24px;
 }

@@ -136,7 +136,12 @@ test('another tab cannot overwrite progress, and corrupt data stays intact until
   const isolated = await context.browser()!.newContext({ permissions: ['camera'] });
   const corrupt = await isolated.newPage();
   await syntheticCamera(corrupt);
-  await corrupt.addInitScript((key) => localStorage.setItem(key, '{"version":99}'), PROGRESS_KEY);
+  await corrupt.addInitScript((key) => {
+    if (!sessionStorage.getItem('corrupt-seeded')) {
+      localStorage.setItem(key, '{"version":99}');
+      sessionStorage.setItem('corrupt-seeded', 'yes');
+    }
+  }, PROGRESS_KEY);
   await corrupt.goto(page.url());
   await expect(corrupt.locator('#storage-warning')).toContainText(
     'Saved progress could not be read',
@@ -149,6 +154,11 @@ test('another tab cannot overwrite progress, and corrupt data stays intact until
   await corrupt.locator('#reset').click();
   await corrupt.locator('#reset').click();
   expect(await corrupt.evaluate((key) => localStorage.getItem(key), PROGRESS_KEY)).toBeNull();
+  await corrupt.reload();
+  await expect(corrupt.locator('#storage-warning')).toBeHidden();
+  await expect
+    .poll(() => corrupt.evaluate((key) => localStorage.getItem(key), PROGRESS_KEY))
+    .not.toBeNull();
   await isolated.close();
 });
 
