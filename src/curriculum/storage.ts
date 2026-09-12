@@ -119,6 +119,9 @@ export function parseProgress(raw: string): ProgressData {
       a.unknown += a.total - a.observed - a.unknown;
       for (const item of a.recent) if (item.outcome === 'pending') item.outcome = 'unknown';
     }
+    assert(Object.values(c.actual).reduce((n, a) => n + a.total, 0) === c.total);
+    assert(Object.values(c.targets).reduce((n, t) => n + t.total, 0) <= c.total);
+    assert(Object.values(c.targets).reduce((n, t) => n + t.correct, 0) <= c.correct);
     if (legacy) {
       c.activeMs = 0;
       c.excludedActivity = 0;
@@ -259,6 +262,8 @@ export class ProgressStore {
         this.changed();
         return;
       }
+      // Validate counters as well as byte/collection caps before replacing the last good store.
+      parseProgress(raw);
       localStorage.setItem(PROGRESS_KEY, raw);
     } catch {
       this.notice =
