@@ -1,5 +1,9 @@
 # Verification
 
+For repeatable current-head product journeys, explicit synthetic finger observations,
+headed inspection and evidence reports, see [Product simulation](product-testing.md).
+These journeys run in normal browser CI; physical-camera acceptance remains separate.
+
 ## Independently verified
 
 Environment: macOS on Apple Silicon, Node 26.8.1, pnpm 11.19.0, Chromium (Playwright 1.63.0). Tests operate on the production static build.
