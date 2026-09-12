@@ -43,7 +43,7 @@ On restart or handoff, reread the current `AGENTS.md`, that checkpoint, the issu
 - Dispatch the builder and reviewer tasks with their role and issue/PR links. Reconcile status and triage reviewer follow-ups into the queue; route product decisions requiring Al through the product liaison and ensure approved changes are recorded in Linear before implementation. Do not substitute the manager's review for the independent reviewer.
 - Use the authorized five-minute wakeups to recover live queue, ownership, checkpoints and PR state. Record an assignment before dispatch; if it already exists, reconcile or route to that owner instead of creating duplicate work. Recover existing tasks and handoffs after interruption. Stay quiet on unchanged/non-actionable state; escalate meaningful completions, failures or required decisions. Scheduling belongs to the authorized task automation, not repository code.
 - Use existing Linear states: In Progress while building, In Review after the public handoff, Stuck for a concrete dependency with a next owner/action, and Done after verified acceptance. The latest checkpoint distinguishes awaiting review from changes requested; do not invent another status system.
-- Mark an issue Done only after verifying merge and its acceptance criteria. Record deployment and hardware acceptance separately, leaving required unfulfilled acceptance open.
+- Mark code/documentation work Done after reviewer-owned merge and verified acceptance. Research/design work is Done when the liaison accepts its brief/artifacts and reconciles decisions into product issues; no implementation PR is required. Record deployment and hardware acceptance separately, leaving required unfulfilled acceptance open.
 
 ## Builder
 

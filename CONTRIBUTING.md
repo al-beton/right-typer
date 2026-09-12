@@ -15,4 +15,6 @@ Human contributions are welcome. You do not need Linear membership or six agents
 
 The product liaison turns discussion with Al into scoped work, uses researcher and product designer advice, and authorizes increments within the approved initiative. The delivery manager assigns ready work and supervises status, dependencies, CI and review. The builder implements; the independent reviewer checks the PR and handles merge. Research/design helpers advise unless separately assigned implementation.
 
+Research/design issues finish when the liaison accepts the brief/artifacts and reconciles their decisions into product issues; they need no implementation PR. Code and documentation work require reviewer-owned merge and verified acceptance.
+
 [AGENTS.md](AGENTS.md) holds the shared role, autonomy, escalation, recovery and Git rules. Current owners and the ready queue live in Linear. Project decisions and handoffs belong in Linear; implementation findings and revisions belong in public GitHub threads. Shared-account posts identify their role; an independent agent's COMMENT review is not an independent-account approval. Contributors can follow this same public review path without reproducing the agent setup.
