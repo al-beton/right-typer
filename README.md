@@ -39,6 +39,10 @@ pnpm preview                      # production build on localhost
 
 Linux CI installs the browser with `pnpm exec playwright install --with-deps chromium`. See [verification results and hardware protocol](docs/verification.md). Synthetic tests use a test-only worker replacement; the shipped app has no bypass or simulated-practice mode. The separate real-model smoke test uses Chrome’s fake camera and verifies local model execution and network requests.
 
+## Development flow
+
+Contributions are welcome through public GitHub issues and pull requests; Linear membership is not required. See [CONTRIBUTING.md](CONTRIBUTING.md) for agreeing scope, supplying verification and working through review. It also explains the project's current assisted delivery workflow; contributors do not need to run agents.
+
 ## Required merge checks
 
 The single required GitHub status is `blocking-checks`, defined in
