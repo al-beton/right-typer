@@ -76,8 +76,6 @@ test('exact evidence views, accessible single key selector, persisted choice and
   await expect(page.locator('#heatmap-detail')).toContainText('Expected target character');
   await expect(page.locator('#heatmap-key')).toBeFocused();
   await page.locator('#heatmap-key').press('ArrowDown');
-  await page.locator('#heatmap-key').press('ArrowDown');
-  await page.locator('#heatmap-key').press('Enter');
   await expect(page.locator('#heatmap-key')).not.toHaveValue('KeyN');
   await page.locator('#settings-close').click();
   await page.locator('#keyboard-view').selectOption('response');

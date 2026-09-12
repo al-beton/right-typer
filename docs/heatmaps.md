@@ -1,0 +1,9 @@
+# Keyboard progress views
+
+The View selector beside the keyboard defaults to Finger guide and saves locally with preferences. Metric views retain physical geometry, legends, the next-key outline and a finger-color strip. View changes keep the current attempt; Key details opens Practice & history using the existing pause/fresh-attempt resume boundary.
+
+Response time uses the last 32 valid target intervals. Its fixed color scale runs from 1,200 ms to 200 ms; numbers outside the scale remain truthful. Accuracy uses lifetime prompted character/code counts. Finger and hand compliance use observed actual-key presses; coverage uses observed/all accepted presses, with pending shown separately. No finalized coverage evidence is No data; finalized observed-plus-unknown counts determine its 20-sample threshold. Other metrics use their own denominators/sample counts. Below 20 samples the fill stays muted, with a dashed outline and Limited evidence marker.
+
+Key details is a single keyboard-operable selector in the drawer, with explicit numerator/denominator, unknown/pending counts, current compatible history and Space thumb-only percentages. A multi-output key summarizes its next expected output when applicable, otherwise the first included curriculum output (then the first supported curriculum output). Other outputs are listed, never averaged into target evidence. Actual-key observations necessarily cover all outputs of that physical key.
+
+Heatmaps read the shared progress store without changing grading, attribution or curriculum. Progress-only reset clears their evidence but preserves the selected view and setup. Full reset restores Finger guide. Synthetic fixtures and browser journeys cover numerical states, focus, preset/custom geometry, 390px widths and 200% zoom at a 780px viewport. They do not prove physical-camera accuracy or learning efficacy.

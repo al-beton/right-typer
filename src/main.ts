@@ -344,6 +344,20 @@ $('#key-details-open').onclick = () => {
   $('#heatmap-key').focus({ preventScroll: true });
   $('#key-inspector').scrollIntoView({ block: 'start' });
 };
+$('#heatmap-key').onkeydown = (event) => {
+  if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+  event.preventDefault();
+  const select = event.currentTarget as HTMLSelectElement;
+  const index =
+    event.key === 'Home'
+      ? 0
+      : event.key === 'End'
+        ? select.options.length - 1
+        : select.selectedIndex + (event.key === 'ArrowDown' ? 1 : -1);
+  select.selectedIndex = Math.max(0, Math.min(select.options.length - 1, index));
+  detailKey = select.value;
+  renderKeyDetail();
+};
 $('#heatmap-key').onchange = (event) => {
   detailKey = (event.target as HTMLSelectElement).value;
   renderKeyDetail();
