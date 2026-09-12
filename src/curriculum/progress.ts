@@ -150,11 +150,16 @@ export type PendingPress = {
 export class Progress {
   private pending = new Set<PendingPress>();
   private previous?: { at: number; correctPrefix: boolean };
-  private action?: { at: number; wall: number };
+  private action?: { at: number; wall: number; offset: number };
   constructor(
     public cohort: Cohort,
     private changed: () => void = () => {},
-    private activity: (ms: number, start: number, end: number) => void = () => {},
+    private activity: (
+      ms: number,
+      start: number,
+      end: number,
+      calendarChanged: boolean,
+    ) => void = () => {},
   ) {}
   accept(input: InputSnapshot): PendingPress {
     const c = this.cohort;
@@ -239,10 +244,15 @@ export class Progress {
       const ms = at - this.action.at;
       if (ms > 0 && ms <= 5000) {
         this.cohort.activeMs += ms;
-        this.activity(ms, this.action.wall, wall);
+        this.activity(
+          ms,
+          this.action.wall,
+          wall,
+          this.action.offset !== new Date(this.action.wall).getTimezoneOffset(),
+        );
       } else this.cohort.excludedActivity++;
     }
-    this.action = { at, wall };
+    this.action = { at, wall, offset: new Date(wall).getTimezoneOffset() };
   }
   correction(at?: number, wall = Date.now(), meaningful = true) {
     this.cohort.corrections++;
