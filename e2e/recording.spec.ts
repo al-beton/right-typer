@@ -236,3 +236,23 @@ for (const [profileId, key, code, finger, shiftKey] of [
     await page.locator('#sample-discard').click();
   });
 }
+
+test('recording started after completion snapshots the prepared next round', async ({ page }) => {
+  await syntheticCamera(page, []);
+  await setup(page);
+  const previous = await page.locator('.passage > span').allTextContents();
+  for (const value of previous) {
+    await page.locator('#typing').pressSequentially(value + ' ');
+    await expect(page.locator('#typing[readonly]')).toHaveCount(0);
+  }
+  await expect(page.locator('#restart')).toBeVisible();
+  await openSettings(page, 'debugging');
+  await page.locator('#sample-start').click();
+  const current = await page.locator('.passage > span').allTextContents();
+  expect(current).not.toEqual(previous);
+  await page.locator('#typing').pressSequentially(current[0]! + ' ');
+  await expect(page.locator('.passage > .passed')).toHaveCount(1);
+  const { sample } = await recordedSample(page);
+  expect(sample.manifest.words).toEqual(current);
+  expect((await replaySample(sample)).differences).toEqual([]);
+});
