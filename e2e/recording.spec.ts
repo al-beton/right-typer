@@ -163,6 +163,7 @@ for (const [profileId, key, code, finger, shiftKey] of [
         ];
       }),
     );
+    await openSettings(page);
     for (const point of Object.values(points)) {
       const box = await page.locator('#overlay').boundingBox();
       await page

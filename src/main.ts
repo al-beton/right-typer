@@ -170,10 +170,14 @@ function closeSettings(resume = false) {
   moveCamera();
   render();
   if (resume && ready()) startPractice();
-  else
-    (settingsOpener?.isConnected ? settingsOpener : $('#settings-open')).focus({
-      preventScroll: true,
-    });
+  else {
+    const opener = settingsOpener?.isConnected
+      ? settingsOpener
+      : settingsOpener?.id
+        ? document.getElementById(settingsOpener.id)
+        : null;
+    (opener ?? $('#settings-open')).focus({ preventScroll: true });
+  }
 }
 $('#settings-open').onclick = () => openSettings();
 $('#camera-settings').onclick = () => openSettings('camera-group');
@@ -396,11 +400,17 @@ function render() {
     activeWord = document.querySelector<HTMLElement>('.passage .active');
   if (activeWord) passage.scrollTop = Math.max(0, activeWord.offsetTop - passage.clientHeight / 2);
   $('#keyboard-caption').textContent = `${profile.name} · ${MODES[fingeringMode]} fingering`;
-  $('#settings-state').textContent = resuming
-    ? 'Practice paused. Completed words are kept.'
-    : 'Setup and preferences stay in this browser.';
+  $('#settings-state').textContent = complete
+    ? 'Practice complete. Review results in Practice & history.'
+    : resuming
+      ? 'Practice paused. Completed words are kept.'
+      : 'Setup and preferences stay in this browser.';
   $<HTMLButtonElement>('#settings-resume').disabled = !ready();
-  $('#settings-resume').textContent = resuming ? 'Close & resume' : 'Close & start practice';
+  $('#settings-resume').textContent = complete
+    ? 'Close & practise again'
+    : resuming
+      ? 'Close & resume'
+      : 'Close & start practice';
   $('#data-notice').textContent =
     storageWarning ||
     saved.migrationNotice ||
@@ -575,8 +585,9 @@ function startPractice() {
   camera.evidence.reset();
   message = '';
   boundaryKeys = 0;
-  if (resuming) exercise.retry();
+  if (resuming && exercise.state !== 'complete') exercise.retry();
   else exercise = new Exercise(WORDS, fingeringMode);
+  resuming = false;
   setPhase('practice');
   $('#typing').focus({ preventScroll: true });
   $('#typing').scrollIntoView({ block: 'nearest' });

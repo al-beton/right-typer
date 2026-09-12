@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { WORDS } from '../src/passage';
 import { syntheticCamera, setup, openSettings, resumePractice, word } from './helpers';
 
 test('saved practice, modal ownership, explicit resume and preserved custom draft', async ({
@@ -114,9 +115,7 @@ for (const width of [320, 390, 640])
     await page.screenshot({ path: `test-results/alo281/drawer-${width}.png`, fullPage: true });
   });
 
-test('checking keeps the same input and value; tabbed-away focus stays away', async ({
-  page,
-}) => {
+test('checking keeps the same input and value; tabbed-away focus stays away', async ({ page }) => {
   await syntheticCamera(page, []);
   await setup(page);
   const input = await page.locator('#typing').elementHandle();
@@ -163,4 +162,45 @@ test('200 percent text and layout zoom keeps controls reachable without horizont
       fullPage: true,
     });
   }
+});
+
+test('completed practice starts afresh from the drawer after an earlier pause', async ({
+  page,
+}) => {
+  await syntheticCamera(page, []);
+  await setup(page);
+  await page.locator('#typing').pressSequentially(WORDS[0]! + ' ');
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
+  await openSettings(page);
+  await resumePractice(page);
+  for (const value of WORDS.slice(1)) {
+    await page.locator('#typing').pressSequentially(value + ' ');
+    await expect(page.locator('#typing')).not.toHaveAttribute('readonly');
+  }
+  await expect(page.locator('#restart')).toBeVisible();
+  const result = await page.evaluate(
+    () => JSON.parse(localStorage.getItem('right-typer.v1')!).results,
+  );
+  await openSettings(page, 'history-group');
+  await expect(page.locator('#settings-resume')).toHaveText('Close & practise again');
+  await resumePractice(page);
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[0]!);
+  await expect(page.locator('#typing')).toHaveValue('');
+  await expect(page.locator('#typing')).toBeFocused();
+  await expect(page.locator('.practice-metrics')).toContainText('0 /');
+  await page.locator('#typing').pressSequentially(WORDS[0]! + ' ');
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
+  expect(
+    await page.evaluate(() => JSON.parse(localStorage.getItem('right-typer.v1')!).results),
+  ).toEqual(result);
+});
+
+test('contextual setup action regains focus after its render is replaced', async ({ page }) => {
+  await syntheticCamera(page);
+  await page.goto('/');
+  await expect(page.locator('#camera-badge')).toContainText('hands detected');
+  await page.locator('#setup-next').click();
+  await expect(page.locator('#settings')).toBeVisible();
+  await page.locator('#settings-close').click();
+  await expect(page.locator('#setup-next')).toBeFocused();
 });

@@ -286,6 +286,7 @@ test('camera is requested on load; denial is actionable and the button retries o
   });
   await page.goto('/');
   await expect(page.locator('#setup-message')).toContainText('Camera permission is blocked');
+  await openSettings(page);
   await expect(page.getByRole('button', { name: 'Remap key positions' })).toBeDisabled();
   expect(await page.evaluate(() => window.__cameraRequests)).toBe(1);
   await page.evaluate(() => {
@@ -381,6 +382,7 @@ test('worker failure releases the stream and returns to camera recovery', async 
   await page.goto('/');
   await expect(page.locator('#setup-message')).toContainText('model asset unavailable');
   expect(await page.locator('video').evaluate((v) => (v as HTMLVideoElement).srcObject)).toBeNull();
+  await openSettings(page);
   await expect(page.getByRole('button', { name: 'Enable camera' })).toBeEnabled();
 });
 

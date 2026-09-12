@@ -64,10 +64,11 @@ test.describe('camera view rotation', () => {
       await page.locator('#typing').press('q');
       await openSettings(page);
       await rotation.selectOption(String((angle + 90) % 360));
-      await expect(page.locator('#typing')).toHaveValue('');
+      await expect(page.locator('#typing')).toHaveValue('q');
       expect(await page.evaluate(() => window.__terminated)).toBe(0);
       expect(await documentBox()).toEqual(initial);
       await resumePractice(page);
+      await expect(page.locator('#typing')).toHaveValue('');
       await page.reload();
       await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeVisible();
       await expect(rotation).toHaveValue(String((angle + 90) % 360));
