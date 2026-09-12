@@ -81,6 +81,7 @@ test('custom edit/export/import validates and persists safely with literal label
   const id = await page.locator('#keyboard-profile').inputValue();
   await page.reload();
   await expect(page.locator('#keyboard-profile')).toHaveValue(id);
+  await openSettings(page, 'keyboard-group');
   const download = page.waitForEvent('download');
   await page.locator('#export-profile').click();
   const path = await (await download).path();
@@ -122,6 +123,8 @@ test('profile switching invalidates pending attempt and incompatible calibration
   await expect(page.locator('#camera-badge')).toContainText('disconnected');
   await openSettings(page, 'camera-group');
   await page.locator('#start-camera').click();
+  await expect(page.locator('#settings-resume')).toBeEnabled();
+  await resumePractice(page);
   await expect(page.locator('#typing')).toBeEnabled();
   await page.locator('#typing').press('a');
   await openSettings(page, 'keyboard-group');
@@ -260,7 +263,11 @@ test('German and French physical presses use the calibrated position and resolve
       { finger, x: 0.1 + key.x * 0.07, y: 0.2 + key.y * 0.2 },
     );
     await page.waitForTimeout(100);
-    await page.locator('#overlay').dispatchEvent('keydown', { key: text, code, shiftKey: shift });
+    await openSettings(page);
+    await page.locator('#diagnostic').focus();
+    await page
+      .locator('#diagnostic')
+      .dispatchEvent('keydown', { key: text, code, shiftKey: shift });
     await expect(page.locator('#diagnostic-result')).toContainText(
       `saw ${finger.replace('-', ' ')}. Intended: ${finger.replace('-', ' ')}.`,
     );

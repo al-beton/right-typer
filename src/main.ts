@@ -200,7 +200,7 @@ settings.addEventListener('keydown', (event) => {
 settings.addEventListener('cancel', (event) => {
   event.preventDefault();
   if (!$('#profile-editor').hidden) {
-    $('#cancel-profile').click();
+    profilesUI.closeEditor();
     $('#custom-layout').focus();
   } else closeSettings();
 });

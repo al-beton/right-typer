@@ -944,7 +944,7 @@ main {
 }
 #content {
   height: auto;
-  min-height: 300px;
+  min-height: 340px;
   overflow: visible;
   padding-top: 24px;
 }

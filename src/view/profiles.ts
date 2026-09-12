@@ -48,6 +48,7 @@ export function profileControls(
   };
   const commit = (p: KeyboardProfile) => {
     selected = p;
+    draft = undefined;
     refresh();
     change(p, customs);
     el('profile-editor').hidden = true;
@@ -100,6 +101,10 @@ export function profileControls(
   };
   editKey.onchange = showKey;
   el('custom-layout').onclick = () => {
+    if (draft) {
+      el('profile-editor').hidden = false;
+      return;
+    }
     draft = structuredClone(selected);
     if (PRESETS.some((p) => p.id === draft!.id)) {
       draft.id = `custom-${crypto.randomUUID()}`;
@@ -208,6 +213,9 @@ export function profileControls(
     input.value = '';
   };
   return {
+    closeEditor() {
+      el('profile-editor').hidden = true;
+    },
     reset() {
       customs = [];
       selected = PRESETS[0]!;
