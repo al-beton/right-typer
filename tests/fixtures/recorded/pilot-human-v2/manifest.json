@@ -1,0 +1,30 @@
+{
+  "version": 1,
+  "snapshot": "pilot-human-v2",
+  "cases": 77,
+  "sources": [
+    {
+      "id": "recording-1",
+      "archiveSha256": "63a1dc82605a4591c4896be61deae9a5c2aa6849eb136cdb8caa04f36018d2a4",
+      "labelsSha256": "561af45758c6ea0fb6727aa2bf22e032fc5396fe20bedace7c573131c318b645"
+    },
+    {
+      "id": "recording-2",
+      "archiveSha256": "c05993b3f9376e4e67ac09965d3e91daba4fb4494eb88ec4f4c934d49b6567ae",
+      "labelsSha256": "457536cd886bbab94cc8e5da4a7be08b2aa992957dc25f626d91eee14880cd46"
+    },
+    {
+      "id": "recording-3",
+      "archiveSha256": "929950364a9e5c53e263196484c1c29baba70769bb8385b83e3fa6522b86d26b",
+      "labelsSha256": "838524736f03dfd6d65386cee73afd3548fcff0188eccd92ad335aabcb73b9f6"
+    },
+    {
+      "id": "recording-4",
+      "archiveSha256": "76e435bf441ba138086b126d87ccaf6ee97a6b5e2da6f977db7fc23f60f498f0",
+      "labelsSha256": "e649722ab859bd9fb6c91f0b5a8b51674790a4d8a1d1adbd918685f4709f57e6"
+    }
+  ],
+  "provenance": "Recorded numeric hand landmarks and human-labelled presses; not synthetic.",
+  "limits": "One participant, development data only. Cached 2D landmarks; no vision-model rerun, pixels or video.",
+  "sourceSnapshotSha256": "1d60607101727706045ae4e0767860f277db7eeb5e35f9dcfa9cf97ef2060194"
+}

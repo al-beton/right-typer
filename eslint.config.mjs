@@ -9,6 +9,7 @@ export default defineConfig(
     'dist-ssr/**',
     'public/**',
     '.sample-cli/**',
+    '.benchmark-cli/**',
     'test-results/**',
     'playwright-report/**',
   ]),

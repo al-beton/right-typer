@@ -34,3 +34,5 @@ __pycache__/
 # Private recording bundles and generated sample CLI
 *.tar
 .sample-cli/
+
+.benchmark-cli/

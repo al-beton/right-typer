@@ -86,3 +86,13 @@ Open **Debugging** below the camera for opt-in camera/keymap/keypress sample exp
 The section is collapsed by default, and recording starts only when you click
 **Start sample (fresh passage)**. The `?record=1` shortcut opens the same section. See
 [the recording and replay guide](docs/samples.md) before collecting a pilot.
+
+For reusable human labelling and versioned private reference sets, see the
+[dataset library guide](docs/dataset-library.md). The local review tool keeps raw
+recordings, label history and frozen test sets separate from application code.
+
+The [recorded-camera benchmark](docs/camera-benchmark.md) runs in GitHub Actions and
+reports accuracy from camera pixels through MediaPipe and the production mapping
+rules. The approved four-recording dataset is published as versioned release assets.
+[Fast numeric reference tests](tests/fixtures/recorded/README.md) also exercise all 77
+human-labelled presses in the normal test suite without rerunning the vision model.
