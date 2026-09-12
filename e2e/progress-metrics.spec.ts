@@ -51,6 +51,8 @@ test('inspect exact target/actual counters, export, reload and reset progress wi
   await expect(page.locator('#retry')).toBeVisible();
   await openSettings(page, 'history-group');
   await expect(page.locator('#progress-view')).toContainText('75.0% (3/4)');
+  await page.locator('#progress-title').scrollIntoViewIfNeeded();
+  await page.screenshot({ path: '/tmp/alo280-summary.png' });
   const expected = page.getByRole('region', { name: 'Expected target keys', exact: true });
   await page.getByText('Expected target keys', { exact: true }).click();
   await expect(expected.getByRole('row').filter({ hasText: 'KeyN' })).toContainText('50.0% (1/2)');
@@ -83,6 +85,12 @@ test('inspect exact target/actual counters, export, reload and reset progress wi
   expect(await page.evaluate(() => localStorage.getItem('right-typer.v1'))).toBe(settings);
   await page.setViewportSize({ width: 390, height: 900 });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page
+    .locator('#progress-view details')
+    .evaluateAll((details) =>
+      details.forEach((detail) => ((detail as HTMLDetailsElement).open = false)),
+    );
+  await page.locator('#progress-title').scrollIntoViewIfNeeded();
   await page.screenshot({ path: '/tmp/alo280-reset-390.png' });
   expect(errors).toEqual([]);
   expect(external).toEqual([]);
@@ -155,4 +163,90 @@ test('date capacity preserves saved history while export and progress-only reset
   );
   expect(saved.activity.days).toEqual([]);
   expect(saved.cohorts[0]!.total).toBe(0);
+});
+
+test('progress reset after a recorded completed round stops recording before changing exercises', async ({
+  page,
+}) => {
+  await seed(page, fixture());
+  await syntheticCamera(page);
+  await setup(page);
+  await page.evaluate(() => {
+    window.__hands = [];
+  });
+  await page.waitForTimeout(600);
+  await openSettings(page, 'debugging');
+  await page.locator('#sample-start').click();
+  const words = await page.locator('.passage > span').allTextContents();
+  for (const value of words) {
+    await page.locator('#typing').pressSequentially(value + ' ');
+    await expect(page.locator('#typing[readonly]')).toHaveCount(0);
+  }
+  await expect(page.locator('#restart')).toBeVisible();
+  await expect(page.locator('#sample-indicator')).toContainText('Recording');
+  await openSettings(page, 'history-group');
+  await page.locator('#progress-reset').click();
+  await page.locator('#progress-reset').click();
+  await expect(page.locator('#sample-indicator')).not.toContainText('Recording');
+  await openSettings(page, 'debugging');
+  await expect(page.locator('#sample-download')).toBeEnabled({ timeout: 30000 });
+  await expect(page.locator('#sample-stop')).toBeDisabled();
+  const data = parseProgress(
+    (await page.evaluate((key) => localStorage.getItem(key), PROGRESS_KEY))!,
+  );
+  expect(data.cohorts[0]!.total).toBe(0);
+  expect(
+    JSON.parse((await page.evaluate(() => localStorage.getItem('right-typer.v1')))!).results,
+  ).toHaveLength(1);
+});
+
+test('sixteen saved cohorts are retained when a new mapping must practise in memory', async ({
+  page,
+}) => {
+  const data = emptyData();
+  for (let i = 0; i < 16; i++) {
+    const profile = structuredClone(PRESETS[0]!);
+    profile.keys[0]!.x += (i + 1) / 100;
+    const c = getCohort(data, signature(profile, 'standard'), i + 1);
+    generateRound(c, profile);
+  }
+  await seed(page, data);
+  await syntheticCamera(page);
+  await setup(page);
+  await expect(page.locator('#storage-warning')).toContainText('Local progress is full');
+  const saved = parseProgress(
+    (await page.evaluate((key) => localStorage.getItem(key), PROGRESS_KEY))!,
+  );
+  expect(saved.cohorts.map((c) => c.signature)).toEqual(data.cohorts.map((c) => c.signature));
+  await openSettings(page, 'history-group');
+  expect((await exported(page)).cohorts).toHaveLength(17);
+  await page.locator('#progress-reset').click();
+  await page.locator('#progress-reset').click();
+  expect(
+    parseProgress((await page.evaluate((key) => localStorage.getItem(key), PROGRESS_KEY))!).cohorts,
+  ).toHaveLength(1);
+  await expect(page.locator('#storage-warning')).toBeHidden();
+});
+
+test('progress reset in a non-writing tab cannot delete the writer history', async ({
+  page,
+  context,
+}) => {
+  await seed(page, fixture());
+  await syntheticCamera(page);
+  await setup(page);
+  await press(page, 'a');
+  await openSettings(page, 'history-group');
+  const before = await page.evaluate((key) => localStorage.getItem(key), PROGRESS_KEY);
+  const second = await context.newPage();
+  await syntheticCamera(second);
+  await second.goto('/');
+  await expect(second.locator('#storage-warning')).toContainText('Another tab owns saved progress');
+  await openSettings(second, 'history-group');
+  await second.locator('#progress-reset').click();
+  await second.locator('#progress-reset').click();
+  await expect(second.locator('#progress-status')).toContainText('Progress reset in memory only');
+  expect(await page.evaluate((key) => localStorage.getItem(key), PROGRESS_KEY)).toBe(before);
+  expect((await exported(second)).cohorts[0]!.total).toBe(0);
+  await second.close();
 });

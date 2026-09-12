@@ -524,6 +524,7 @@ function renderProgress() {
     }
     clearTimeout(progressResetTimer);
     progressResetArmed = false;
+    void sample?.stop('progress-reset');
     abandonProgress();
     const cleared = progressStore.reset();
     progress = makeProgress(
