@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { syntheticCamera, press, word } from './helpers';
+import { syntheticCamera, press, word, editSetup, openSettings, resumePractice } from './helpers';
 import { calibration, handsAt } from '../tests/fixtures';
 
 test('one stable page from camera off through mapping, optional test, retry and setup edits', async ({
@@ -9,38 +9,17 @@ test('one stable page from camera off through mapping, optional test, retry and 
   await page.goto('/');
   const positions = () =>
     page.evaluate(() =>
-      ['#finger-map', '#view-wrap'].map((selector) => {
+      ['#finger-map', '#camera-preview'].map((selector) => {
         const r = document.querySelector(selector)!.getBoundingClientRect();
         return { top: r.top + window.scrollY, left: r.left, width: r.width, height: r.height };
       }),
     );
   const initial = await positions();
-  const centers = await page.evaluate(() => {
-    const box = (selector: string) => document.querySelector(selector)!.getBoundingClientRect();
-    const entry = box('.word-entry'),
-      keyboard = box('.keyboard'),
-      camera = box('#view-wrap'),
-      controls = box('.camera-layout aside');
-    return {
-      entry: entry.x + entry.width / 2,
-      keyboard: keyboard.x + keyboard.width / 2,
-      camera: camera.x + camera.width / 2,
-      controls: controls.x + controls.width / 2,
-      entryWidth: entry.width,
-      cameraBottom: camera.bottom,
-      controlsTop: controls.top,
-    };
-  });
-  expect(centers.entryWidth).toBeLessThanOrEqual(560);
-  expect(centers.entry).toBeCloseTo(centers.keyboard, 0);
-  expect(centers.camera).toBeCloseTo(centers.keyboard, 0);
-  expect(centers.controls).toBeCloseTo(centers.camera, 0);
-  expect(centers.controlsTop).toBeGreaterThan(centers.cameraBottom);
-
   const go = page.getByRole('button', { name: /^(Start|Resume) practice$/ });
   await expect(go).toBeDisabled();
   await expect(page.getByRole('checkbox')).toHaveCount(0);
   await page.screenshot({ path: 'test-results/single-page-initial.png', fullPage: true });
+  await openSettings(page);
   await expect(page.locator('#requested-key')).toHaveText('Mark q in the image');
   // No hands at all: setup completion is independent of inference confidence/visibility.
   await page.evaluate(() => {
@@ -63,10 +42,10 @@ test('one stable page from camera off through mapping, optional test, retry and 
     handsAt('f', 'left-index'),
   );
   await page.waitForTimeout(150);
-  await page.locator('#overlay').press('f');
+  await page.locator('#diagnostic').press('f');
   await expect(page.locator('#diagnostic-result')).toContainText('saw left index');
   await page.screenshot({ path: 'test-results/single-page-mapped-synthetic.png', fullPage: true });
-  await go.click();
+  await resumePractice(page);
   await expect(page.locator('.next-key')).toHaveAttribute('data-key', 'KeyA');
   expect(await positions()).toEqual(initial);
   await press(page, 'a', 'left-index');
@@ -76,17 +55,17 @@ test('one stable page from camera off through mapping, optional test, retry and 
   await page.locator('#typing').press('Space');
   await expect(page.locator('.next-key')).toHaveAttribute('data-key', 'KeyA');
   await word(page, 'a');
-  await expect(page.locator('.target-word')).toHaveText('quick');
+  await expect(page.locator('.passage .active')).toHaveText('quick');
   await expect(page.locator('.next-key')).toHaveAttribute('data-key', 'KeyQ');
   expect(await positions()).toEqual(initial);
-  await page.getByRole('button', { name: 'Edit setup' }).click();
+  await editSetup(page);
   await expect(page.locator('.next-key')).toHaveCount(0);
   await expect(go).toBeEnabled();
   await page.getByRole('button', { name: 'Map q', exact: true }).click();
   const oldQ = calibration().points.q!;
   await page.locator('#overlay').focus();
   await page.locator('#overlay').press('ArrowRight');
-  await go.click();
+  await resumePractice(page);
   const stored = await page.evaluate(
     () => JSON.parse(localStorage.getItem('right-typer.v1')!).calibration,
   );

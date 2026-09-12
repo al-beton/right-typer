@@ -22,7 +22,7 @@ test('selected wordmark and favicon are the normal app defaults', async ({ page 
   for (const width of [320, 390, 1440]) {
     await page.setViewportSize({ width, height: 1000 });
     const logo = await heading.boundingBox();
-    const source = await page.locator('.topbar a').boundingBox();
+    const source = await page.locator('#settings-open').boundingBox();
     expect(logo!.x + logo!.width).toBeLessThan(source!.x);
     expect(await heading.evaluate((e) => getComputedStyle(e).fontSize)).toBe('22px');
   }

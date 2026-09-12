@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { openSettings } from './helpers';
 import { createServer, type Server } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { resolve, extname } from 'node:path';
@@ -145,6 +146,7 @@ test('production footer identifies the built commit without review branding', as
     `https://github.com/al-beton/right-typer/commit/${sha}`,
   );
   await page.setViewportSize({ width: 375, height: 812 });
+  await openSettings(page, 'about-group');
   await label.scrollIntoViewIfNeeded();
   expect(await label.evaluate((el) => el.getBoundingClientRect().right <= innerWidth)).toBe(true);
 });

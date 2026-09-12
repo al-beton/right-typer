@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { syntheticCamera, setup, word } from './helpers';
+import { syntheticCamera, setup, word, openSettings, resumePractice } from './helpers';
 
 test('disconnect cancels boundary grading, releases tracks and persists until reconnect', async ({
   page,
@@ -15,8 +15,10 @@ test('disconnect cancels boundary grading, releases tracks and persists until re
   });
   await setup(page);
   await word(page, 'a');
-  await expect(page.locator('.target-word')).toHaveText('quick');
+  await expect(page.locator('.passage .active')).toHaveText('quick');
+  await openSettings(page, 'camera-group');
   await page.getByLabel('Rotate camera view').selectOption('90');
+  await resumePractice(page);
   const stream = await page
     .locator('video')
     .evaluateHandle((v) => (v as HTMLVideoElement).srcObject as MediaStream);
@@ -25,6 +27,7 @@ test('disconnect cancels boundary grading, releases tracks and persists until re
   });
   await page.locator('#typing').pressSequentially('quick ');
   await expect(page.locator('#typing')).toHaveAttribute('readonly', '');
+  await openSettings(page, 'camera-group');
   await page.getByRole('button', { name: 'Disconnect camera', exact: true }).click();
   await expect(page.locator('#camera-badge')).toHaveText('Camera disconnected');
   expect(await stream.evaluate((s) => s.getTracks().every((t) => t.readyState === 'ended'))).toBe(
@@ -34,18 +37,21 @@ test('disconnect cancels boundary grading, releases tracks and persists until re
   expect(await page.locator('video').evaluate((v) => (v as HTMLVideoElement).srcObject)).toBeNull();
   await page.waitForTimeout(2100);
   await expect(page.locator('#typing')).toBeDisabled();
-  await expect(page.locator('.target-word')).toHaveText('quick');
+  await expect(page.locator('.passage .active')).toHaveText('quick');
+  await openSettings(page, 'camera-group');
   await page.getByRole('button', { name: 'Reconnect camera' }).click();
   await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeEnabled();
-  await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
+  await resumePractice(page);
   await expect(page.locator('#typing')).toHaveValue('');
   await expect(page.locator('.practice-metrics')).toContainText('1 /');
+  await openSettings(page, 'camera-group');
   await page.getByRole('button', { name: 'Disconnect camera', exact: true }).click();
   await page.reload();
   await expect(page.locator('#camera-badge')).toHaveText('Camera disconnected');
   expect(await page.evaluate(() => window.__cameraRequests)).toBe(0);
   await expect(page.getByLabel('Rotate camera view')).toHaveValue('90');
   await expect(page.locator('#device')).toHaveValue('synthetic-macbook-camera');
+  await openSettings(page, 'camera-group');
   await page.getByRole('button', { name: 'Reconnect camera' }).click();
   await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeEnabled();
   await expect(page.locator('.cal-key.mapped')).toHaveCount(30);
@@ -66,6 +72,7 @@ test('disconnect during pending permission stops a late stream and permits recon
     };
   });
   await page.goto('/');
+  await openSettings(page, 'camera-group');
   await page.getByRole('button', { name: 'Disconnect camera', exact: true }).click();
   await expect
     .poll(() =>
@@ -78,6 +85,7 @@ test('disconnect during pending permission stops a late stream and permits recon
     .toBe(true);
   await expect(page.locator('#camera-badge')).toHaveText('Camera disconnected');
   expect(await page.evaluate(() => window.__terminated)).toBe(0);
+  await openSettings(page, 'camera-group');
   await page.getByRole('button', { name: 'Reconnect camera' }).click();
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
 });
@@ -107,6 +115,7 @@ test('disconnect while the model loads terminates it and ignores its late ready 
   await expect
     .poll(() => page.evaluate(() => sessionStorage.getItem('model-loading')))
     .toBe('true');
+  await openSettings(page, 'camera-group');
   await page.getByRole('button', { name: 'Disconnect camera', exact: true }).click();
   await page.waitForTimeout(1700);
   await expect(page.locator('#camera-badge')).toHaveText('Camera disconnected');
@@ -117,9 +126,12 @@ test('reconnect retains partial mapping edits in this session', async ({ page })
   await syntheticCamera(page);
   await page.goto('/');
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
+  await openSettings(page);
   await page.locator('#overlay').click({ position: { x: 100, y: 100 } });
   await expect(page.locator('.cal-key.mapped')).toHaveCount(1);
+  await openSettings(page, 'camera-group');
   await page.getByRole('button', { name: 'Disconnect camera', exact: true }).click();
+  await openSettings(page, 'camera-group');
   await page.getByRole('button', { name: 'Reconnect camera' }).click();
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
   await expect(page.locator('.cal-key.mapped')).toHaveCount(1);

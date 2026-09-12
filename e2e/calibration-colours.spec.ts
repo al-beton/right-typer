@@ -1,6 +1,6 @@
 import { LEGACY_CODES } from '../src/core/profile';
 import { test, expect } from '@playwright/test';
-import { syntheticCamera, setup } from './helpers';
+import { syntheticCamera, setup, openSettings, editSetup } from './helpers';
 import { allowedFingers, type FingeringMode } from '../src/core/keyboard';
 import { orderedFingers } from '../src/view/finger-colours';
 
@@ -15,10 +15,12 @@ test('camera dots match keyboard policy, retain sizes and keep halves upright at
   const points = await page.evaluate(
     () => JSON.parse(localStorage.getItem('right-typer.v1')!).calibration.points,
   );
-  await page.getByRole('button', { name: 'Edit setup' }).click();
+  await editSetup(page);
   for (const mode of ['standard', 'alternate', 'either'] as FingeringMode[]) {
+    await openSettings(page, 'keyboard-group');
     await page.getByLabel('Fingering', { exact: true }).selectOption(mode);
     for (const angle of [0, 90, 180, 270]) {
+      await openSettings(page, 'camera-group');
       await page.getByLabel('Rotate camera view').selectOption(String(angle));
       for (const selected of [false, true]) {
         await page

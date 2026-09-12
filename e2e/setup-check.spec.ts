@@ -1,17 +1,18 @@
 import { test, expect } from '@playwright/test';
-import { setup, syntheticCamera } from './helpers';
+import { setup, syntheticCamera, resumePractice, openSettings } from './helpers';
 import { handsAt } from '../tests/fixtures';
 
-test('implicit setup checks report evidence, preserve control ownership and discard stale results', async ({
+test('focused setup checks report evidence, preserve control ownership and discard stale results', async ({
   page,
 }) => {
   await syntheticCamera(page);
   await setup(page);
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
+  await openSettings(page);
   const result = page.locator('#diagnostic-result');
   const go = page.getByRole('button', { name: /^(Start|Resume) practice$/ });
   await expect(page.locator('#diagnostic-input')).toHaveCount(0);
-  await page.locator('#overlay').press('f');
+  await page.locator('#diagnostic').press('f');
   await expect(result).toContainText('saw left index');
   await page.evaluate(
     (hands) => {
@@ -20,14 +21,14 @@ test('implicit setup checks report evidence, preserve control ownership and disc
     handsAt('f', 'right-index'),
   );
   await page.waitForTimeout(150);
-  await page.locator('#overlay').press('f');
+  await page.locator('#diagnostic').press('f');
   await expect(result).toContainText('saw right index. Intended: left index.');
   await expect(go).toBeEnabled();
   await page.evaluate(() => {
     window.__hands = [];
   });
   await page.waitForTimeout(550);
-  await page.locator('#overlay').press('f');
+  await page.locator('#diagnostic').press('f');
   await expect(result).toContainText('f: unknown.');
   await expect(go).toBeEnabled();
   const unknown = await result.textContent();
@@ -74,10 +75,10 @@ test('implicit setup checks report evidence, preserve control ownership and disc
   await page.evaluate(() => {
     window.__inferenceDelay = 450;
   });
-  await page.locator('#overlay').press('f');
+  await page.locator('#diagnostic').press('f');
   await page.locator('#swap').click();
   await page.waitForTimeout(700);
-  await expect(result).toHaveText('Press a key to check its observed finger.');
+  await expect(result).toBeEmpty();
   await page.evaluate(
     (hands) => {
       window.__hands = hands;
@@ -86,9 +87,9 @@ test('implicit setup checks report evidence, preserve control ownership and disc
     handsAt('f', 'left-index'),
   );
   await page.waitForTimeout(550);
-  await page.locator('#overlay').press('f');
+  await page.locator('#diagnostic').press('f');
   await expect(result).toContainText('saw right index');
-  await go.click();
+  await resumePractice(page);
   await expect(result).toBeEmpty();
   await expect(page.locator('#typing')).toBeFocused();
 });
@@ -99,6 +100,7 @@ test('camera controls wrap without overflow and Go remains independent of checks
   await syntheticCamera(page);
   await setup(page);
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
+  await openSettings(page);
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 1000 });
     const boxes = await page.locator('.camera-options').evaluate((el) => ({
@@ -113,6 +115,6 @@ test('camera controls wrap without overflow and Go remains independent of checks
     expect(boxes.children.every((b) => b.left >= 0 && b.right <= width)).toBe(true);
     await page.screenshot({ path: `test-results/compact-setup-${width}.png`, fullPage: true });
   }
-  await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
+  await resumePractice(page);
   await expect(page.locator('#typing')).toBeEnabled();
 });

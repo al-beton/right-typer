@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { syntheticCamera } from './helpers';
+import { syntheticCamera, openSettings, resumePractice } from './helpers';
 import oldSaved from '../tests/fixtures/alo264-british-pre34.json' with { type: 'json' };
 import { PRESETS } from '../src/core/profile';
 
@@ -77,9 +77,10 @@ for (const variant of ['pre34', 'pr34', 'pc', 'custom'] as const)
     expect((await read()).calibration.points).toEqual(initial.calibration.points);
     if (variant === 'pc') {
       // User chooses actual hardware: don't infer a MacBook from the browser OS.
+      await openSettings(page, 'keyboard-group');
       await page.locator('#keyboard-profile').selectOption('apple-gb-iso');
       await expect(page.locator('#practice')).toBeEnabled();
-      await page.locator('#practice').click();
+      await resumePractice(page);
       expect((await read()).calibration.points).toEqual(initial.calibration.points);
     }
   });

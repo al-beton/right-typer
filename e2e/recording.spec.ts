@@ -2,16 +2,18 @@ import { PRESETS, calibrationCodes } from '../src/core/profile';
 import { handsAt, calibration } from '../tests/fixtures';
 import { test, expect } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
-import { syntheticCamera, setup, press } from './helpers';
+import { syntheticCamera, setup, press, openSettings } from './helpers';
 import { unarchive, sha256 } from '../src/recording/archive';
 import { replaySample } from '../src/recording/replay';
 import type { Sample } from '../src/recording/types';
 import type { FingeringMode } from '../src/core/keyboard';
 
 async function recordedSample(page: import('@playwright/test').Page) {
-  await page.locator('#sample-stop').click();
+  await openSettings(page, 'debugging');
+  if (await page.locator('#sample-stop').isEnabled()) await page.locator('#sample-stop').click();
   await expect(page.locator('#sample-download')).toBeEnabled({ timeout: 30000 });
   const download = page.waitForEvent('download');
+  await openSettings(page, 'debugging');
   await page.locator('#sample-download').click();
   const file = await download;
   const bytes = await readFile((await file.path())!);
@@ -42,17 +44,17 @@ for (const mode of ['standard', 'alternate', 'either'] as FingeringMode[]) {
     await syntheticCamera(page);
     await setup(page);
     await expect(page.locator('#sample-panel')).toBeHidden();
-    await page.locator('#debugging > summary').click();
+    await openSettings(page, 'debugging');
     await expect(page.locator('#sample-start')).toBeEnabled();
     await expect(page.locator('#sample-stop')).toBeDisabled();
     await expect(page.locator('#sample-download')).toBeDisabled();
+    await openSettings(page, 'keyboard-group');
     await page.locator('#fingering-mode').selectOption(mode);
+    await openSettings(page, 'debugging');
     await page.locator('#sample-start').click();
     await expect(page.locator('#sample-status')).toContainText('Recording');
-    await page.locator('#debugging > summary').click();
-    await expect(page.locator('#sample-panel')).toBeHidden();
-    await expect(page.locator('#debugging > summary')).toHaveText('Debugging · Recording sample');
-    await page.locator('#debugging > summary').click();
+    await expect(page.locator('#settings')).not.toBeVisible();
+    await expect(page.locator('#sample-indicator')).toContainText('Recording');
     await press(page, 'w', 'left-ring');
     await press(page, ' ', 'right-thumb');
     await expect(page.locator('#retry')).toBeVisible();
@@ -76,47 +78,64 @@ for (const mode of ['standard', 'alternate', 'either'] as FingeringMode[]) {
       mode === 'alternate' ? 1 : 0,
     );
     expect(errors).toEqual([]);
+    await openSettings(page, 'debugging');
     await page.locator('#sample-discard').click();
     await expect(page.locator('#sample-start')).toBeEnabled();
   });
 }
-test('stops before mode or geometry changes; discard allows a new sample', async ({ page }) => {
+test('opening settings stops before mode or geometry changes; discard allows a new sample', async ({
+  page,
+}) => {
   await syntheticCamera(page);
   await setup(page);
   await page.goto('/?record=1');
   await expect(page.locator('#sample-start')).toBeEnabled();
+  await openSettings(page, 'debugging');
   await page.locator('#sample-start').click();
   await press(page, 'f');
+  await openSettings(page, 'keyboard-group');
   await page.locator('#fingering-mode').selectOption('either');
   await expect(page.locator('#sample-download')).toBeEnabled();
-  await expect(page.locator('#sample-status')).toContainText('fingering-mode-changed');
+  await expect(page.locator('#sample-status')).toContainText('practice-paused');
+  await openSettings(page, 'debugging');
   await page.locator('#sample-discard').click();
+  await openSettings(page, 'debugging');
   await page.locator('#sample-start').click();
   await press(page, 'f');
+  await openSettings(page);
   await page.locator('#camera-rotation').selectOption('90');
   await expect(page.locator('#sample-download')).toBeEnabled();
-  await expect(page.locator('#sample-status')).toContainText('camera-view-changed');
+  await expect(page.locator('#sample-status')).toContainText('practice-paused');
+  await openSettings(page, 'debugging');
   await page.locator('#sample-discard').click();
 });
 
-test('disconnect finalizes recording and reconnect permits a new sample', async ({ page }) => {
+test('settings finalizes recording before disconnect and reconnect permits a new sample', async ({
+  page,
+}) => {
   await syntheticCamera(page);
   await setup(page);
   await page.goto('/?record=1');
   await expect(page.locator('#sample-start')).toBeEnabled();
+  await openSettings(page, 'debugging');
   await page.locator('#sample-start').click();
   await press(page, 'f');
+  await openSettings(page, 'camera-group');
   await page.locator('#disconnect-camera').click();
   await expect(page.locator('#sample-download')).toBeEnabled();
-  await expect(page.locator('#sample-status')).toContainText('camera-disconnected');
+  await expect(page.locator('#sample-status')).toContainText('practice-paused');
   expect(await page.locator('#camera').evaluate((v: HTMLVideoElement) => v.srcObject)).toBeNull();
+  await openSettings(page, 'debugging');
   await page.locator('#sample-discard').click();
   await expect(page.locator('#sample-start')).toBeDisabled();
+  await openSettings(page, 'camera-group');
   await page.locator('#start-camera').click();
   await expect(page.locator('#sample-start')).toBeEnabled();
+  await openSettings(page, 'debugging');
   await page.locator('#sample-start').click();
   await press(page, 'f');
   await recordedSample(page);
+  await openSettings(page, 'debugging');
   await page.locator('#sample-discard').click();
 });
 
@@ -129,6 +148,7 @@ for (const [profileId, key, code, finger, shiftKey] of [
     await page.goto('/?record=1');
     await expect(page.locator('#camera-badge')).toContainText('hands detected');
     const profile = PRESETS.find((p) => p.id === profileId)!;
+    await openSettings(page, 'keyboard-group');
     await page.locator('#keyboard-profile').selectOption(profileId);
     const points = Object.fromEntries(
       calibrationCodes(profile).map((code) => {
@@ -143,6 +163,7 @@ for (const [profileId, key, code, finger, shiftKey] of [
         ];
       }),
     );
+    await openSettings(page);
     for (const point of Object.values(points)) {
       const box = await page.locator('#overlay').boundingBox();
       await page
@@ -150,6 +171,7 @@ for (const [profileId, key, code, finger, shiftKey] of [
         .click({ position: { x: point.x * box!.width, y: point.y * box!.height } });
     }
     await expect(page.locator('#sample-start')).toBeEnabled();
+    await openSettings(page, 'debugging');
     await page.locator('#sample-start').click();
     await page.evaluate(
       (hands) => {
@@ -190,19 +212,27 @@ for (const [profileId, key, code, finger, shiftKey] of [
     if (request?.type === 'evidence' && request.event.type === 'request')
       delete request.event.press.allowedFingers;
     await expect(replaySample(sample)).rejects.toThrow('allowed-finger snapshot');
+    await openSettings(page, 'debugging');
     await page.locator('#sample-discard').click();
+    await openSettings(page, 'debugging');
     await page.locator('#sample-start').click();
     await press(page, 'f');
+    await openSettings(page, 'keyboard-group');
     await page.locator('#keyboard-profile').selectOption('us-ansi');
     await expect(page.locator('#sample-download')).toBeEnabled();
-    await expect(page.locator('#sample-status')).toContainText('keyboard-profile-changed');
+    await expect(page.locator('#sample-status')).toContainText('practice-paused');
+    await openSettings(page, 'debugging');
     await page.locator('#sample-discard').click();
+    await openSettings(page, 'keyboard-group');
     await page.locator('#keyboard-profile').selectOption(profileId);
+    await openSettings(page, 'debugging');
     await page.locator('#sample-start').click();
     await press(page, 'f');
+    await openSettings(page, 'keyboard-group');
     await page.locator('#custom-layout').click();
     await expect(page.locator('#sample-download')).toBeEnabled();
-    await expect(page.locator('#sample-status')).toContainText('keyboard-profile-edit');
+    await expect(page.locator('#sample-status')).toContainText('practice-paused');
+    await openSettings(page, 'debugging');
     await page.locator('#sample-discard').click();
   });
 }

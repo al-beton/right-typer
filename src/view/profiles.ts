@@ -48,6 +48,7 @@ export function profileControls(
   };
   const commit = (p: KeyboardProfile) => {
     selected = p;
+    draft = undefined;
     refresh();
     change(p, customs);
     el('profile-editor').hidden = true;
@@ -100,6 +101,10 @@ export function profileControls(
   };
   editKey.onchange = showKey;
   el('custom-layout').onclick = () => {
+    if (draft) {
+      el('profile-editor').hidden = false;
+      return;
+    }
     draft = structuredClone(selected);
     if (PRESETS.some((p) => p.id === draft!.id)) {
       draft.id = `custom-${crypto.randomUUID()}`;
@@ -111,7 +116,13 @@ export function profileControls(
     showKey();
   };
   el('capture-key').onkeydown = (e) => {
-    if (e.key === 'Tab') return;
+    if (
+      e.key === 'Tab' ||
+      e.key === 'Escape' ||
+      e.metaKey ||
+      ((e.ctrlKey || e.altKey) && !e.getModifierState('AltGraph'))
+    )
+      return;
     e.preventDefault();
     if (!draft || e.repeat) return;
     const k = draft.keys.find((k) => k.code === editKey.value)!;
@@ -202,6 +213,9 @@ export function profileControls(
     input.value = '';
   };
   return {
+    closeEditor() {
+      el('profile-editor').hidden = true;
+    },
     reset() {
       customs = [];
       selected = PRESETS[0]!;
