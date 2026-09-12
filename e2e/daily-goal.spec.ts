@@ -117,6 +117,8 @@ test('local day changes only presentation; second tab and denied goal storage re
   await expect(other.locator('#daily-goal')).toContainText('Daily goal met');
   expect(await milliseconds(other)).toBe(before);
   await other.close();
+  // Playwright clock updates are shared by pages in this browser context.
+  await page.clock.setSystemTime(new Date(wall + 86400000));
   await openSettings(page, 'history-group');
   await page.evaluate(() => {
     Storage.prototype.setItem = function () {
