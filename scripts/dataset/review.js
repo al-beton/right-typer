@@ -85,7 +85,19 @@ async function show() {
   $('pulse').classList.remove('on');
   $('keyMarker').classList.remove('on');
   const camera = current.camera;
-  document.querySelector('.stage').style.aspectRatio = camera.width + '/' + camera.height;
+  const quarterTurn = Math.abs(camera.rotation % 180) === 90;
+  const stage = document.querySelector('.stage');
+  stage.style.aspectRatio = quarterTurn
+    ? camera.height + '/' + camera.width
+    : camera.width + '/' + camera.height;
+  stage.style.setProperty(
+    '--content-width',
+    (quarterTurn ? (100 * camera.width) / camera.height : 100) + '%',
+  );
+  stage.style.setProperty(
+    '--content-height',
+    (quarterTurn ? (100 * camera.height) / camera.width : 100) + '%',
+  );
   document.querySelector('.stage').style.setProperty('--rotation', camera.rotation + 'deg');
   $('keyMarker').setAttribute('viewBox', '0 0 ' + camera.width + ' ' + camera.height);
   $('keyCircle').setAttribute('cx', (current.keyPoint?.x ?? 0) * camera.width);
