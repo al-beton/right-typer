@@ -1258,3 +1258,63 @@ label[for='diagnostic'] {
   display: block;
   margin-top: 16px;
 }
+
+/* Secondary progress inspection; no new controls on the practice surface. */
+#progress-view {
+  padding-bottom: 20px;
+  border-bottom: 1px solid #c6cdd4;
+  margin-bottom: 16px;
+  font-size: 13px;
+}
+#progress-view h3 {
+  margin: 0 0 12px;
+}
+#progress-cohort {
+  width: 100%;
+  margin: 6px 0;
+}
+.progress-facts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+.progress-facts dt {
+  color: #536172;
+}
+.progress-facts dd {
+  margin: 4px 0 0;
+  overflow-wrap: anywhere;
+}
+.progress-note {
+  color: #536172;
+  font-size: 12px;
+}
+.progress-table {
+  max-height: 320px;
+  overflow: auto;
+}
+.progress-table table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.progress-table td,
+.progress-table th {
+  padding: 8px;
+  border-bottom: 1px solid #c6cdd4;
+  vertical-align: top;
+  text-align: left;
+}
+.progress-table th small {
+  display: block;
+  font-weight: normal;
+}
+.progress-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+@media (max-width: 440px) {
+  .progress-facts {
+    grid-template-columns: 1fr;
+  }
+}

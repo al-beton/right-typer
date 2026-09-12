@@ -23,14 +23,38 @@ const code = (value: unknown) =>
 // an unknown schema by overwriting it with an empty history.
 export function parseProgress(raw: string): ProgressData {
   assert(new TextEncoder().encode(raw).length <= MAX_BYTES);
-  const data = JSON.parse(raw) as ProgressData;
+  const data = JSON.parse(raw) as Omit<ProgressData, 'version'> & { version: number };
   assert(
     data &&
-      data.version === 1 &&
+      (data.version === 1 || data.version === 2) &&
       data.corpus === CORPUS_ID &&
       Array.isArray(data.cohorts) &&
       data.cohorts.length <= 16,
   );
+  const legacy = data.version === 1;
+  if (legacy) data.activity = { days: [], clockAnomalies: 0, undatedMs: 0 };
+  assert(
+    record(data.activity) &&
+      count(data.activity.clockAnomalies) &&
+      Number.isFinite(data.activity.undatedMs) &&
+      data.activity.undatedMs >= 0 &&
+      data.activity.undatedMs <= Number.MAX_SAFE_INTEGER &&
+      Array.isArray(data.activity.days) &&
+      data.activity.days.length <= 90,
+  );
+  const dates = new Set<string>();
+  for (const day of data.activity.days) {
+    assert(record(day) && /^\d{4}-\d{2}-\d{2}$/.test(day.date) && !dates.has(day.date));
+    const time = Date.parse(day.date + 'T12:00:00Z');
+    assert(
+      Number.isFinite(time) &&
+        new Date(time).toISOString().slice(0, 10) === day.date &&
+        Number.isFinite(day.ms) &&
+        day.ms >= 0 &&
+        day.ms <= Number.MAX_SAFE_INTEGER,
+    );
+    dates.add(day.date);
+  }
   const signatures = new Set<string>();
   for (const c of data.cohorts) {
     assert(
@@ -95,6 +119,25 @@ export function parseProgress(raw: string): ProgressData {
       a.unknown += a.total - a.observed - a.unknown;
       for (const item of a.recent) if (item.outcome === 'pending') item.outcome = 'unknown';
     }
+    if (legacy) {
+      c.activeMs = 0;
+      c.excludedActivity = 0;
+      c.space = { left: 0, right: 0, other: 0, unclassified: c.actual.Space?.observed ?? 0 };
+    }
+    assert(
+      Number.isFinite(c.activeMs) &&
+        c.activeMs >= 0 &&
+        c.activeMs <= Number.MAX_SAFE_INTEGER &&
+        count(c.excludedActivity),
+    );
+    assert(
+      record(c.space) &&
+        [c.space.left, c.space.right, c.space.other, c.space.unclassified].every(count),
+    );
+    assert(
+      c.space.left + c.space.right + c.space.other + c.space.unclassified ===
+        (c.actual.Space?.observed ?? 0),
+    );
     const course = c.course;
     assert(
       record(course) &&
@@ -148,7 +191,8 @@ export function parseProgress(raw: string): ProgressData {
         );
     }
   }
-  return data;
+  data.version = 2;
+  return data as ProgressData;
 }
 export class ProgressStore {
   data = emptyData();
@@ -164,7 +208,7 @@ export class ProgressStore {
       if (this.original) this.data = parseProgress(this.original);
     } catch {
       this.notice =
-        'Saved progress could not be read. Practice continues in memory; existing data is preserved. Reset local data to start a new saved history.';
+        'Saved progress could not be read. Practice continues in memory; existing data is preserved. Export or reset progress in Practice & history to start a new saved history.';
       this.unreadable = true;
     }
     if (!navigator.locks) {
@@ -204,9 +248,13 @@ export class ProgressStore {
     if (!this.writable) return;
     try {
       const raw = JSON.stringify(this.data);
-      if (this.data.cohorts.length > 16 || new TextEncoder().encode(raw).length > MAX_BYTES) {
+      if (
+        this.data.cohorts.length > 16 ||
+        this.data.activity.days.length > 90 ||
+        new TextEncoder().encode(raw).length > MAX_BYTES
+      ) {
         this.notice =
-          'Local progress is full. This session continues in memory; your saved history is preserved.';
+          'Local progress is full. This session continues in memory; your saved history is preserved. Export or reset progress in Practice & history.';
         this.writable = false;
         this.changed();
         return;
