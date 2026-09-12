@@ -20,7 +20,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "sample": "vite build --config vite.sample.config.ts && node .sample-cli/sample.mjs",
-    "lint": "eslint . --max-warnings 0"
+    "lint": "eslint . --max-warnings 0",
+    "test:samples": "vite build --config vite.sample.config.ts && node .sample-cli/sample-suite.mjs"
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "0.10.32"

@@ -121,3 +121,66 @@ keyboard is currently selected. Incomplete or inconsistent v2 snapshots are reje
 Original profile-less schema v1 bundles still replay with their British QWERTY
 interpretation. They are not migrated to the new default layout. Keep the original
 bundle and download independent label revisions alongside it.
+
+## Run a private regression suite
+
+Keep downloaded archives, imported sessions, independent label revisions and reports
+in one private data folder **outside every Git checkout**. Preserve originals;
+deduplicate downloads by archive SHA-256 and session ID. Record hardware/setup
+corrections in separate review notes instead of modifying an original manifest.
+Recorded person/setup IDs can be reused accidentally; do not assume different IDs
+or sessions establish independent participants or a valid holdout.
+
+After importing samples, create `suite.json` beside `archives/` and `labels/`:
+
+```json
+{
+  "version": 1,
+  "cases": [
+    {
+      "archive": "archives/example.tar",
+      "sha256": "<archive SHA-256>",
+      "labels": "labels/example-reviewed-v1.jsonl",
+      "labelsSha256": "<label revision SHA-256>",
+      "expected": {
+        "sessionId": "example",
+        "settledPresses": 3,
+        "submittedWords": 1,
+        "groundTruth": {
+          "confirmed": 3,
+          "unresolved": 0,
+          "correctPresses": 1,
+          "correctPressesRejected": 0,
+          "wrongPresses": 2,
+          "wrongPressesMissed": 0
+        }
+      }
+    }
+  ]
+}
+```
+
+The values above illustrate the format, not measured results. Use the report from
+`pnpm sample -- archive.tar --labels labels.jsonl` and explicitly review the baseline.
+Omit both label fields for unreviewed samples; keep their ground-truth counters zero.
+A visual label's source must name the reviewer, input frames and uncertainty; an AI
+visual review must not be described as human or participant confirmation.
+
+```sh
+pnpm test:samples -- /private/right-typer-data/suite.json
+```
+
+The command rebuilds the replay CLI from this checkout, checks archive/label hashes,
+then runs production attribution and grading on each recording in sequence. It exits
+nonzero for missing/changed data, replay errors, duplicate sessions, changed recorded
+decisions, changed press/word counts or changed labelled-outcome counters. Empty
+suites fail. It never updates baselines or uploads samples. To retain a machine-readable
+report after building, run `node .sample-cli/sample-suite.mjs /private/right-typer-data/suite.json`
+and redirect stdout into the private `reports/` folder.
+
+Unlabelled replay agreement tests reproducibility, not accuracy. Labelled counters
+compare rejection/miss behavior against the pinned independent annotations. Exact
+baselines intentionally flag improvements as well as regressions: inspect differences
+and review new expectations after an intentional algorithm change. This command uses
+cached landmarks; model reruns, broader labels and held-out evaluation remain ALO-182.
+Keep these private-data checks local; public CI runs only the synthetic suite-runner tests.
