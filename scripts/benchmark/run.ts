@@ -111,6 +111,7 @@ const address = server.httpServer!.address();
 if (!address || typeof address === 'string') throw new Error('Benchmark server did not bind');
 const origin = `http://127.0.0.1:${address.port}`;
 const browser = await chromium.launch({ headless: true });
+const browserVersion = browser.version();
 const results = [];
 const landmarks: {
   recording: string;
@@ -165,6 +166,9 @@ const method = createHash('sha256');
 for (const file of methodFiles) method.update(file).update(await readFile(file));
 const report = {
   schemaVersion: 1,
+  browserVersion,
+  platform: process.platform,
+  architecture: process.arch,
   dataset: input.name,
   codeRevision: execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim(),
   modelSha256: digest(await readFile('public/models/hand_landmarker.task')),
