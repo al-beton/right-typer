@@ -117,8 +117,8 @@ export async function resumePractice(page: Page) {
     await page.locator('#settings-resume').click();
   else await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
 }
-export async function setup(page: Page, saved = false) {
-  await page.goto('/');
+export async function setup(page: Page, saved = false, startURL = '/') {
+  await page.goto(startURL);
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
   if (!saved) {
     await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeDisabled();
