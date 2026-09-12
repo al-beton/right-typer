@@ -20,7 +20,9 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "sample": "vite build --config vite.sample.config.ts && node .sample-cli/sample.mjs",
-    "lint": "eslint . --max-warnings 0"
+    "lint": "eslint . --max-warnings 0",
+    "dataset": "vite build --config vite.sample.config.ts && python3 scripts/dataset/library.py",
+    "test:dataset": "python3 -m unittest discover -s scripts/dataset -p 'test_*.py'"
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "0.10.32"

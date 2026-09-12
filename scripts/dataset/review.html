@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width,initial-scale=1"
+  /><title>Right Typer · Finger review</title
+  ><link rel="stylesheet" href="/review.css" />
+  <main>
+    <header>
+      <span id="progress">Loading…</span
+      ><button id="back" aria-label="Previous press">← Back</button>
+    </header>
+    <section id="review">
+      <h1 id="question">Which finger?</h1>
+      <div class="stage">
+        <img id="clip" alt="Recorded hand movement around this keypress" /><svg
+          id="keyMarker"
+          viewBox="0 0 960 720"
+          preserveAspectRatio="xMidYMid meet"
+          aria-hidden="true"
+        >
+          <circle id="keyCircle" r="15" /></svg
+        ><span id="pulse"></span>
+      </div>
+      <p class="hint">Watch the loop. The circle marks the key at the recorded keypress.</p>
+      <div class="hands">
+        <div class="hand">
+          <p>Left hand</p>
+          <div class="fingers" id="left"></div>
+        </div>
+        <div class="hand">
+          <p>Right hand</p>
+          <div class="fingers" id="right"></div>
+        </div>
+      </div>
+      <footer>
+        <button id="unclear">Can't tell <small>(Space)</small></button
+        ><button id="replay">Replay</button>
+      </footer>
+      <p id="status" role="status"></p>
+    </section>
+    <section id="done" hidden>
+      <h1>All done.</h1>
+      <p>Your labels are saved.</p>
+      <button id="reviewAgain">Review again</button>
+    </section>
+  </main>
+  <script type="module" src="/review.js"></script>
+</html>

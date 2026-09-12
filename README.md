@@ -86,3 +86,7 @@ Open **Debugging** below the camera for opt-in camera/keymap/keypress sample exp
 The section is collapsed by default, and recording starts only when you click
 **Start sample (fresh passage)**. The `?record=1` shortcut opens the same section. See
 [the recording and replay guide](docs/samples.md) before collecting a pilot.
+
+For reusable human labelling and versioned private reference sets, see the
+[dataset library guide](docs/dataset-library.md). The local review tool keeps raw
+recordings, label history and frozen test sets separate from application code.
