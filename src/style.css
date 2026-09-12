@@ -931,3 +931,329 @@ footer {
   cursor: pointer;
   color: var(--muted);
 }
+
+/* Focused practice and its secondary workspace. Hardware geometry stays above. */
+.topbar,
+main {
+  width: min(920px, calc(100% - 48px));
+}
+.topbar nav {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+#content {
+  height: auto;
+  min-height: 300px;
+  overflow: visible;
+  padding-top: 24px;
+}
+.practice-top {
+  height: auto;
+  min-height: 36px;
+  font-size: 13px;
+}
+.passage {
+  height: 3.8em;
+  margin: 12px 0 20px;
+}
+.entry-heading,
+.word-entry {
+  width: 100%;
+}
+.entry-heading {
+  height: auto;
+  min-height: 24px;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+}
+.word-entry {
+  border: 0;
+  border-bottom: 2px solid #536c8e;
+  border-radius: 0;
+  height: 54px;
+  padding: 8px 12px;
+}
+.word-entry input {
+  font-size: 26px;
+}
+.word-entry:focus-within {
+  outline: 2px solid #2459a8;
+  outline-offset: 2px;
+}
+.word-entry:has(#practice) input {
+  display: block;
+}
+.feedback {
+  min-height: 56px;
+  height: auto;
+  overflow: visible;
+  text-align: left;
+  justify-content: flex-start;
+  max-width: none;
+  font-size: 13px;
+}
+.input-message {
+  text-align: left;
+  max-width: none;
+}
+.input-message:empty {
+  display: none;
+}
+.recent {
+  text-align: left;
+  max-width: none;
+  padding: 4px 0 10px;
+}
+.results {
+  height: auto;
+  overflow: visible;
+}
+#attempt-evidence {
+  padding-bottom: 12px;
+  font-size: 13px;
+}
+#attempt-evidence .attempt-details {
+  padding: 10px 0;
+}
+#finger-map {
+  min-height: 0;
+  padding: 14px 0 0;
+  border-bottom: 0;
+}
+#keyboard-caption {
+  font-size: 12px;
+  color: #505b68;
+  margin: 12px 0 16px;
+}
+#camera-section {
+  max-width: none;
+  margin: 0 0 24px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-top: 16px;
+}
+#camera-preview {
+  flex: 0 0 192px;
+  height: 108px;
+}
+#camera-preview .view-wrap {
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+}
+#camera-preview canvas {
+  pointer-events: none;
+}
+#camera-preview .camera-empty {
+  padding: 10px;
+  font-size: 12px;
+}
+#camera-preview .camera-empty span {
+  display: none;
+}
+.camera-strip-info {
+  min-width: 0;
+  font-size: 13px;
+}
+.camera-strip-info p {
+  color: #505b68;
+}
+#sample-indicator {
+  display: block;
+}
+body.settings-open {
+  overflow: hidden;
+}
+#settings {
+  position: fixed;
+  inset: 0 0 0 auto;
+  width: min(580px, 100%);
+  max-width: 100%;
+  height: 100%;
+  height: 100dvh;
+  max-height: 100%;
+  margin: 0;
+  border: 0;
+  border-left: 1px solid var(--line);
+  padding: 24px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  background: #fafafa;
+  color: inherit;
+}
+#settings::backdrop {
+  background: rgb(25 32 42 / 28%);
+}
+.drawer-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+.drawer-header h2 {
+  font-size: 20px;
+}
+#settings-state {
+  font-size: 13px;
+  color: #505b68;
+}
+#settings > details {
+  border-top: 1px solid var(--line);
+  margin: 16px 0 0;
+  padding: 18px 0;
+}
+summary {
+  cursor: pointer;
+}
+#settings > details > summary {
+  font-weight: 600;
+}
+#settings > details[open] > summary {
+  margin-bottom: 18px;
+}
+#settings .camera-layout {
+  gap: 16px;
+}
+#settings aside {
+  font-size: 13px;
+}
+#settings input,
+#settings select {
+  max-width: 100%;
+  min-width: 0;
+}
+#settings .camera-options {
+  justify-content: flex-start;
+  gap: 8px;
+}
+#settings .camera-options select {
+  width: 100%;
+}
+#settings #camera-controls {
+  align-items: stretch;
+}
+#settings #camera-controls label {
+  width: 100%;
+}
+#settings #camera-controls select {
+  flex-basis: 100%;
+  width: 100%;
+}
+#settings #setup-message,
+#settings #cal-message,
+#settings #diagnostic-result {
+  height: auto;
+  min-height: 20px;
+  overflow: visible;
+}
+#settings #diagnostic {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+}
+#settings #profile-settings {
+  background: transparent;
+  margin: 0;
+  padding: 0;
+  border-radius: 0;
+}
+#settings .profile-toolbar,
+#settings #profile-editor,
+#settings .fingering-control {
+  justify-content: flex-start;
+}
+#settings #profile-settings label {
+  flex-wrap: wrap;
+}
+#settings #profile-settings p {
+  text-align: left;
+}
+#settings #profile-editor {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+#settings #sample-panel {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+#settings #debugging {
+  max-width: none;
+}
+#settings .sample-fields label {
+  min-width: 100%;
+}
+#settings footer {
+  margin-top: 12px;
+}
+#settings-resume {
+  margin: 12px 0;
+}
+#history-list > details {
+  margin: 12px 0;
+}
+#history-list .result-grid {
+  display: block;
+  font-size: 13px;
+  margin: 8px 0;
+}
+#history-list {
+  font-size: 13px;
+}
+@media (max-width: 600px) {
+  .topbar,
+  main {
+    width: calc(100% - 32px);
+  }
+  .topbar nav {
+    gap: 8px;
+    font-size: 13px;
+  }
+  .topbar nav > a {
+    display: none;
+  }
+  #content {
+    min-height: 336px;
+    padding-top: 20px;
+  }
+  .passage {
+    height: 5.7em;
+    font-size: 18px;
+  }
+  .practice-metrics {
+    flex-wrap: wrap;
+    gap: 4px 8px;
+  }
+  .entry-heading {
+    font-size: 12px;
+  }
+  #camera-section {
+    gap: 12px;
+  }
+  #camera-preview {
+    flex-basis: 128px;
+    height: 96px;
+  }
+  #settings {
+    padding: 16px;
+    border: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+label[for='diagnostic'] {
+  display: block;
+  margin-top: 16px;
+}

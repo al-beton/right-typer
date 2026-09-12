@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { syntheticCamera } from './helpers';
+import { syntheticCamera, openSettings, resumePractice } from './helpers';
 import { PRESETS, calibrationCodes } from '../src/core/profile';
 import fs from 'node:fs';
 
@@ -26,6 +26,7 @@ for (const [
   test(`${id}: fresh and saved desktop/mobile hardware fidelity`, async ({ page }) => {
     await syntheticCamera(page);
     await page.goto('./');
+    await openSettings(page, 'keyboard-group');
     await page.locator('#keyboard-profile').selectOption(id);
     const p = PRESETS.find((p) => p.id === id)!;
     await expect(page.locator('#camera-badge')).toContainText('hands detected');
@@ -43,7 +44,7 @@ for (const [
         .locator('#overlay')
         .click({ position: { x: pt.x * box.width, y: pt.y * box.height } });
     }
-    await page.locator('#practice').click();
+    await resumePractice(page);
     await expect(page.locator('#typing')).toBeEnabled();
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('right-typer.v1')!));
     for (const route of ['fresh', 'saved']) {

@@ -1,6 +1,6 @@
 import { LEGACY_CODES } from '../src/core/profile';
 import { test, expect } from '@playwright/test';
-import { syntheticCamera, setup, press, word } from './helpers';
+import { syntheticCamera, setup, press, word, openSettings, resumePractice } from './helpers';
 import { allowedFingers, intended, ROWS, MODES, type FingeringMode } from '../src/core/keyboard';
 import { WORDS } from '../src/passage';
 
@@ -19,19 +19,14 @@ test('policies update labels, hints, errors and preserve camera geometry; refres
       }),
     );
   const initial = await geometry();
-  const separation = await page.evaluate(() => {
-    const box = (s: string) => document.querySelector(s)!.getBoundingClientRect();
-    return [
-      box('.space-key').bottom <= box('.fingering-control').top,
-      box('.fingering-control').bottom <= box('#camera-section').top,
-    ];
-  });
-  expect(separation).toEqual([true, true]);
+  expect(await page.locator('#finger-map').evaluate((el) => el.closest('dialog'))).toBeNull();
   const calibration = await page.evaluate(
     () => JSON.parse(localStorage.getItem('right-typer.v1')!).calibration,
   );
   for (const value of Object.keys(MODES) as FingeringMode[]) {
+    await openSettings(page, 'keyboard-group');
     await mode.selectOption(value);
+    await resumePractice(page);
     for (const key of [...ROWS.join(''), ' ']) {
       const cell = page.locator(
         `[data-key="${key === ' ' ? 'Space' : (LEGACY_CODES[key] ?? key)}"]`,
@@ -48,8 +43,10 @@ test('policies update labels, hints, errors and preserve camera geometry; refres
     'background-image',
     'linear-gradient(90deg, rgb(247, 180, 200) 50%, rgb(255, 195, 131) 50%)',
   );
-  await page.screenshot({ path: 'docs/images/fingering-either-synthetic.png', fullPage: true });
+  await page.screenshot({ path: 'test-results/fingering-either-synthetic.png', fullPage: true });
+  await openSettings(page, 'keyboard-group');
   await mode.selectOption('alternate');
+  await resumePractice(page);
   await press(page, 'c', 'left-middle');
   await expect(page.locator('#word-hint')).toContainText('Next: space · either thumb');
   await press(page, ' ', 'right-thumb');
@@ -62,22 +59,25 @@ test('policies update labels, hints, errors and preserve camera geometry; refres
     'Saw left middle; use left index',
   );
   await page.screenshot({
-    path: 'docs/images/fingering-alternate-retry-synthetic.png',
+    path: 'test-results/fingering-alternate-retry-synthetic.png',
     fullPage: true,
   });
+  await openSettings(page, 'keyboard-group');
   await mode.selectOption('either');
+  await resumePractice(page);
   await expect(page.locator('#typing')).toHaveValue('');
   await expect(page.locator('#typing')).not.toHaveAttribute('readonly');
   await expect(page.locator('#policy-status')).toContainText('Fresh attempt');
   await word(page, WORDS[0]!);
-  await expect(page.locator('.target-word')).toHaveText(WORDS[1]!);
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
   expect(await page.evaluate(() => window.__terminated)).toBe(0);
   expect(
     await page.evaluate(() => JSON.parse(localStorage.getItem('right-typer.v1')!).calibration),
-  ).toEqual(calibration);
+  ).toMatchObject({ ...calibration, savedAt: expect.any(Number) });
   await page.reload();
   await expect(mode).toHaveValue('either');
   await expect(page.locator('#typing')).toBeEnabled();
+  await openSettings(page, 'about-group');
   await page.getByRole('button', { name: 'Reset local data' }).click();
   await page.getByRole('button', { name: 'Confirm reset' }).click();
   await expect(mode).toHaveValue('standard');
@@ -93,8 +93,10 @@ test('switch while typing and checking discards pending evidence; completed mixe
   const mode = page.getByLabel('Fingering', { exact: true });
   await word(page, WORDS[0]!);
   await page.locator('#typing').press('x');
+  await openSettings(page, 'keyboard-group');
   await mode.selectOption('alternate');
-  await expect(page.locator('.target-word')).toHaveText(WORDS[1]!);
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
+  await resumePractice(page);
   await expect(page.locator('#typing')).toHaveValue('');
   await page.evaluate(() => {
     window.__hands = [];
@@ -103,9 +105,11 @@ test('switch while typing and checking discards pending evidence; completed mixe
   await page.locator('#typing').pressSequentially(WORDS[1]!);
   await page.locator('#typing').press('Space');
   await expect(page.locator('#feedback')).toContainText('Checking fingers');
+  await openSettings(page, 'keyboard-group');
   await mode.selectOption('either');
   await page.waitForTimeout(1000);
-  await expect(page.locator('.target-word')).toHaveText(WORDS[1]!);
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
+  await resumePractice(page);
   await expect(page.locator('#typing')).toHaveValue('');
   await page.evaluate(() => {
     window.__inferenceDelay = 12;
@@ -117,6 +121,7 @@ test('switch while typing and checking discards pending evidence; completed mixe
     await expect(page.locator('#typing[readonly]')).toHaveCount(0);
   }
   await expect(page.locator('.results')).toContainText('Mixed: Standard + Either');
+  await openSettings(page, 'keyboard-group');
   await mode.selectOption('alternate');
   await expect(page.locator('.results')).toContainText('Mixed: Standard + Either');
   const result = await page.evaluate(() =>
@@ -126,11 +131,10 @@ test('switch while typing and checking discards pending evidence; completed mixe
   expect(result.attempts).toBe(WORDS.length);
   expect(result.retries).toBe(0);
   await page.screenshot({
-    path: 'docs/images/fingering-mixed-results-synthetic.png',
+    path: 'test-results/fingering-mixed-results-synthetic.png',
     fullPage: true,
   });
   await page.reload();
-  await page.getByRole('button', { name: 'Pause', exact: true }).click();
   await expect(page.locator('.recent')).toContainText('Mixed: Standard + Either');
 });
 
@@ -145,17 +149,22 @@ test('selector supports keyboard focus, updates diagnostics and ignores malforme
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
   const mode = page.getByLabel('Fingering', { exact: true });
   await expect(mode).toHaveValue('standard');
+  await openSettings(page, 'keyboard-group');
   await mode.focus();
   await expect(mode).toBeFocused();
   await mode.press('Tab');
   await expect(page.locator('#keyboard-profile')).toBeFocused();
   // Use Playwright's native-select API; macOS headless popup keys are not reliable.
+  await openSettings(page, 'keyboard-group');
   await mode.selectOption('alternate');
   await expect(mode).toHaveValue('alternate');
-  await page.locator('#overlay').press('c');
+  await openSettings(page);
+  await page.locator('#diagnostic').press('c');
   await expect(page.locator('#diagnostic-result')).toContainText('Intended: left index.');
+  await openSettings(page, 'keyboard-group');
   await mode.selectOption('either');
-  await page.locator('#overlay').press('c');
+  await openSettings(page);
+  await page.locator('#diagnostic').press('c');
   await expect(page.locator('#diagnostic-result')).toContainText(
     'Intended: left middle or left index.',
   );

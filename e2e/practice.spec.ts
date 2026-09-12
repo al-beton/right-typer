@@ -1,5 +1,13 @@
 import { test, expect } from '@playwright/test';
-import { syntheticCamera, setup, press, word } from './helpers';
+import {
+  syntheticCamera,
+  setup,
+  press,
+  word,
+  openSettings,
+  resumePractice,
+  editSetup,
+} from './helpers';
 import { WORDS } from '../src/passage';
 
 test('complete guided setup, a whole correctly observed passage, results, restart and persistence', async ({
@@ -18,21 +26,24 @@ test('complete guided setup, a whole correctly observed passage, results, restar
     return { y: r.top + scrollY, width: r.width, height: r.height };
   });
   for (let i = 0; i < WORDS.length; i++) {
-    await expect(page.locator('.target-word')).toHaveText(WORDS[i]!);
+    await expect(page.locator('.passage .active')).toHaveText(WORDS[i]!);
     await word(page, WORDS[i]!);
-    if (i < WORDS.length - 1) await expect(page.locator('.target-word')).toHaveText(WORDS[i + 1]!);
+    if (i < WORDS.length - 1)
+      await expect(page.locator('.passage .active')).toHaveText(WORDS[i + 1]!);
     if (i === 7)
       await page.screenshot({ path: 'test-results/practice-synthetic.png', fullPage: true });
   }
-  await expect(page.getByText('Passage complete', { exact: true })).toBeVisible();
+  await expect(page.locator('#feedback')).toContainText('Passage complete');
   expect(
     await page.locator('#view-wrap').evaluate((el) => {
       const r = el.getBoundingClientRect();
       return { y: r.top + scrollY, width: r.width, height: r.height };
     }),
   ).toEqual(viewPosition);
-  await expect(page.locator('.result-note')).toContainText('0 retries');
-  await expect(page.locator('.result-grid')).toContainText('0wrong-finger presses');
+  await openSettings(page, 'history-group');
+  await page.locator('#history-list > details > summary').first().click();
+  await expect(page.locator('#history-list')).toContainText('0 retries');
+  await expect(page.locator('.result-grid')).toContainText('0 wrong-finger presses');
   expect(await page.evaluate(() => window.__terminated)).toBe(0);
   const persisted = await page.evaluate(() => JSON.parse(localStorage.getItem('right-typer.v1')!));
   expect(persisted.results).toHaveLength(1);
@@ -40,15 +51,16 @@ test('complete guided setup, a whole correctly observed passage, results, restar
   expect(persisted.results[0].gradingPolicy).toBe('wrong-finger-veto');
   expect(persisted.results[0].passedWords).toBe(WORDS.length);
   await page.screenshot({ path: 'test-results/results-synthetic.png', fullPage: true });
-  await page.getByRole('button', { name: 'Edit setup', exact: true }).click();
+  await editSetup(page);
   await expect(page.locator('#mapping-editor')).toBeVisible();
   await expect(page.locator('#typing')).toBeDisabled();
-  await page.getByRole('button', { name: 'Start practice', exact: true }).click();
+  await resumePractice(page);
   await expect(page.locator('#camera-section')).toBeVisible();
   await expect(page.locator('#typing')).toBeFocused();
   await page.reload();
   await expect(page.locator('#typing')).toBeFocused();
-  await expect(page.locator('.target-word')).toHaveText('a');
+  await expect(page.locator('.passage .active')).toHaveText('a');
+  await openSettings(page, 'about-group');
   await page.getByRole('button', { name: 'Reset local data' }).click();
   await page.getByRole('button', { name: 'Confirm reset' }).click();
   expect(await page.evaluate(() => localStorage.getItem('right-typer.v1'))).toBeNull();
@@ -67,7 +79,7 @@ test('wrong and erased fingers still retry alongside unknowns; text errors retry
   await press(page, ' ', undefined, true);
   await expect(page.locator('#feedback')).toContainText('saw left index');
   await expect(page.locator('#feedback')).toContainText('could not verify 2 presses');
-  await expect(page.locator('.target-word')).toHaveText('a');
+  await expect(page.locator('.passage .active')).toHaveText('a');
   await expect(page.locator('.press-result.unseen')).toHaveCount(2);
   await page.screenshot({ path: 'test-results/wrong-finger-synthetic.png', fullPage: true });
   // Holding the submitting space must not dismiss feedback, and Enter is no longer retry.
@@ -76,12 +88,12 @@ test('wrong and erased fingers still retry alongside unknowns; text errors retry
   await expect(page.locator('#retry')).toBeVisible();
   await page.locator('#typing').press('Space');
   await expect(page.locator('#retry')).toHaveCount(0);
-  await expect(page.locator('.target-word')).toHaveText('a');
+  await expect(page.locator('.passage .active')).toHaveText('a');
   await expect(page.locator('#typing')).toHaveValue('');
   await press(page, 'b', undefined, true);
   await press(page, ' ', undefined, true);
   await expect(page.locator('#feedback')).toContainText('text did not match');
-  await expect(page.locator('.target-word')).toHaveText('a');
+  await expect(page.locator('.passage .active')).toHaveText('a');
   await page.getByRole('button', { name: 'Retry word' }).click();
   await press(page, 'a', undefined, true);
   await press(page, ' ', 'right-index');
@@ -89,20 +101,20 @@ test('wrong and erased fingers still retry alongside unknowns; text errors retry
   await page.locator('#typing').press('Space');
   await press(page, 'a', undefined, true);
   await press(page, ' ', undefined, true);
-  await expect(page.locator('.target-word')).toHaveText('quick');
+  await expect(page.locator('.passage .active')).toHaveText('quick');
   await expect(page.locator('#feedback')).toContainText(
     'Word accepted. I could not verify 2 presses',
   );
   // Mixed word: confident correct letters and an unknown submitting space.
   for (const key of 'quick') await press(page, key);
   await press(page, ' ', undefined, true);
-  await expect(page.locator('.target-word')).toHaveText(WORDS[2]!);
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[2]!);
   await expect(page.locator('#feedback')).toContainText('could not verify 1 press.');
   await expect(page.locator('.practice-metrics')).toContainText('3 retries');
   await expect(page.getByRole('button', { name: 'Retry word' })).toHaveCount(0);
   await expect(page.locator('.recovery')).toHaveCount(0);
   // Setup repair remains available voluntarily and preserves the next word.
-  await page.getByRole('button', { name: 'Edit setup' }).click();
+  await editSetup(page);
   await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeEnabled();
   const { handsAt } = await import('../tests/fixtures');
   await page.evaluate(
@@ -111,8 +123,8 @@ test('wrong and erased fingers still retry alongside unknowns; text errors retry
     },
     handsAt('f', 'left-index'),
   );
-  await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
-  await expect(page.locator('.target-word')).toHaveText(WORDS[2]!);
+  await resumePractice(page);
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[2]!);
 });
 
 test('a passage with unknown words reports accurate unverified counts, saves and reloads results', async ({
@@ -130,12 +142,12 @@ test('a passage with unknown words reports accurate unverified counts, saves and
   await page.locator('#typing').press('Space');
   const unknownWords = 2;
   for (let i = 0; i < WORDS.length; i++) {
-    await expect(page.locator('.target-word')).toHaveText(WORDS[i]!);
+    await expect(page.locator('.passage .active')).toHaveText(WORDS[i]!);
     if (i < unknownWords)
       for (const key of WORDS[i]! + ' ') await press(page, key, undefined, true);
     else await word(page, WORDS[i]!);
     if (i < WORDS.length - 1) {
-      await expect(page.locator('.target-word')).toHaveText(WORDS[i + 1]!);
+      await expect(page.locator('.passage .active')).toHaveText(WORDS[i + 1]!);
       if (i < unknownWords)
         await expect(page.locator('#feedback')).toContainText('Word accepted. I could not verify');
     }
@@ -146,12 +158,14 @@ test('a passage with unknown words reports accurate unverified counts, saves and
       });
   }
   const unknownCount = WORDS.slice(0, unknownWords).join(' ').length + 1 + 2;
-  await expect(page.getByText('Passage complete', { exact: true })).toBeVisible();
-  await expect(page.locator('.result-grid')).toContainText(`${unknownCount}unverified presses`);
-  await expect(page.locator('.result-grid')).toContainText('0wrong-finger presses');
-  await expect(page.locator('.result-grid')).toContainText('1text-mismatch attempts');
-  await expect(page.locator('.result-note')).toContainText('1 retries');
-  await expect(page.locator('.result-note')).toContainText('Unverified presses remain unknown');
+  await expect(page.locator('#feedback')).toContainText('Passage complete');
+  await openSettings(page, 'history-group');
+  await page.locator('#history-list > details > summary').first().click();
+  await expect(page.locator('.result-grid')).toContainText(`${unknownCount} unverified presses`);
+  await expect(page.locator('.result-grid')).toContainText('0 wrong-finger presses');
+  await expect(page.locator('.result-grid')).toContainText('1 text-mismatch attempts');
+  await expect(page.locator('#history-list')).toContainText('1 retries');
+  await expect(page.locator('#history-list')).toContainText('Unverified presses remain unknown');
   await expect(page.locator('.results')).not.toContainText('checked attempt');
   await page.screenshot({ path: 'test-results/unknown-results-synthetic.png', fullPage: true });
   const persisted = await page.evaluate(() => JSON.parse(localStorage.getItem('right-typer.v1')!));
@@ -167,9 +181,10 @@ test('a passage with unknown words reports accurate unverified counts, saves and
   });
   expect(persisted.results[0]).not.toHaveProperty('uncertaintyRetries');
   expect(persisted.results[0].wpm).toBeGreaterThan(0);
+  await page.locator('#settings-close').click();
   await page.getByRole('button', { name: 'Practise again' }).click();
   await expect(page.locator('#typing')).toBeFocused();
-  await expect(page.locator('.target-word')).toHaveText('a');
+  await expect(page.locator('.passage .active')).toHaveText('a');
   await expect(page.locator('.practice-metrics')).toContainText('0 /');
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
   await expect(page.locator('.recent')).toContainText('1 retries');
@@ -239,17 +254,17 @@ test('boundary wait owns input; pause resumes the same word and pasted text cann
   await expect(page.locator('#feedback')).not.toContainText('Checking fingers', {
     timeout: 5000,
   });
-  await expect(page.locator('.target-word')).toHaveText('quick');
+  await expect(page.locator('.passage .active')).toHaveText('quick');
   await expect(page.locator('#feedback')).toContainText('Word accepted.');
   await expect(page.locator('#typing')).toHaveValue('');
   await page.waitForTimeout(2700);
-  await expect(page.locator('.target-word')).toHaveText('quick');
+  await expect(page.locator('.passage .active')).toHaveText('quick');
   await expect(page.locator('.practice-metrics')).toContainText('0 retries');
   await page.evaluate(() => {
     window.__inferenceDelay = 12;
   });
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
-  await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
+  await resumePractice(page);
   await page.locator('#typing').dispatchEvent('paste');
   await expect(page.locator('#typing')).toHaveValue('');
   await expect(page.locator('#input-message')).toContainText('Pasting is not graded');
@@ -276,6 +291,7 @@ test('camera is requested on load; denial is actionable and the button retries o
   await page.evaluate(() => {
     window.__denyCamera = false;
   });
+  await openSettings(page, 'camera-group');
   await page.getByRole('button', { name: 'Enable camera' }).click();
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
   expect(await page.evaluate(() => window.__cameraRequests)).toBe(2);
@@ -305,10 +321,11 @@ test('saved calibration survives a reload with the same camera', async ({ page }
 test('changed camera identity requires remapping', async ({ page }) => {
   await syntheticCamera(page);
   await setup(page);
-  await page.getByRole('button', { name: 'Edit setup' }).click();
+  await editSetup(page);
   await page.evaluate(() => {
     window.__deviceId = 'different-camera';
   });
+  await openSettings(page, 'camera-group');
   await page.getByRole('button', { name: 'Restart camera' }).click();
   await expect(page.getByRole('button', { name: 'Remap key positions' })).toBeEnabled();
   await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeDisabled();
@@ -328,6 +345,7 @@ test('missing capture timestamps remain unknown without a setup gate', async ({ 
   });
   await page.goto('/');
   await expect(page.locator('#camera-badge')).toContainText('Capture timing unavailable');
+  await openSettings(page);
   const { calibration } = await import('../tests/fixtures');
   for (const p of Object.values(calibration().points)) {
     const c = page.locator('#overlay'),
@@ -335,10 +353,10 @@ test('missing capture timestamps remain unknown without a setup gate', async ({ 
     await c.click({ position: { x: p.x * b!.width, y: p.y * b!.height } });
   }
   await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeEnabled();
-  await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
+  await resumePractice(page);
   await page.locator('#typing').press('a');
   await page.locator('#typing').press('Space');
-  await expect(page.locator('.target-word')).toHaveText('quick');
+  await expect(page.locator('.passage .active')).toHaveText('quick');
   await expect(page.locator('#feedback')).toContainText('could not verify');
 });
 
@@ -377,5 +395,5 @@ test('blocked persistence is visible while practice still works', async ({ page 
   await expect(page.locator('#storage-warning')).toBeVisible();
   await expect(page.locator('#storage-warning')).toContainText('Local storage is unavailable');
   await word(page, 'a');
-  await expect(page.locator('.target-word')).toHaveText('quick');
+  await expect(page.locator('.passage .active')).toHaveText('quick');
 });

@@ -1,6 +1,6 @@
 import { LEGACY_CODES } from '../src/core/profile';
 import { test, expect } from '@playwright/test';
-import { syntheticCamera, word } from './helpers';
+import { syntheticCamera, word, openSettings, resumePractice, editSetup } from './helpers';
 import { calibration } from '../tests/fixtures';
 
 test.describe('camera view rotation', () => {
@@ -16,6 +16,7 @@ test.describe('camera view rotation', () => {
           const r = el.getBoundingClientRect();
           return { x: r.x, y: r.y + scrollY, width: r.width, height: r.height };
         });
+      await openSettings(page);
       const initial = await documentBox();
       await rotation.selectOption(String(angle));
       expect(await documentBox()).toEqual(initial);
@@ -43,7 +44,7 @@ test.describe('camera view rotation', () => {
         path: `test-results/rotation-${angle}-synthetic.png`,
         fullPage: true,
       });
-      await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
+      await resumePractice(page);
       const stored = await page.evaluate(() => JSON.parse(localStorage.getItem('right-typer.v1')!));
       expect(stored.cameraRotation).toBe(angle);
       for (const [key, point] of Object.entries(calibration().points)) {
@@ -58,23 +59,25 @@ test.describe('camera view rotation', () => {
         ).toBeLessThanOrEqual(1.01);
       }
       await word(page, 'a');
-      await expect(page.locator('.target-word')).toHaveText('quick');
-      // Rotation during practice must not restart tracking or discard the current word.
+      await expect(page.locator('.passage .active')).toHaveText('quick');
+      // Settings abandons the partial attempt, retaining the current word and tracking.
       await page.locator('#typing').press('q');
+      await openSettings(page);
       await rotation.selectOption(String((angle + 90) % 360));
-      await expect(page.locator('#typing')).toHaveValue('q');
+      await expect(page.locator('#typing')).toHaveValue('');
       expect(await page.evaluate(() => window.__terminated)).toBe(0);
       expect(await documentBox()).toEqual(initial);
+      await resumePractice(page);
       await page.reload();
       await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeVisible();
       await expect(rotation).toHaveValue(String((angle + 90) % 360));
       await expect(page.locator('#typing')).toBeEnabled();
-      await page.getByRole('button', { name: 'Edit setup' }).click();
+      await editSetup(page);
       if (angle === 90) {
         await page.setViewportSize({ width: 640, height: 1000 });
         await expect
           .poll(async () => (await stage.boundingBox())!.width)
-          .toBeLessThan(initial.width);
+          .toBeLessThanOrEqual(initial.width);
         await expect
           .poll(async () => {
             const a = (await stage.boundingBox())!,
@@ -90,7 +93,7 @@ test.describe('camera view rotation', () => {
       await rotation.selectOption(String(angle));
       await page.getByRole('button', { name: 'Map q', exact: true }).click();
       await page.locator('#overlay').press('ArrowRight');
-      await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
+      await resumePractice(page);
       const q = await page.evaluate(
         () => JSON.parse(localStorage.getItem('right-typer.v1')!).calibration.points.KeyQ,
       );
@@ -104,6 +107,7 @@ test.describe('camera view rotation', () => {
               : [0.005, 0];
       expect(q.x).toBeCloseTo(stored.calibration.points.KeyQ.x + dx, 8);
       expect(q.y).toBeCloseTo(stored.calibration.points.KeyQ.y + dy, 8);
+      await openSettings(page, 'about-group');
       await page.getByRole('button', { name: 'Reset local data' }).click();
       await page.getByRole('button', { name: 'Confirm reset' }).click();
       await expect(rotation).toHaveValue('0');

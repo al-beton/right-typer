@@ -81,37 +81,129 @@ let sample: SampleRecorder | undefined;
 const openDebugging = new URLSearchParams(location.search).get('record') === '1';
 
 $('#app').innerHTML = `
-  <header class="topbar"><h1 class="brand" aria-label="Right Typer"><span aria-hidden="true">${brandWordmark()}</span></h1><a href="https://github.com/al-beton/right-typer" target="_blank" rel="noreferrer">Source on GitHub</a></header>
+  <header class="topbar"><h1 class="brand" aria-label="Right Typer"><span aria-hidden="true">${brandWordmark()}</span></h1><nav aria-label="App"><a href="https://github.com/al-beton/right-typer" target="_blank" rel="noreferrer">Source</a><button id="settings-open" class="text-button">Settings & progress</button></nav></header>
   <main>
     <div id="content" aria-label="Typing practice"></div>
-    <section id="finger-map" aria-label="Intended finger map"></section>
-    <div class="fingering-control"><label for="fingering-mode">Fingering</label><select id="fingering-mode">${Object.entries(
-      MODES,
-    )
-      .map(([value, name]) => `<option value="${value}">${name}</option>`)
-      .join('')}</select><span id="policy-status" role="status"></span></div>
-    <section id="profile-settings" aria-label="Keyboard settings"></section>
+    <section id="finger-map" aria-label="Intended finger map"></section><p id="keyboard-caption"></p>
     <section id="camera-section" aria-label="Live camera and finger tracking">
-      <div class="camera-heading"><h2>Camera & key positions</h2><span id="camera-badge" role="status">Camera off</span></div>
-      <div class="camera-layout">
+      <div id="camera-preview"></div><div class="camera-strip-info"><span id="camera-badge">Camera off</span><p>Frames stay in this browser.</p><button id="camera-settings" class="text-button">Camera settings</button><button id="sample-indicator" class="text-button" hidden></button></div>
+    </section>
+    <div id="storage-warning" class="storage-alert" role="status" hidden></div>
+  </main>
+  <dialog id="settings" aria-labelledby="settings-title"><div class="drawer-header"><h2 id="settings-title" tabindex="-1">Settings & progress</h2><button id="settings-close">Close</button></div><p id="settings-state">Changes stay in this browser.</p>
+    <details id="camera-group"><summary>Camera & key positions</summary>
+      <div class="camera-layout"><div id="mapping-host">
         <div class="view-wrap" id="view-wrap"><div id="camera-image"><video id="camera" autoplay playsinline muted aria-label="Live view of your keyboard"></video><canvas id="overlay" aria-label="Keyboard calibration. Click the center of the requested key, or use arrow keys and Enter." tabindex="0"></canvas></div><div class="camera-empty" id="camera-empty"><strong>Allow camera access</strong><span>Tilt your MacBook screen toward the keyboard.<br/>Use your external display for this page.</span></div></div>
-        <aside>
+        </div><aside>
           <div class="camera-options"><label for="camera-rotation">Rotate camera view</label><select id="camera-rotation"><option value="0">0°</option><option value="90">90° clockwise</option><option value="180">180°</option><option value="270">270° clockwise</option></select><button id="swap" aria-pressed="false">Swap left/right hand labels</button></div>
           <div id="camera-controls"><label for="device">Camera</label><select id="device"><option value="">MacBook / default camera</option></select><button id="start-camera">Enable camera</button><button id="disconnect-camera" hidden>Disconnect camera</button></div>
           <div id="setup-panel"></div>
           <p id="tracking-readout">Camera frames stay in this browser.</p>
         </aside>
       </div>
-    </section>
+    </details>
+    <details id="keyboard-group"><summary>Keyboard & fingering</summary>    <div class="fingering-control"><label for="fingering-mode">Fingering</label><select id="fingering-mode">${Object.entries(
+      MODES,
+    )
+      .map(([value, name]) => `<option value="${value}">${name}</option>`)
+      .join('')}</select><span id="policy-status" role="status"></span></div>
+    <section id="profile-settings" aria-label="Keyboard settings"></section>
+</details>
+    <details id="history-group"><summary>Practice & history</summary><div id="history-list"></div></details>
     <details id="debugging"><summary>Debugging</summary><section id="sample-panel" aria-label="Debug sample recording"></section></details>
-    <div id="storage-warning" class="storage-alert" role="status" hidden></div>
+    <details id="about-group"><summary>Local data & about</summary><p id="data-notice"></p><a href="https://github.com/al-beton/right-typer">Source on GitHub</a>
     <footer><span>Local processing · Keyboard profiles · Chrome</span><button class="text-button" id="reset">Reset local data</button><span id="build-version" aria-label="App version">${import.meta.env.VITE_BUILD_LABEL} · <a href="https://github.com/al-beton/right-typer/commit/${import.meta.env.VITE_BUILD_SHA}" title="${import.meta.env.VITE_BUILD_SHA}">${import.meta.env.VITE_BUILD_SHA.slice(0, 7)}</a></span></footer>
-  </main>`;
+    </details><button id="settings-resume" class="primary">Close & resume</button>
+  </dialog>`;
 const video = $<HTMLVideoElement>('#camera');
 const canvas = $<HTMLCanvasElement>('#overlay');
 const camera = new Camera(video, cameraChanged, drawFrame);
 const fingerPalette = readFingerPalette(getComputedStyle(document.documentElement));
 const content = $('#content');
+const settings = $<HTMLDialogElement>('#settings');
+let settingsOpener: HTMLElement | null = null;
+const heldActivations = new Set<string>();
+const blockedActivations = new Set<string>();
+document.addEventListener(
+  'keydown',
+  (event) => {
+    if (event.key === ' ' || event.key === 'Enter') heldActivations.add(event.key);
+  },
+  true,
+);
+document.addEventListener(
+  'keyup',
+  (event) => {
+    heldActivations.delete(event.key);
+    if (blockedActivations.delete(event.key)) event.preventDefault();
+  },
+  true,
+);
+function moveCamera() {
+  $(settings.open ? '#mapping-host' : '#camera-preview').append($('#view-wrap'));
+  canvas.tabIndex = settings.open ? 0 : -1;
+  layoutCameraView();
+  if (video.srcObject) void video.play().catch(() => {});
+}
+function openSettings(
+  group = 'camera-group',
+  opener = document.activeElement as HTMLElement | null,
+) {
+  if (!settings.open) {
+    settingsOpener = opener;
+    if (phase === 'practice') pause(false);
+    disableAutoStart();
+    settings.showModal();
+    document.body.classList.add('settings-open');
+  }
+  $<HTMLDetailsElement>(`#${group}`).open = true;
+  moveCamera();
+  render();
+  const summary = $<HTMLElement>(`#${group} > summary`);
+  summary.focus({ preventScroll: true });
+  summary.scrollIntoView({ block: 'nearest' });
+}
+function closeSettings(resume = false) {
+  for (const key of heldActivations) blockedActivations.add(key);
+  settings.close();
+  document.body.classList.remove('settings-open');
+  moveCamera();
+  render();
+  if (resume && ready()) startPractice();
+  else
+    (settingsOpener?.isConnected ? settingsOpener : $('#settings-open')).focus({
+      preventScroll: true,
+    });
+}
+$('#settings-open').onclick = () => openSettings();
+$('#camera-settings').onclick = () => openSettings('camera-group');
+$('#sample-indicator').onclick = () => openSettings('debugging');
+$('#settings-close').onclick = () => closeSettings();
+$('#settings-resume').onclick = () => closeSettings(true);
+settings.addEventListener('keydown', (event) => {
+  if (event.key !== 'Tab') return;
+  const controls = [
+    ...settings.querySelectorAll<HTMLElement>(
+      'button, input, select, textarea, a[href], summary, [tabindex="0"]',
+    ),
+  ].filter((el) => !el.matches(':disabled') && el.getClientRects().length > 0);
+  const first = controls[0],
+    last = controls.at(-1);
+  if (event.shiftKey && (document.activeElement === first || document.activeElement === settings)) {
+    event.preventDefault();
+    last?.focus();
+  } else if (!event.shiftKey && document.activeElement === last) {
+    event.preventDefault();
+    first?.focus();
+  }
+});
+settings.addEventListener('cancel', (event) => {
+  event.preventDefault();
+  if (!$('#profile-editor').hidden) {
+    $('#cancel-profile').click();
+    $('#custom-layout').focus();
+  } else closeSettings();
+});
 const rotationControl = $<HTMLSelectElement>('#camera-rotation');
 rotationControl.value = String(cameraRotation);
 function layoutCameraView() {
@@ -214,52 +306,80 @@ function setPhase(next: typeof phase) {
 }
 function render() {
   const focused = document.activeElement as HTMLElement | null;
-  const ownedTypingFocus = !focused || focused === document.body || focused.id === 'typing';
+  const ownedTypingFocus =
+    !settings.open && (!focused || focused === document.body || focused.id === 'typing');
   const focusedControl =
     content.contains(focused) && focused?.id !== 'typing' ? focused?.id : undefined;
+  const previousInput = document.querySelector<HTMLInputElement>('#typing');
   updateSampleControls();
-  canvas.classList.toggle('calibrating', phase === 'calibrate');
+  canvas.classList.toggle('calibrating', settings.open && phase === 'calibrate');
   $<HTMLSelectElement>('#device').disabled = phase === 'practice';
   $<HTMLButtonElement>('#start-camera').disabled =
     phase === 'practice' || camera.status === 'loading';
   renderSetup();
-  if (phase !== 'practice' && phase !== 'results') {
-    const last = saved.results.at(-1);
-    const complete = ready();
-    content.innerHTML = `<section class="practice"><div class="practice-top"><h2>Practice</h2><div class="practice-metrics"><span>${WORDS.length} words</span><button class="text-button" id="fix-setup">Edit setup</button></div></div><div class="progress-track"></div>${passageMarkup()}<div class="entry-heading"><label for="typing">Your word</label><span>Space finishes each word.</span></div><div class="word-entry"><div class="target-word">${WORDS[exercise.index]}</div><input id="typing" aria-label="Type the current word" placeholder="${resuming ? 'Paused' : 'Your word here'}" disabled /><button class="primary" id="practice" ${complete ? '' : 'disabled'}>${resuming ? 'Resume practice' : 'Start practice'}</button></div><div class="feedback flow-feedback"><span id="ready-message" role="status">${escapeHtml(flowMessage())}</span>${!complete && camera.status !== 'loading' ? `<button class="text-button" id="setup-next">${camera.status === 'ready' ? 'Map keys' : 'Camera settings'}</button>` : ''}</div>${last ? `<p class="recent">Last practice: ${policyLabel(last.fingeringModes ?? ['standard'])} · ${last.wpm.toFixed(1)} WPM · ${last.retries} retries${last.gradingPolicy !== 'wrong-finger-veto' ? ' · Earlier rule: unknown presses required retries' : ''}</p>` : ''}</section>`;
-    $('#practice').onclick = startPractice;
-    const next = document.querySelector<HTMLButtonElement>('#setup-next');
-    if (next) next.onclick = editSetup;
-  } else if (phase === 'practice') {
-    const retry = exercise.state === 'retry',
-      checking = exercise.state === 'checking';
-    const stats = exercise.stats(performance.now());
-    const word = WORDS[exercise.index]!;
-    content.innerHTML = `<section class="practice"><div class="practice-top"><span class="eyebrow">Practice</span><div class="practice-metrics"><span><b>${exercise.index}</b> / ${WORDS.length} words</span><span><b>${stats.retries}</b> retries</span><button class="text-button" id="pause">Pause</button><button class="text-button" id="fix-setup">Edit setup</button></div></div><div class="progress-track"><div style="width:${(exercise.index / WORDS.length) * 100}%"></div></div><div class="passage" aria-label="Practice passage">${WORDS.map((w, i) => `<span class="${i < exercise.index ? 'passed' : i === exercise.index ? 'active' : ''}" ${i === exercise.index ? 'aria-current="step"' : ''}>${w}</span>`).join(' ')}</div><div class="entry-heading"><label class="eyebrow" for="typing">${retry ? 'Try again' : checking ? 'Checking' : 'Your word'}</label><span id="word-hint">${exercise.index === 0 ? 'Include punctuation. Space finishes the word.' : 'Space finishes the word.'}</span></div><div class="word-entry ${retry ? 'needs-retry' : ''}"><div class="target-word" aria-label="Current word">${word}</div><input id="typing" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type the current word" placeholder="type here" ${retry || checking ? 'readonly' : ''}/><span class="entry-indicator">${checking ? '<span class="spinner"></span>' : retry ? '↺' : '↵'}</span></div><div id="feedback" class="feedback ${retry ? 'mistake' : ''}" role="status">${retry ? `<div><p>${escapeHtml(feedback(exercise.lastVerdict!, word, exercise.attempt.mode))}</p></div><button class="primary" id="retry">Retry word <span>Space</span></button>` : checking ? '<span class="spinner"></span> Checking fingers. Wait for the next word.' : escapeHtml(message || 'Type the word, including punctuation.')}</div><p id="input-message" class="input-message" role="status"></p></section>`;
-    const input = $<HTMLInputElement>('#typing');
-    input.value = exercise.attempt.text;
-    input.onkeydown = typing;
-    input.onkeyup = (event) => recordKey(event, 'keyup');
-    input.onbeforeinput = (e) => e.preventDefault();
+  const practicing = phase === 'practice';
+  const complete = phase === 'results';
+  const retry = practicing && exercise.state === 'retry';
+  const checking = practicing && exercise.state === 'checking';
+  const stats = exercise.stats(performance.now());
+  const last = saved.results.at(-1);
+  const action = practicing
+    ? '<button class="text-button" id="pause">Pause</button>'
+    : complete
+      ? '<button class="primary" id="restart">Practise again</button>'
+      : `<button class="primary" id="practice" ${ready() ? '' : 'disabled'}>${resuming ? 'Resume practice' : 'Start practice'}</button>`;
+  const feedbackText = complete
+    ? `Passage complete · ${stats.wpm.toFixed(1)} WPM · ${stats.retries} retries. All words accepted. Camera detection can be wrong.`
+    : retry
+      ? feedback(exercise.lastVerdict!, WORDS[exercise.index]!, exercise.attempt.mode)
+      : checking
+        ? 'Checking fingers. Wait for the next word.'
+        : practicing
+          ? message || 'Type the whole word, then Space.'
+          : flowMessage();
+  content.innerHTML = `<section class="practice${complete ? ' results' : ''}">
+    <div class="practice-top"><span class="practice-metrics">Practice · <span>${exercise.index} / ${WORDS.length} words</span><span>${stats.retries} retries</span></span>${action}</div>
+    ${passageMarkup()}
+    <div class="entry-heading"><label for="typing">${complete ? 'Completed' : retry ? 'Try again' : 'Your word'}</label><span id="word-hint">Space finishes each word.</span></div>
+    <div class="word-entry ${retry ? 'needs-retry' : ''}"><input id="typing" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type the current word" aria-describedby="word-hint${complete ? '' : ' current-target'}" placeholder="${complete ? 'Passage complete' : practicing ? 'type here' : resuming ? 'Paused' : 'Ready when you are'}" /></div>
+    <div id="feedback" class="feedback ${retry ? 'mistake' : ''}"><span id="ready-message" role="status">${escapeHtml(feedbackText)}</span>${retry ? '<button class="primary" id="retry">Retry word <span>Space</span></button>' : !practicing && !complete && !ready() && camera.status !== 'loading' ? `<button class="text-button" id="setup-next">${camera.status === 'ready' ? 'Map keys' : 'Camera settings'}</button>` : ''}</div>
+    <p id="input-message" class="input-message" role="status"></p>
+    ${retry ? `<details id="attempt-evidence"><summary>Attempt details</summary>${attemptDetails()}</details>` : ''}
+    ${last && !practicing ? `<p class="recent">Last practice: ${policyLabel(last.fingeringModes ?? ['standard'])} · ${last.wpm.toFixed(1)} WPM · ${last.retries} retries${last.gradingPolicy !== 'wrong-finger-veto' ? ' · Earlier rule: unknown presses required retries' : ''}</p>` : ''}
+  </section>`;
+  const placeholder = $<HTMLInputElement>('#typing');
+  const input = previousInput ?? placeholder;
+  if (previousInput) {
+    previousInput.placeholder = placeholder.placeholder;
+    previousInput.setAttribute(
+      'aria-describedby',
+      complete ? 'word-hint' : 'word-hint current-target',
+    );
+    placeholder.replaceWith(previousInput);
+  }
+  input.disabled = !practicing;
+  input.readOnly = retry || checking;
+  input.value = complete ? '' : exercise.attempt.text;
+  input.onkeydown = typing;
+  input.onkeyup = (event) => recordKey(event, 'keyup');
+  input.onbeforeinput = (event) => event.preventDefault();
+  if (!previousInput)
     input.addEventListener('compositionstart', () => {
       $('#input-message').textContent =
         'Composition cannot be graded. Use a direct input source or edit your keyboard profile.';
     });
-    input.onpaste = (e) => {
-      e.preventDefault();
-      $('#input-message').textContent =
-        'Type each character so its finger can be observed. Pasting is not graded.';
-    };
-    input.ondrop = (e) => e.preventDefault();
-    if (ownedTypingFocus) input.focus({ preventScroll: true });
-    const passage = $('.passage'),
-      activeWord = $('.passage .active');
-    passage.scrollTop = Math.max(0, activeWord.offsetTop - 40);
+  input.onpaste = (event) => {
+    event.preventDefault();
+    $('#input-message').textContent =
+      'Type each character so its finger can be observed. Pasting is not graded.';
+  };
+  input.ondrop = (event) => event.preventDefault();
+  if (practicing) {
     $('#pause').onclick = () => pause();
     if (retry) $('#retry').onclick = retryWord;
-  } else {
-    const stats = exercise.stats(performance.now());
-    content.innerHTML = `<section class="results"><h2>Passage complete</h2><p class="lede">All words accepted. No wrong fingers detected in accepted attempts.</p><div class="result-grid"><div class="primary-stat"><strong>${stats.wpm.toFixed(1)}</strong><span>effective WPM</span></div><div><strong>${stats.wrongFingers}</strong><span>wrong-finger presses</span></div><div><strong>${stats.textMistakes}</strong><span>text-mismatch attempts</span></div><div><strong>${stats.uncertainPresses}</strong><span>unverified presses</span></div></div><p class="result-note">Fingering: ${policyLabel(exercise.policies())}<br/>${WORDS.length} words · ${stats.attempts} submitted attempts · ${stats.retries} retries · ${formatTime(stats.elapsedMs)} elapsed<br/>Unverified presses remain unknown and do not cause retries.</p><details><summary>How results are counted</summary><p>WPM = accepted characters (including spaces) ÷ 5 ÷ elapsed minutes. Time includes retries, feedback and pauses, from the first character to the final space. Wrong-finger and unverified counts include erased keys and spaces in all submitted attempts. Text mistakes count attempts with mismatched text. An attempt can include both mistakes and unknown observations.</p></details><div class="result-actions"><button class="primary" id="restart">Practise again <span>↻</span></button><button class="text-button" id="fix-setup">Edit setup</button></div><p class="result-limit">Camera detection can be wrong.</p></section>`;
+    updateTyped();
+    if (ownedTypingFocus) input.focus({ preventScroll: true });
+  } else if (complete) {
     $('#restart').onclick = () => {
       void sample?.stop('passage-restarted');
       disableAutoStart();
@@ -269,20 +389,52 @@ function render() {
       if (ready()) startPractice();
       else setPhase(camera.status === 'ready' ? 'verify' : 'setup');
     };
-  }
-  const edit = document.querySelector<HTMLButtonElement>('#fix-setup');
-  if (edit) edit.onclick = editSetup;
-  if (phase === 'practice' && exercise.state === 'retry') {
-    $('#feedback').insertAdjacentHTML('beforeend', attemptDetails());
-  }
-
-  document
-    .querySelectorAll<HTMLElement>('[data-key]')
-    .forEach((el) => el.classList.remove('next-key'));
-  if (phase === 'practice') updateTyped();
+  } else $('#practice').onclick = startPractice;
+  const next = document.querySelector<HTMLButtonElement>('#setup-next');
+  if (next) next.onclick = editSetup;
+  const passage = $('.passage'),
+    activeWord = document.querySelector<HTMLElement>('.passage .active');
+  if (activeWord) passage.scrollTop = Math.max(0, activeWord.offsetTop - passage.clientHeight / 2);
+  $('#keyboard-caption').textContent = `${profile.name} · ${MODES[fingeringMode]} fingering`;
+  $('#settings-state').textContent = resuming
+    ? 'Practice paused. Completed words are kept.'
+    : 'Setup and preferences stay in this browser.';
+  $<HTMLButtonElement>('#settings-resume').disabled = !ready();
+  $('#settings-resume').textContent = resuming ? 'Close & resume' : 'Close & start practice';
+  $('#data-notice').textContent =
+    storageWarning ||
+    saved.migrationNotice ||
+    'Reset clears calibration, preferences, custom profiles and result history on this device.';
+  renderHistory();
+  if (!practicing)
+    document
+      .querySelectorAll<HTMLElement>('[data-key]')
+      .forEach((el) => el.classList.remove('next-key'));
   if (camera.latest) drawOverlay(camera.latest);
-  if (focusedControl) document.getElementById(focusedControl)?.focus({ preventScroll: true });
-  else if (phase === 'results' && ownedTypingFocus) $('#restart').focus({ preventScroll: true });
+  if (!settings.open && focusedControl)
+    document.getElementById(focusedControl)?.focus({ preventScroll: true });
+  else if (complete && ownedTypingFocus) $('#restart').focus({ preventScroll: true });
+}
+function renderHistory() {
+  const opened = [...$('#history-list').querySelectorAll('details')].map((el) => el.open);
+  $('#history-list').innerHTML = saved.results.length
+    ? [...saved.results]
+        .reverse()
+        .map(
+          (result) =>
+            `<details><summary>${escapeHtml(result.date.slice(0, 10))} · ${result.wpm.toFixed(1)} WPM · ${result.retries} retries</summary><p class="result-note">${policyLabel(result.fingeringModes ?? ['standard'])} · ${result.attempts} submitted attempts · ${formatTime(result.elapsedMs)} elapsed${result.gradingPolicy !== 'wrong-finger-veto' ? ' · Earlier rule: unknown presses required retries' : ''}</p><p class="result-grid">${result.wrongFingers} wrong-finger presses · ${result.textMistakes} text-mismatch attempts · ${result.uncertainPresses} unverified presses</p></details>`,
+        )
+        .join('')
+    : '<p>No completed practice yet.</p>';
+  $('#history-list').insertAdjacentHTML(
+    'beforeend',
+    '<details><summary>How results are counted</summary><p>WPM = accepted characters (including spaces) ÷ 5 ÷ elapsed minutes. Time includes retries, feedback and pauses, from the first character to the final space. Wrong-finger and unverified counts include erased keys and spaces in all submitted attempts. Text mistakes count attempts with mismatched text. An attempt can include both mistakes and unknown observations. Unverified presses remain unknown and do not cause retries. Camera detection can be wrong.</p></details>',
+  );
+  $('#history-list')
+    .querySelectorAll('details')
+    .forEach((el, i) => {
+      el.open = opened[i] ?? false;
+    });
 }
 function formatTime(ms: number) {
   return `${Math.floor(ms / 60000)}m ${Math.floor(ms / 1000) % 60}s`;
@@ -326,7 +478,7 @@ function ready() {
   return camera.status === 'ready' && coverage(profile).length === 0 && draftValid();
 }
 function passageMarkup() {
-  return `<div class="passage" aria-label="Practice passage">${WORDS.map((w, i) => `<span class="${i < exercise.index ? 'passed' : i === exercise.index ? 'active' : ''}">${w}</span>`).join(' ')}</div>`;
+  return `<div class="passage" aria-label="Practice passage">${WORDS.map((w, i) => `<span class="${i < exercise.index ? 'passed' : i === exercise.index ? 'active' : ''}" ${i === exercise.index ? 'id="current-target" aria-current="step"' : ''}>${w}</span>`).join(' ')}</div>`;
 }
 function flowMessage() {
   if (camera.status === 'loading') return 'Starting camera…';
@@ -343,6 +495,7 @@ function flowMessage() {
     : 'Key positions ready. Start when you’re ready to type.';
 }
 function editSetup() {
+  openSettings('camera-group');
   void sample?.stop('edit-setup');
   disableAutoStart();
   if (phase === 'practice') {
@@ -369,13 +522,16 @@ function renderSetup() {
   const showMapping = !locked && (setupOpen || !complete);
   $('#setup-panel').innerHTML = `
     <p id="setup-message" role="status">${escapeHtml(locked ? 'Keep the camera and keyboard still.' : message)}</p>
+    <button id="edit-map" ${showMapping ? 'hidden' : ''} ${!complete ? 'disabled' : ''}>Edit key positions</button>
     <div id="mapping-editor" ${showMapping ? '' : 'hidden'}>
     <div class="mapping-heading"><strong id="requested-key">${editing ? `Mark ${escapeHtml(physicalLabel(CALIBRATION_KEYS[selectedKey]!))} in the image` : 'Key positions'}</strong><span>${count} / ${CALIBRATION_KEYS.length}</span></div>
     <div class="cal-keys" aria-label="Choose a key to edit">${CALIBRATION_KEYS.map((k, i) => `<button class="cal-key ${points[k] ? 'mapped' : ''} ${editing && i === selectedKey ? 'selected' : ''}" data-cal="${i}" aria-label="Map ${escapeHtml(physicalLabel(k))}" aria-pressed="${editing && i === selectedKey}" ${camera.status !== 'ready' || locked ? 'disabled' : ''}>${k.startsWith('space') ? (k.endsWith('left') ? 'space ◂' : 'space ▸') : escapeHtml(physicalLabel(k))}<span aria-hidden="true" style="visibility:${points[k] ? 'visible' : 'hidden'}"> ✓</span></button>`).join('')}</div>
     <p id="cal-message">Click key centres and both ends of space. Select a key to adjust it. Arrows nudge; Enter selects the next.</p>
     <button id="remap" ${camera.status !== 'ready' || locked ? 'disabled' : ''}>Remap key positions</button>
     </div>
-    <p id="diagnostic-result" role="status">${complete && !locked ? 'Press a key to check its observed finger.' : ''}</p>`;
+    <label for="diagnostic">Check an observed finger</label><input id="diagnostic" placeholder="Focus here and press a key" autocomplete="off" readonly ${!complete || locked ? 'disabled' : ''} /><p>Optional check; not required to begin practice.</p><p id="diagnostic-result" role="status"></p>`;
+  $('#diagnostic').onkeydown = diagnostic;
+  $('#edit-map').onclick = editSetup;
   $('#setup-panel')
     .querySelectorAll<HTMLButtonElement>('[data-cal]')
     .forEach((el) => {
@@ -404,6 +560,11 @@ function renderSetup() {
 }
 function startPractice() {
   if (!ready()) return;
+  if (settings.open) {
+    closeSettings(true);
+    return;
+  }
+  for (const key of heldActivations) blockedActivations.add(key);
   setupOpen = false;
   calibration = makeCalibration();
   saved.calibration = calibration;
@@ -514,7 +675,7 @@ function cameraChanged() {
       selectedKey = 0;
       phase = 'calibrate';
     }
-    if (autoStartPending) {
+    if (autoStartPending && !settings.open) {
       autoStartPending = false;
       if (calibration && ready()) startPractice();
       else disableAutoStart();
@@ -627,7 +788,7 @@ function drawOverlay(frame: Frame) {
   }
 }
 canvas.onclick = (event) => {
-  if (phase !== 'calibrate') return;
+  if (!settings.open || phase !== 'calibrate') return;
   const box = canvas.getBoundingClientRect();
   points[CALIBRATION_KEYS[selectedKey]!] = unrotatePoint(
     {
@@ -645,20 +806,18 @@ canvas.onclick = (event) => {
   message = '';
   render();
   if (finished) {
-    $('#practice').focus({ preventScroll: true });
-    $('#practice').scrollIntoView({ block: 'nearest' });
+    $(settings.open ? '#settings-resume' : '#practice').focus({ preventScroll: true });
   }
 };
 canvas.onkeydown = (event) => {
-  if (phase !== 'calibrate') return;
+  if (!settings.open || phase !== 'calibrate') return;
   if (event.key === 'Enter') {
     event.preventDefault();
     if (event.repeat) return;
     if (draftValid()) {
       setupOpen = false;
       setPhase('verify');
-      $('#practice').focus({ preventScroll: true });
-      $('#practice').scrollIntoView({ block: 'nearest' });
+      $(settings.open ? '#settings-resume' : '#practice').focus({ preventScroll: true });
       return;
     }
     selectedKey = Math.min(CALIBRATION_KEYS.length - 1, selectedKey + 1);
@@ -757,7 +916,14 @@ $('#reset').onclick = () => {
   setPhase('setup');
 };
 function typing(event: KeyboardEvent) {
-  if (phase !== 'practice' || event.currentTarget !== document.activeElement || !ready()) return;
+  if (
+    settings.open ||
+    blockedActivations.has(event.key) ||
+    phase !== 'practice' ||
+    event.currentTarget !== document.activeElement ||
+    !ready()
+  )
+    return;
   if (
     event.key === 'Tab' ||
     event.metaKey ||
@@ -904,7 +1070,7 @@ function pause(remember = true) {
   setupOpen = false;
   message = '';
   setPhase('verify');
-  if (remember) $('#practice').focus({ preventScroll: true });
+  if (remember && !settings.open) $('#practice').focus({ preventScroll: true });
 }
 function attemptDetails() {
   const a = exercise.attempt;
@@ -935,18 +1101,10 @@ function diagnostic(event: KeyboardEvent) {
     !/^[a-z,. ]$/.test(event.key)
   )
     return;
-  // Form controls and keyboard editors own their keys, including Space activation.
   if (
-    event
-      .composedPath()
-      .some(
-        (target) =>
-          target instanceof HTMLElement &&
-          (target.isContentEditable ||
-            target.matches(
-              'input, textarea, select, button, a, summary, [role="textbox"], [role="combobox"], [role="grid"], [data-keyboard-editor], #profile-editor',
-            )),
-      )
+    !settings.open ||
+    event.currentTarget !== document.activeElement ||
+    (event.currentTarget as HTMLElement).id !== 'diagnostic'
   )
     return;
   event.preventDefault();
@@ -980,7 +1138,6 @@ function diagnostic(event: KeyboardEvent) {
         : `${keyName(press.key)}: unknown. ${o.reason}`;
   });
 }
-document.addEventListener('keydown', diagnostic);
 $('#profile-settings').addEventListener(
   'click',
   (event) => {
@@ -1075,6 +1232,13 @@ function recordKey(event: KeyboardEvent, action: 'keydown' | 'keyup') {
 function updateSampleControls() {
   if (!document.querySelector('#sample-start')) return;
   const active = sample && sample.state !== 'discarded';
+  $('#sample-indicator').hidden = !active;
+  $('#sample-indicator').textContent =
+    sample?.state === 'recording'
+      ? 'Recording sample'
+      : sample?.state === 'stopping'
+        ? 'Stopping sample'
+        : 'Sample retained';
   $<HTMLButtonElement>('#sample-start').disabled = !!active || !ready();
   $<HTMLButtonElement>('#sample-stop').disabled = sample?.state !== 'recording';
   $<HTMLButtonElement>('#sample-download').disabled = sample?.state !== 'ready';
@@ -1134,3 +1298,5 @@ updateCameraChoices();
 
 if (saved.cameraDisconnected) cameraChanged();
 else restartCamera();
+moveCamera();
+if (openDebugging) openSettings('debugging');

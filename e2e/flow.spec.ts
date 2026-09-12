@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { setup, syntheticCamera, word } from './helpers';
+import { setup, syntheticCamera, word, editSetup, openSettings, resumePractice } from './helpers';
 import { calibration } from '../tests/fixtures';
 
 test('mapping hands focus to Start without consuming activation as a typing press', async ({
@@ -19,7 +19,7 @@ test('mapping hands focus to Start without consuming activation as a typing pres
       .locator('#overlay')
       .click({ position: { x: point.x * box!.width, y: point.y * box!.height } });
   }
-  const start = page.getByRole('button', { name: 'Start practice', exact: true });
+  const start = page.locator('#settings-resume');
   await expect(start).toBeFocused();
   await expect(page.locator('#mapping-editor')).toBeHidden();
   await expect(page.locator('#typing')).toBeDisabled();
@@ -29,7 +29,7 @@ test('mapping hands focus to Start without consuming activation as a typing pres
   await expect(page.locator('.practice-metrics')).toContainText('0 retries');
   await page.locator('#typing').press('a');
   await page.locator('#typing').press('Space');
-  await expect(page.locator('.target-word')).toHaveText('quick');
+  await expect(page.locator('.passage .active')).toHaveText('quick');
   await expect(page.locator('#feedback')).toContainText('could not verify');
 });
 
@@ -49,16 +49,16 @@ test('pause preserves progress, rejects detached input and keeps mapping out of 
   await page.getByRole('button', { name: 'Resume practice', exact: true }).press('Enter');
   await expect(page.locator('#typing')).toBeFocused();
   await expect(page.locator('#typing')).toHaveValue('');
-  await expect(page.locator('.target-word')).toHaveText('quick');
+  await expect(page.locator('.passage .active')).toHaveText('quick');
   await expect(page.locator('.practice-metrics')).toContainText('1 /');
-  await page.getByRole('button', { name: 'Edit setup', exact: true }).click();
+  await editSetup(page);
   await expect(page.locator('#mapping-editor')).toBeVisible();
   await expect(page.locator('#overlay')).toBeFocused();
   await page.getByRole('button', { name: 'Map q', exact: true }).click();
   await expect(page.locator('#overlay')).toBeFocused();
   await page.locator('#overlay').press('ArrowRight');
   await page.locator('#overlay').press('Enter');
-  await expect(page.getByRole('button', { name: 'Resume practice', exact: true })).toBeFocused();
+  await expect(page.locator('#settings-resume')).toBeFocused();
   await expect(page.locator('#typing')).toBeDisabled();
   await page.reload();
   await expect(page.getByRole('button', { name: 'Start practice', exact: true })).toBeEnabled();
@@ -77,12 +77,12 @@ test('boundary completion preserves focus in controls and editor keys never ente
     window.__inferenceDelay = 2000;
   });
   await page.locator('#typing').pressSequentially('a ');
-  await page.locator('#camera-rotation').focus();
+  await page.locator('#settings-open').focus();
   await expect(page.locator('#feedback')).not.toContainText('Checking fingers');
-  await expect(page.locator('#camera-rotation')).toBeFocused();
-  await page.locator('#camera-rotation').press('a');
+  await expect(page.locator('#settings-open')).toBeFocused();
+  await page.locator('#settings-open').press('a');
   await expect(page.locator('#typing')).toHaveValue('');
-  await expect(page.locator('#camera-rotation')).toBeFocused();
+  await expect(page.locator('#settings-open')).toBeFocused();
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
   await page.evaluate(() => {
     const editor = document.createElement('div');
@@ -92,9 +92,7 @@ test('boundary completion preserves focus in controls and editor keys never ente
   });
   await page.getByLabel('Custom key capture').fill('a');
   await page.getByLabel('Custom key capture').press('Space');
-  await expect(page.locator('#diagnostic-result')).toHaveText(
-    'Press a key to check its observed finger.',
-  );
+  await expect(page.locator('#diagnostic-result')).toBeEmpty();
   await expect(page.getByLabel('Custom key capture')).toHaveValue('a ');
 });
 
@@ -107,12 +105,13 @@ test('invalid full mapping cannot start and narrow transitions keep centered geo
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
   const positions = () =>
     page.evaluate(() =>
-      ['#finger-map', '#view-wrap'].map((s) => {
+      ['#finger-map', '#camera-preview'].map((s) => {
         const r = document.querySelector(s)!.getBoundingClientRect();
         return { top: r.top + scrollY, left: r.left, width: r.width, height: r.height };
       }),
     );
   const initial = await positions();
+  await openSettings(page);
   for (let i = 0; i < 30; i++)
     await page.locator('#overlay').click({ position: { x: 100, y: 100 } });
   await expect(page.locator('#ready-message')).toContainText('overlapping dots');
@@ -126,7 +125,7 @@ test('invalid full mapping cannot start and narrow transitions keep centered geo
       .click({ position: { x: point.x * box!.width, y: point.y * box!.height } });
   }
   await page.screenshot({ path: 'test-results/flow-ready-390.png', fullPage: true });
-  await page.getByRole('button', { name: 'Start practice', exact: true }).click();
+  await resumePractice(page);
   expect(await positions()).toEqual(initial);
   await page.getByRole('button', { name: 'Pause', exact: true }).click();
   expect(await positions()).toEqual(initial);
@@ -134,7 +133,7 @@ test('invalid full mapping cannot start and narrow transitions keep centered geo
   await page.screenshot({ path: 'test-results/flow-paused-390.png', fullPage: true });
 });
 
-for (const control of ['Pause', 'Edit setup']) {
+for (const control of ['Pause', 'Settings & progress']) {
   test(`settlement retains keyboard focus on ${control}`, async ({ page }) => {
     await syntheticCamera(page);
     await setup(page);

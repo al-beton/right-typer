@@ -111,7 +111,13 @@ export function profileControls(
     showKey();
   };
   el('capture-key').onkeydown = (e) => {
-    if (e.key === 'Tab') return;
+    if (
+      e.key === 'Tab' ||
+      e.key === 'Escape' ||
+      e.metaKey ||
+      ((e.ctrlKey || e.altKey) && !e.getModifierState('AltGraph'))
+    )
+      return;
     e.preventDefault();
     if (!draft || e.repeat) return;
     const k = draft.keys.find((k) => k.code === editKey.value)!;

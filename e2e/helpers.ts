@@ -101,11 +101,28 @@ export async function syntheticCamera(page: Page, initialHands = handsAt('f', 'l
     { hands: initialHands },
   );
 }
+export async function openSettings(page: Page, group = 'camera-group') {
+  if (!(await page.locator('#settings').evaluate((el) => (el as HTMLDialogElement).open)))
+    await page.locator('#settings-open').click();
+  const disclosure = page.locator(`#${group}`);
+  if (!(await disclosure.evaluate((el) => (el as HTMLDetailsElement).open)))
+    await disclosure.locator(':scope > summary').click();
+}
+export async function editSetup(page: Page) {
+  await openSettings(page);
+  if (await page.locator('#edit-map').isVisible()) await page.locator('#edit-map').click();
+}
+export async function resumePractice(page: Page) {
+  if (await page.locator('#settings').evaluate((el) => (el as HTMLDialogElement).open))
+    await page.locator('#settings-resume').click();
+  else await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
+}
 export async function setup(page: Page, saved = false) {
   await page.goto('/');
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
   if (!saved) {
     await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeDisabled();
+    await openSettings(page);
     for (const point of Object.values(calibration().points)) {
       const canvas = page.locator('#overlay');
       const box = await canvas.boundingBox();
@@ -113,7 +130,7 @@ export async function setup(page: Page, saved = false) {
     }
   }
   await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeEnabled();
-  await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
+  await resumePractice(page);
 }
 export async function press(page: Page, key: string, finger?: Finger, missing = false) {
   await page.evaluate(

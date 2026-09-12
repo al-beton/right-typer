@@ -1,24 +1,28 @@
 import { test, expect } from '@playwright/test';
-import { syntheticCamera, setup } from './helpers';
+import { syntheticCamera, setup, openSettings, resumePractice, editSetup } from './helpers';
 
 test('Go survives refresh; Pause and Edit setup remain paused; reset clears preferences', async ({
   page,
 }) => {
   await syntheticCamera(page);
   await setup(page);
+  await openSettings(page, 'camera-group');
   await page.getByLabel('Rotate camera view').selectOption('270');
+  await resumePractice(page);
   await page.reload();
   await expect(page.getByRole('button', { name: 'Pause', exact: true })).toBeVisible();
   await expect(page.locator('#typing')).toBeFocused();
   await expect(page.getByLabel('Rotate camera view')).toHaveValue('270');
   await expect(page.locator('#device')).toHaveValue('synthetic-macbook-camera');
   for (const action of ['Pause', 'Edit setup']) {
-    await page.getByRole('button', { name: action, exact: true }).click();
+    if (action === 'Edit setup') await editSetup(page);
+    else await page.getByRole('button', { name: action, exact: true }).click();
     await page.reload();
     await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeEnabled();
     await expect(page.locator('#typing')).toBeDisabled();
-    await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
+    await resumePractice(page);
   }
+  await openSettings(page, 'about-group');
   await page.getByRole('button', { name: 'Reset local data' }).click();
   await page.getByRole('button', { name: 'Confirm reset' }).click();
   expect(await page.evaluate(() => localStorage.getItem('right-typer.v1'))).toBeNull();
@@ -71,7 +75,8 @@ test('selected camera is requested after refresh and missing camera offers recov
     };
   });
   await setup(page);
-  await page.getByRole('button', { name: 'Edit setup' }).click();
+  await editSetup(page);
+  await openSettings(page, 'camera-group');
   await page.locator('#device').selectOption('external-camera');
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
   await expect(page.locator('.cal-key.mapped')).toHaveCount(0);
@@ -86,6 +91,7 @@ test('selected camera is requested after refresh and missing camera offers recov
   await page.reload();
   await expect(page.locator('#camera-badge')).toHaveText('Camera needs attention');
   await expect(page.locator('#device')).toBeEnabled();
+  await openSettings(page, 'camera-group');
   await page.locator('#device').selectOption('synthetic-macbook-camera');
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
   await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeEnabled();

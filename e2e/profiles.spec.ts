@@ -1,6 +1,6 @@
 import { hardwareKeys } from '../src/view/hardware';
 import { test, expect } from '@playwright/test';
-import { syntheticCamera } from './helpers';
+import { syntheticCamera, openSettings, resumePractice, editSetup } from './helpers';
 import { PRESETS, calibrationCodes, characterKey } from '../src/core/profile';
 import { WORDS } from '../src/passage';
 import { calibration } from '../tests/fixtures';
@@ -19,12 +19,14 @@ test('presets update physical labels; French shifted punctuation completes passa
   await expect(page.locator('[data-key="Space"] small')).toHaveText('either thumb');
   await expect(page.locator('[data-key="KeyA"] b')).toHaveText('A');
   for (const p of PRESETS) {
+    await openSettings(page, 'keyboard-group');
     await page.locator('#keyboard-profile').selectOption(p.id);
     for (const k of hardwareKeys(p)) {
       await expect(page.locator(`[data-key="${k.code}"] b`)).toHaveText(k.legends.join(''));
     }
   }
   const p = PRESETS[4]!;
+  await openSettings(page, 'keyboard-group');
   await page.locator('#keyboard-profile').selectOption(p.id);
   for (const code of calibrationCodes(p)) {
     const k = p.keys.find((k) => k.code === code);
@@ -39,7 +41,7 @@ test('presets update physical labels; French shifted punctuation completes passa
       .locator('#overlay')
       .click({ position: { x: pt.x * box!.width, y: pt.y * box!.height } });
   }
-  await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
+  await resumePractice(page);
   await page.evaluate(() => {
     window.__hands = [];
   });
@@ -67,6 +69,7 @@ test('custom edit/export/import validates and persists safely with literal label
 }) => {
   await syntheticCamera(page);
   await page.goto('./');
+  await openSettings(page, 'keyboard-group');
   await page.locator('#custom-layout').click();
   await page.locator('#profile-name').fill('<img src=x onerror=alert(1)>');
   await page.locator('#edit-key').selectOption('KeyQ');
@@ -92,6 +95,7 @@ test('custom edit/export/import validates and persists safely with literal label
   await expect(page.locator('#profile-status')).toContainText('Last valid profile kept');
   await expect(page.locator('#keyboard-profile')).toHaveValue(selected);
   expect(await page.locator('#profile-settings img').count()).toBe(0);
+  await openSettings(page, 'keyboard-group');
   await page.locator('#custom-layout').click();
   await page.locator('#delete-profile').click();
   await expect(page.locator('#keyboard-profile')).toHaveValue('us-ansi');
@@ -116,33 +120,40 @@ test('profile switching invalidates pending attempt and incompatible calibration
   await expect(page.locator('#keyboard-profile')).toHaveValue('apple-gb-iso');
   await expect(page.locator('#camera-rotation')).toHaveValue('90');
   await expect(page.locator('#camera-badge')).toContainText('disconnected');
+  await openSettings(page, 'camera-group');
   await page.locator('#start-camera').click();
   await expect(page.locator('#typing')).toBeEnabled();
   await page.locator('#typing').press('a');
+  await openSettings(page, 'keyboard-group');
   await page.locator('#keyboard-profile').selectOption('fr-iso');
   await expect(page.locator('#typing')).toBeDisabled();
   await expect(page.locator('#practice')).toBeDisabled();
   await expect(page.locator('#profile-status')).toContainText('own key positions');
+  await openSettings(page, 'keyboard-group');
   await page.locator('#keyboard-profile').selectOption('apple-gb-iso');
   await expect(page.locator('#practice')).toBeEnabled();
   await expect(page.locator('#mapping-editor')).toBeHidden();
-  await page.locator('#practice').click();
+  await resumePractice(page);
   await expect(page.locator('#typing')).toHaveValue('');
   await expect(page.locator('#typing')).toBeFocused();
   await page.locator('#pause').click();
   await expect(page.locator('#practice')).toHaveText('Resume practice');
   await expect(page.locator('#mapping-editor')).toBeHidden();
-  await page.locator('#fix-setup').click();
+  await editSetup(page);
   await expect(page.locator('#mapping-editor')).toBeVisible();
   await expect(page.locator('#overlay')).toBeFocused();
-  await page.locator('#practice').click();
+  await resumePractice(page);
   await expect(page.locator('#mapping-editor')).toBeHidden();
+  await openSettings(page, 'camera-group');
   await page.locator('#disconnect-camera').click();
+  await openSettings(page, 'keyboard-group');
   await page.locator('#keyboard-profile').selectOption('fr-iso');
+  await openSettings(page, 'keyboard-group');
   await page.locator('#keyboard-profile').selectOption('apple-gb-iso');
+  await openSettings(page, 'camera-group');
   await page.locator('#start-camera').click();
   await expect(page.locator('#practice')).toBeEnabled();
-  await page.locator('#practice').click();
+  await resumePractice(page);
   await expect(page.locator('#typing')).toHaveValue('');
 });
 for (const variant of ['success', 'ambiguous', 'absent', 'denied'] as const)
@@ -171,6 +182,7 @@ for (const variant of ['success', 'ambiguous', 'absent', 'denied'] as const)
       { variant, presets: PRESETS },
     );
     await page.goto('./');
+    await openSettings(page, 'keyboard-group');
     await page.locator('#keyboard-profile').selectOption('de-iso');
     await page.locator('#detect-layout').click();
     await expect(page.locator('#profile-status')).toContainText(
@@ -189,6 +201,7 @@ test('narrow layout remains centered and keyboard settings are accessible', asyn
   await syntheticCamera(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto('./');
+  await openSettings(page, 'keyboard-group');
   await page.locator('#keyboard-profile').focus();
   await expect(page.locator('#keyboard-profile')).toBeFocused();
   const widths = await page.evaluate(() => ({
@@ -211,6 +224,7 @@ test('German and French physical presses use the calibrated position and resolve
     ['fr-iso', 'Semicolon', 'm', 'right-little', false],
     ['fr-iso', 'Comma', '.', 'right-middle', true],
   ] as const) {
+    await openSettings(page, 'keyboard-group');
     await page.locator('#keyboard-profile').selectOption(id);
     const p = PRESETS.find((p) => p.id === id)!;
     if (!(await page.locator('#practice').isEnabled()))
@@ -250,6 +264,7 @@ test('German and French physical presses use the calibrated position and resolve
     await expect(page.locator('#diagnostic-result')).toContainText(
       `saw ${finger.replace('-', ' ')}. Intended: ${finger.replace('-', ' ')}.`,
     );
+    await openSettings(page, 'keyboard-group');
     await page.locator('#custom-layout').click();
     await page.locator('#edit-key').selectOption(code);
     const before = await page.locator('#diagnostic-result').textContent();

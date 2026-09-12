@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { syntheticCamera } from './helpers';
+import { syntheticCamera, openSettings } from './helpers';
 import { PRESETS } from '../src/core/profile';
 import { calibration } from '../tests/fixtures';
 
@@ -24,6 +24,7 @@ test('visible MacBook spacebar edges match C–M on desktop and mobile; PC/custo
   for (const width of [1440, 768, 390, 320]) {
     await page.setViewportSize({ width, height: 1000 });
     for (const p of [...PRESETS, custom]) {
+      await openSettings(page, 'keyboard-group');
       await page.locator('#keyboard-profile').selectOption(p.id);
       const rect = async (code: string) =>
         (await page.locator(`[data-key="${code}"]`).boundingBox())!;
@@ -51,6 +52,7 @@ test('visible MacBook spacebar edges match C–M on desktop and mobile; PC/custo
         true,
       );
     }
+    await openSettings(page, 'keyboard-group');
     await page.locator('#keyboard-profile').selectOption('apple-us-ansi');
     if ([1440, 390].includes(width))
       await page.screenshot({ path: `/tmp/alo264-${width}.png`, fullPage: true });
@@ -73,8 +75,10 @@ test('old camera setup uses corrected MacBook geometry without remapping', async
   await page.goto('/');
   await expect(page.locator('#keyboard-profile')).toHaveValue('apple-gb-iso');
   await expect(page.locator('#typing')).toBeEnabled();
+  await openSettings(page, 'keyboard-group');
   await page.locator('#keyboard-profile').selectOption('apple-gb-iso');
   await expect(page.locator('#practice')).toBeEnabled();
+  await openSettings(page, 'keyboard-group');
   await page.locator('#keyboard-profile').selectOption('apple-gb-iso');
   await expect(page.locator('#practice')).toBeEnabled();
 });
