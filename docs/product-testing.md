@@ -16,7 +16,7 @@ PLAYWRIGHT_PORT=4285 pnpm exec playwright test e2e/product-journeys.spec.ts --tr
 # Watch the same journeys; Inspector supports pause and step through UI actions.
 PLAYWRIGHT_PORT=4285 pnpm exec playwright test e2e/product-journeys.spec.ts --debug
 
-# Reproducible cadence and a bounded two-exercise session (actual UI restart).
+# Reproducible curriculum/cadence and two rounds (actual Next round action).
 PRODUCT_SEED=285 PRODUCT_EXERCISES=2 PLAYWRIGHT_PORT=4285 \
   pnpm exec playwright test e2e/product-journeys.spec.ts --grep 'complete exercise' --headed --trace on
 
@@ -50,15 +50,18 @@ visible controls. This keeps one production state machine and one test framework
 ```ts
 import { test, expect } from './product-driver';
 
-test('a wrong finger survives correction', async ({ product: p, page }) => {
-  await p.check('fresh ready target', { target: 'a', focus: 'typing' });
-  await p.press('a', 'left-index', { code: 'KeyA', cadenceMs: 120 });
-  await p.backspace();
-  await p.type('a', ['unknown']);
-  await p.submit('left-thumb');
-  await expect(page.locator('#feedback')).toContainText('saw left index');
-  await p.checkpoint('wrong-finger-feedback');
-  await p.retry();
+test('unknown evidence advances honestly', async ({ product: p, page }) => {
+  const target = await p.target();
+  await p.check('fresh ready target', { target, focus: 'typing' });
+  await p.type(
+    target,
+    [...target].map(() => 'unknown'),
+  );
+  await p.submit('unknown');
+  await expect(page.locator('#feedback')).toContainText(
+    `could not verify ${target.length + 1} presses`,
+  );
+  await p.checkpoint('unknown-feedback');
   await p.correctWord('traditional-right-thumb');
 });
 ```
@@ -82,23 +85,27 @@ test('a wrong finger survives correction', async ({ product: p, page }) => {
   timing cases; missing hands use `unknown`. Normal known presses hold the pose
   for 100 ms either side, unknowns for 550 ms to clear the ±500 ms search window.
   Seeded cadence adds 0–40 ms by default; browser/capture timing remains real.
-  Reproducible inputs do not promise deterministic OS scheduling.
+  The same seed supplies curriculum randomness through the external crypto API;
+  it never writes progress. Reproducible inputs do not promise deterministic OS scheduling.
 - `exercise(policy, maxWords)` reads targets until real completion, with a bound
-  (80 by default, 1–1000 allowed); `session(count, policy, maxWords)` runs 1–5 exercises using the existing
-  Practise again button. No stage/counter/threshold is written. Fresh calibration
+  (80 by default, 1–1000 allowed); `session(count, policy, maxWords)` runs 1–5 rounds using the existing
+  Next round button. No stage/counter/threshold is written. Fresh calibration
   is clicked through UI; reload exercises the state that the app actually saved.
 - `check(label, expected)` records expected and actual visible target, input,
-  feedback, counters, focus and drawer state. `checkpoint(label)` attaches a
+  feedback, current stage, counters, focus and drawer state. `checkpoint(label)` attaches a
   screenshot; `transition(label, action)` records before/after state.
-  `persisted()` only reads the test context's local state. Use normal Playwright
-  assertions for detailed results and future progress UI.
+  `persisted()` reads saved setup/results; `progress()` reads curriculum state.
+  Neither writes storage. Use normal Playwright assertions for detailed results.
 
 Optional `PRODUCT_DATE=2026-09-13T12:00:00Z` fixes Date only, leaving performance,
 video capture timestamps and timers real. For a later day-boundary scenario use
 `page.clock.setFixedTime(new Date(...))`; do not fast-forward capture/inference or
-fabricate timestamps. Adaptive progression, weak-key revisits, per-key metrics,
-heatmaps and daily goals are added with ALO-280/282/283/284 when implemented. These
-initial scenarios make no claims about absent features.
+fabricate timestamps. The journeys read generated twelve-word rounds, test both
+exact completion and insufficient bounds, continue through the UI and reload saved
+curriculum. `e2e/adaptive-practice.spec.ts` additionally covers a fresh earned unlock
+and separately labeled seeded boundary cases. Extend per-key metrics, heatmaps and
+daily-goal coverage alongside ALO-280/283/284 as those features land; do not claim
+absent features passed.
 
 ## Evidence and ownership
 

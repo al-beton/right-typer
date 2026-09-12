@@ -17,6 +17,7 @@ export type ProductState = {
   counters: string;
   focus: string;
   drawer: boolean;
+  stage: string;
 };
 const git = (...args: string[]) =>
   execFileSync('git', args, { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
@@ -61,6 +62,7 @@ export class ProductDriver {
       counters: document.querySelector('.practice-metrics')?.textContent?.trim() ?? '',
       focus: document.activeElement?.id ?? '',
       drawer: (document.querySelector('#settings') as HTMLDialogElement)?.open ?? false,
+      stage: document.querySelector('#round-focus')?.textContent?.trim() ?? '',
     }));
   }
   async transition(label: string, action: () => Promise<unknown>) {
@@ -93,7 +95,17 @@ export class ProductDriver {
     this.page.setDefaultTimeout(10000);
     await syntheticCamera(this.page);
     // Label test sessions without adding consumer controls or changing layout.
-    await this.page.addInitScript(() => {
+    await this.page.addInitScript((seed) => {
+      const nativeRandom = crypto.getRandomValues.bind(crypto);
+      Object.defineProperty(crypto, 'getRandomValues', {
+        value: (array: Uint32Array) => {
+          if (array instanceof Uint32Array && array.length === 1) {
+            array[0] = seed || 1;
+            return array;
+          }
+          return nativeRandom(array);
+        },
+      });
       addEventListener('DOMContentLoaded', () => {
         document.title = `SYNTHETIC PRODUCT TEST — ${document.title}`;
         const label = document.createElement('div');
@@ -105,7 +117,7 @@ export class ProductDriver {
         // Native modal dialogs paint above body overlays. Keep their evidence labeled too.
         document.querySelector('#settings')?.append(label.cloneNode(true));
       });
-    });
+    }, this.seed);
     // Date-only control leaves performance.now(), capture timestamps and timers real.
     if (process.env.PRODUCT_DATE)
       await this.page.clock.setFixedTime(new Date(process.env.PRODUCT_DATE));
@@ -215,12 +227,17 @@ export class ProductDriver {
   async persisted() {
     return this.page.evaluate(() => JSON.parse(localStorage.getItem('right-typer.v1') ?? '{}'));
   }
+  async progress() {
+    return this.page.evaluate(() =>
+      JSON.parse(localStorage.getItem('right-typer.progress.v1') ?? '{}'),
+    );
+  }
   /** Bounded real UI completion; no imported passage or state/counter writes. */
   async exercise(policy: FixturePolicy, maxWords = 80) {
     if (!Number.isInteger(maxWords) || maxWords < 1 || maxWords > 1000)
       throw new Error('Exercise bound must be 1–1000 words');
     for (let count = 0; count < maxWords; count++) {
-      if ((await this.snapshot()).feedback.includes('Passage complete')) return count;
+      if ((await this.snapshot()).feedback.includes('Round complete')) return count;
       const before = await this.snapshot();
       await this.target();
       await this.correctWord(policy);
@@ -230,11 +247,11 @@ export class ProductDriver {
           return (
             state.target !== before.target ||
             state.counters !== before.counters ||
-            state.feedback.includes('Passage complete')
+            state.feedback.includes('Round complete')
           );
         })
         .toBe(true);
-      if ((await this.snapshot()).feedback.includes('Passage complete')) return count + 1;
+      if ((await this.snapshot()).feedback.includes('Round complete')) return count + 1;
     }
     throw new Error(`Exercise did not complete within ${maxWords} words`);
   }
@@ -245,7 +262,7 @@ export class ProductDriver {
       await this.exercise(policy, maxWords);
       await this.checkpoint(`exercise-${round + 1}-complete`);
       if (round + 1 < exercises)
-        await this.page.getByRole('button', { name: 'Practise again', exact: true }).click();
+        await this.page.getByRole('button', { name: 'Next round', exact: true }).click();
     }
   }
 }
@@ -296,7 +313,7 @@ export const test = base.extend<{ product: ProductDriver }>({
                 'PRODUCT_EXERCISES',
               ].map((key) => [key, process.env[key] ?? null]),
             ),
-            scenarioVersion: 1,
+            scenarioVersion: 2,
             scenario: info.title,
             seed,
             browser: browser.version(),
