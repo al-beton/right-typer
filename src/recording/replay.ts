@@ -1,10 +1,13 @@
 import { EvidenceBuffer } from '../core/observation';
 import { grade } from '../core/exercise';
 import { allowedFingers } from '../core/keyboard';
-import type { Observation } from '../core/types';
+import type { Observation, Press } from '../core/types';
 import type { Sample } from './types';
 import { validateSample } from './validate';
-export async function replaySample(sample: Sample) {
+export async function replaySample(
+  sample: Sample,
+  onObservation?: (press: Press, observation: Observation) => void,
+) {
   validateSample(sample);
   const buffer = new EvidenceBuffer();
   const observed = new Map<string, Observation>();
@@ -19,9 +22,10 @@ export async function replaySample(sample: Sample) {
       if (event.type === 'reset') buffer.reset();
       if (event.type === 'tick') buffer.tick(event.at);
       if (event.type === 'request') {
-        void buffer
-          .request(structuredClone(event.press), sample.calibration)
-          .then((o) => observed.set(`${event.press.attemptId}/${event.press.id}`, o));
+        void buffer.request(structuredClone(event.press), sample.calibration).then((o) => {
+          observed.set(`${event.press.attemptId}/${event.press.id}`, o);
+          onObservation?.(event.press, o);
+        });
       }
       // Preserve microtask delivery before subsequent recorded callbacks.
       await Promise.resolve();

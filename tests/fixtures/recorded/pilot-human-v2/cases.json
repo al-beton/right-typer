@@ -1,0 +1,926 @@
+[
+  {
+    "id": "recording-1/press-1-attempt-1",
+    "recording": "recording-1",
+    "press": {
+      "key": "a",
+      "code": "KeyA",
+      "at": 0.0
+    },
+    "frameIds": [1, 2, 3, 4],
+    "finger": "left-little",
+    "allowedFingers": ["left-little"]
+  },
+  {
+    "id": "recording-1/press-2-attempt-1",
+    "recording": "recording-1",
+    "press": {
+      "key": " ",
+      "code": "Space",
+      "at": 240.70000000298023
+    },
+    "frameIds": [3, 4, 5, 6],
+    "finger": "left-thumb",
+    "allowedFingers": ["left-thumb", "right-thumb"]
+  },
+  {
+    "id": "recording-1/press-3-attempt-2",
+    "recording": "recording-1",
+    "press": {
+      "key": "q",
+      "code": "KeyQ",
+      "at": 1336.3000000044703
+    },
+    "frameIds": [7, 8, 9, 10, 11],
+    "finger": "left-little",
+    "allowedFingers": ["left-little"]
+  },
+  {
+    "id": "recording-1/press-4-attempt-2",
+    "recording": "recording-1",
+    "press": {
+      "key": "u",
+      "code": "KeyU",
+      "at": 2044.5
+    },
+    "frameIds": [12, 13, 14, 15, 16],
+    "finger": "right-index",
+    "allowedFingers": ["right-index"]
+  },
+  {
+    "id": "recording-1/press-5-attempt-2",
+    "recording": "recording-1",
+    "press": {
+      "key": "i",
+      "code": "KeyI",
+      "at": 2434.5
+    },
+    "frameIds": [15, 16, 17, 18, 19],
+    "finger": "right-middle",
+    "allowedFingers": ["right-middle"]
+  },
+  {
+    "id": "recording-1/press-6-attempt-2",
+    "recording": "recording-1",
+    "press": {
+      "key": "c",
+      "code": "KeyC",
+      "at": 2756.89999999851
+    },
+    "frameIds": [18, 19, 20, 21, 22],
+    "finger": "left-index",
+    "allowedFingers": ["left-middle"]
+  },
+  {
+    "id": "recording-1/press-7-attempt-2",
+    "recording": "recording-1",
+    "press": {
+      "key": "k",
+      "code": "KeyK",
+      "at": 3061.89999999851
+    },
+    "frameIds": [20, 21, 22, 23, 24, 25],
+    "finger": "right-middle",
+    "allowedFingers": ["right-middle"]
+  },
+  {
+    "id": "recording-1/press-8-attempt-2",
+    "recording": "recording-1",
+    "press": {
+      "key": " ",
+      "code": "Space",
+      "at": 3555.10000000149
+    },
+    "frameIds": [25, 26, 27, 28, 29],
+    "finger": "left-thumb",
+    "allowedFingers": ["left-thumb", "right-thumb"]
+  },
+  {
+    "id": "recording-1/press-9-attempt-3",
+    "recording": "recording-1",
+    "press": {
+      "key": "q",
+      "code": "KeyQ",
+      "at": 5345.10000000149
+    },
+    "frameIds": [30, 31, 32, 33, 34],
+    "finger": "left-little",
+    "allowedFingers": ["left-little"]
+  },
+  {
+    "id": "recording-1/press-10-attempt-3",
+    "recording": "recording-1",
+    "press": {
+      "key": "u",
+      "code": "KeyU",
+      "at": 5716.60000000149
+    },
+    "frameIds": [33, 34, 35, 36, 37],
+    "finger": "right-index",
+    "allowedFingers": ["right-index"]
+  },
+  {
+    "id": "recording-1/press-11-attempt-3",
+    "recording": "recording-1",
+    "press": {
+      "key": "i",
+      "code": "KeyI",
+      "at": 6180.60000000149
+    },
+    "frameIds": [36, 37, 38, 39, 40],
+    "finger": "right-middle",
+    "allowedFingers": ["right-middle"]
+  },
+  {
+    "id": "recording-1/press-12-attempt-3",
+    "recording": "recording-1",
+    "press": {
+      "key": "c",
+      "code": "KeyC",
+      "at": 6571.20000000298
+    },
+    "frameIds": [39, 40, 41, 42, 43],
+    "finger": "left-middle",
+    "allowedFingers": ["left-middle"]
+  },
+  {
+    "id": "recording-1/press-13-attempt-3",
+    "recording": "recording-1",
+    "press": {
+      "key": "k",
+      "code": "KeyK",
+      "at": 6750.10000000149
+    },
+    "frameIds": [41, 42, 43, 44],
+    "finger": "right-middle",
+    "allowedFingers": ["right-middle"]
+  },
+  {
+    "id": "recording-1/press-14-attempt-3",
+    "recording": "recording-1",
+    "press": {
+      "key": " ",
+      "code": "Space",
+      "at": 7005.10000000149
+    },
+    "frameIds": [42, 43, 44, 45, 46, 47],
+    "finger": "left-thumb",
+    "allowedFingers": ["left-thumb", "right-thumb"]
+  },
+  {
+    "id": "recording-1/press-15-attempt-4",
+    "recording": "recording-1",
+    "press": {
+      "key": "q",
+      "code": "KeyQ",
+      "at": 8733.70000000298
+    },
+    "frameIds": [48, 49, 50, 51, 52],
+    "finger": "left-little",
+    "allowedFingers": ["left-little"]
+  },
+  {
+    "id": "recording-1/press-16-attempt-4",
+    "recording": "recording-1",
+    "press": {
+      "key": "u",
+      "code": "KeyU",
+      "at": 9046.10000000149
+    },
+    "frameIds": [51, 52, 53, 54],
+    "finger": "right-index",
+    "allowedFingers": ["right-index"]
+  },
+  {
+    "id": "recording-1/press-17-attempt-4",
+    "recording": "recording-1",
+    "press": {
+      "key": "i",
+      "code": "KeyI",
+      "at": 9272.0
+    },
+    "frameIds": [52, 53, 54, 55, 56],
+    "finger": "right-middle",
+    "allowedFingers": ["right-middle"]
+  },
+  {
+    "id": "recording-1/press-18-attempt-4",
+    "recording": "recording-1",
+    "press": {
+      "key": "c",
+      "code": "KeyC",
+      "at": 9825.10000000149
+    },
+    "frameIds": [56, 57, 58, 59, 60],
+    "finger": "left-middle",
+    "allowedFingers": ["left-middle"]
+  },
+  {
+    "id": "recording-1/press-19-attempt-4",
+    "recording": "recording-1",
+    "press": {
+      "key": "k",
+      "code": "KeyK",
+      "at": 10145.39999999851
+    },
+    "frameIds": [59, 60, 61, 62],
+    "finger": "right-middle",
+    "allowedFingers": ["right-middle"]
+  },
+  {
+    "id": "recording-1/press-20-attempt-4",
+    "recording": "recording-1",
+    "press": {
+      "key": " ",
+      "code": "Space",
+      "at": 10369.89999999851
+    },
+    "frameIds": [60, 61, 62, 63, 64],
+    "finger": "left-thumb",
+    "allowedFingers": ["left-thumb", "right-thumb"]
+  },
+  {
+    "id": "recording-1/press-21-attempt-5",
+    "recording": "recording-1",
+    "press": {
+      "key": "f",
+      "code": "KeyF",
+      "at": 11440.80000000447
+    },
+    "frameIds": [65, 66, 67, 68, 69, 70],
+    "finger": "left-index",
+    "allowedFingers": ["left-index"]
+  },
+  {
+    "id": "recording-1/press-22-attempt-5",
+    "recording": "recording-1",
+    "press": {
+      "key": "o",
+      "code": "KeyO",
+      "at": 11732.5
+    },
+    "frameIds": [68, 69, 70, 71, 72],
+    "finger": "right-ring",
+    "allowedFingers": ["right-ring"]
+  },
+  {
+    "id": "recording-1/press-23-attempt-5",
+    "recording": "recording-1",
+    "press": {
+      "key": "x",
+      "code": "KeyX",
+      "at": 12030.10000000149
+    },
+    "frameIds": [70, 71, 72, 73, 74, 75],
+    "finger": "left-ring",
+    "allowedFingers": ["left-ring"]
+  },
+  {
+    "id": "recording-1/press-24-attempt-5",
+    "recording": "recording-1",
+    "press": {
+      "key": " ",
+      "code": "Space",
+      "at": 12512.60000000149
+    },
+    "frameIds": [75, 76, 77, 78, 79],
+    "finger": "left-thumb",
+    "allowedFingers": ["left-thumb", "right-thumb"]
+  },
+  {
+    "id": "recording-1/press-25-attempt-6",
+    "recording": "recording-1",
+    "press": {
+      "key": "z",
+      "code": "KeyZ",
+      "at": 13504.80000000447
+    },
+    "frameIds": [80, 81, 82, 83, 84],
+    "finger": "left-little",
+    "allowedFingers": ["left-little"]
+  },
+  {
+    "id": "recording-1/press-26-attempt-6",
+    "recording": "recording-1",
+    "press": {
+      "key": "i",
+      "code": "KeyI",
+      "at": 13668.60000000149
+    },
+    "frameIds": [82, 83, 84, 85, 86],
+    "finger": "right-middle",
+    "allowedFingers": ["right-middle"]
+  },
+  {
+    "id": "recording-1/press-27-attempt-6",
+    "recording": "recording-1",
+    "press": {
+      "key": "p",
+      "code": "KeyP",
+      "at": 14645.39999999851
+    },
+    "frameIds": [87, 88, 89, 90],
+    "finger": "right-little",
+    "allowedFingers": ["right-little"]
+  },
+  {
+    "id": "recording-1/press-28-attempt-6",
+    "recording": "recording-1",
+    "press": {
+      "key": "p",
+      "code": "KeyP",
+      "at": 14861.0
+    },
+    "frameIds": [88, 89, 90, 91, 92],
+    "finger": "right-little",
+    "allowedFingers": ["right-little"]
+  },
+  {
+    "id": "recording-1/press-29-attempt-6",
+    "recording": "recording-1",
+    "press": {
+      "key": "e",
+      "code": "KeyE",
+      "at": 15083.5
+    },
+    "frameIds": [90, 91, 92, 93, 94],
+    "finger": "left-middle",
+    "allowedFingers": ["left-middle"]
+  },
+  {
+    "id": "recording-1/press-30-attempt-6",
+    "recording": "recording-1",
+    "press": {
+      "key": "d",
+      "code": "KeyD",
+      "at": 15260.80000000447
+    },
+    "frameIds": [91, 92, 93, 94, 95, 96],
+    "finger": "left-middle",
+    "allowedFingers": ["left-middle"]
+  },
+  {
+    "id": "recording-1/press-31-attempt-6",
+    "recording": "recording-1",
+    "press": {
+      "key": " ",
+      "code": "Space",
+      "at": 15472.89999999851
+    },
+    "frameIds": [93, 94, 95, 96, 97, 98],
+    "finger": "left-thumb",
+    "allowedFingers": ["left-thumb", "right-thumb"]
+  },
+  {
+    "id": "recording-1/press-32-attempt-7",
+    "recording": "recording-1",
+    "press": {
+      "key": "z",
+      "code": "KeyZ",
+      "at": 18540.20000000298
+    },
+    "frameIds": [99, 100, 101, 102, 103],
+    "finger": "left-little",
+    "allowedFingers": ["left-little"]
+  },
+  {
+    "id": "recording-1/press-33-attempt-7",
+    "recording": "recording-1",
+    "press": {
+      "key": "i",
+      "code": "KeyI",
+      "at": 18990.30000000447
+    },
+    "frameIds": [103, 104, 105, 106, 107],
+    "finger": "right-middle",
+    "allowedFingers": ["right-middle"]
+  },
+  {
+    "id": "recording-1/press-34-attempt-7",
+    "recording": "recording-1",
+    "press": {
+      "key": "p",
+      "code": "KeyP",
+      "at": 21150.30000000447
+    },
+    "frameIds": [108, 109, 110, 111, 112, 113],
+    "finger": "right-ring",
+    "allowedFingers": ["right-little"]
+  },
+  {
+    "id": "recording-1/press-35-attempt-7",
+    "recording": "recording-1",
+    "press": {
+      "key": "p",
+      "code": "KeyP",
+      "at": 21305.60000000149
+    },
+    "frameIds": [109, 110, 111, 112, 113, 114],
+    "finger": "right-ring",
+    "allowedFingers": ["right-little"]
+  },
+  {
+    "id": "recording-1/press-36-attempt-7",
+    "recording": "recording-1",
+    "press": {
+      "key": "e",
+      "code": "KeyE",
+      "at": 21477.5
+    },
+    "frameIds": [111, 112, 113, 114, 115, 116],
+    "finger": "left-middle",
+    "allowedFingers": ["left-middle"]
+  },
+  {
+    "id": "recording-1/press-37-attempt-7",
+    "recording": "recording-1",
+    "press": {
+      "key": "d",
+      "code": "KeyD",
+      "at": 21630.20000000298
+    },
+    "frameIds": [113, 114, 115, 116, 117],
+    "finger": "left-middle",
+    "allowedFingers": ["left-middle"]
+  },
+  {
+    "id": "recording-1/press-38-attempt-7",
+    "recording": "recording-1",
+    "press": {
+      "key": " ",
+      "code": "Space",
+      "at": 22156.30000000447
+    },
+    "frameIds": [117, 118, 119, 120, 121],
+    "finger": "left-thumb",
+    "allowedFingers": ["left-thumb", "right-thumb"]
+  },
+  {
+    "id": "recording-2/press-1-attempt-1",
+    "recording": "recording-2",
+    "press": {
+      "key": "a",
+      "code": "KeyA",
+      "at": 0.0
+    },
+    "frameIds": [1, 2, 3, 4, 5, 6],
+    "finger": "left-little",
+    "allowedFingers": ["left-little"]
+  },
+  {
+    "id": "recording-2/press-2-attempt-1",
+    "recording": "recording-2",
+    "press": {
+      "key": " ",
+      "code": "Space",
+      "at": 2032.6000001430511
+    },
+    "frameIds": [7, 8, 9, 10, 11, 12],
+    "finger": "left-thumb",
+    "allowedFingers": ["left-thumb", "right-thumb"]
+  },
+  {
+    "id": "recording-3/press-1-attempt-1",
+    "recording": "recording-3",
+    "press": {
+      "key": "a",
+      "code": "KeyA",
+      "at": 0.0
+    },
+    "frameIds": [1, 2, 3, 4, 5, 6],
+    "finger": "left-little",
+    "allowedFingers": ["left-little"]
+  },
+  {
+    "id": "recording-3/press-2-attempt-1",
+    "recording": "recording-3",
+    "press": {
+      "key": " ",
+      "code": "Space",
+      "at": 445.80000000447035
+    },
+    "frameIds": [6, 7, 8, 9, 10],
+    "finger": "left-thumb",
+    "allowedFingers": ["left-thumb", "right-thumb"]
+  },
+  {
+    "id": "recording-3/press-3-attempt-2",
+    "recording": "recording-3",
+    "press": {
+      "key": "q",
+      "code": "KeyQ",
+      "at": 1721.3999999985099
+    },
+    "frameIds": [11, 12, 13, 14, 15, 16, 17, 18],
+    "finger": "left-little",
+    "allowedFingers": ["left-little"]
+  },
+  {
+    "id": "recording-3/press-4-attempt-2",
+    "recording": "recording-3",
+    "press": {
+      "key": "u",
+      "code": "KeyU",
+      "at": 3165.89999999851
+    },
+    "frameIds": [19, 20, 21, 22, 23, 24, 25, 26, 27],
+    "finger": "right-index",
+    "allowedFingers": ["right-index"]
+  },
+  {
+    "id": "recording-3/press-5-attempt-2",
+    "recording": "recording-3",
+    "press": {
+      "key": "i",
+      "code": "KeyI",
+      "at": 3536.10000000149
+    },
+    "frameIds": [25, 26, 27, 28, 29, 30, 31, 32],
+    "finger": "right-middle",
+    "allowedFingers": ["right-middle"]
+  },
+  {
+    "id": "recording-3/press-6-attempt-2",
+    "recording": "recording-3",
+    "press": {
+      "key": "c",
+      "code": "KeyC",
+      "at": 4003.8000000044703
+    },
+    "frameIds": [32, 33, 34, 35, 36, 37, 38, 39],
+    "finger": "left-index",
+    "allowedFingers": ["left-middle"]
+  },
+  {
+    "id": "recording-3/press-7-attempt-2",
+    "recording": "recording-3",
+    "press": {
+      "key": "k",
+      "code": "KeyK",
+      "at": 4377.20000000298
+    },
+    "frameIds": [37, 38, 39, 40, 41, 42],
+    "finger": "right-middle",
+    "allowedFingers": ["right-middle"]
+  },
+  {
+    "id": "recording-3/press-8-attempt-2",
+    "recording": "recording-3",
+    "press": {
+      "key": " ",
+      "code": "Space",
+      "at": 4754.39999999851
+    },
+    "frameIds": [40, 41, 42, 43, 44, 45, 46],
+    "finger": "left-thumb",
+    "allowedFingers": ["left-thumb", "right-thumb"]
+  },
+  {
+    "id": "recording-3/press-9-attempt-3",
+    "recording": "recording-3",
+    "press": {
+      "key": "q",
+      "code": "KeyQ",
+      "at": 7550.5
+    },
+    "frameIds": [47, 48, 49, 50, 51, 52, 53],
+    "finger": "left-little",
+    "allowedFingers": ["left-little"]
+  },
+  {
+    "id": "recording-3/press-10-attempt-3",
+    "recording": "recording-3",
+    "press": {
+      "key": "u",
+      "code": "KeyU",
+      "at": 8382.30000000447
+    },
+    "frameIds": [54, 55, 56, 57, 58, 59],
+    "finger": "right-index",
+    "allowedFingers": ["right-index"]
+  },
+  {
+    "id": "recording-3/press-11-attempt-3",
+    "recording": "recording-3",
+    "press": {
+      "key": "i",
+      "code": "KeyI",
+      "at": 8652.0
+    },
+    "frameIds": [57, 58, 59, 60, 61, 62],
+    "finger": "right-middle",
+    "allowedFingers": ["right-middle"]
+  },
+  {
+    "id": "recording-3/press-12-attempt-3",
+    "recording": "recording-3",
+    "press": {
+      "key": "c",
+      "code": "KeyC",
+      "at": 8970.70000000298
+    },
+    "frameIds": [60, 61, 62, 63, 64, 65],
+    "finger": "left-index",
+    "allowedFingers": ["left-middle"]
+  },
+  {
+    "id": "recording-3/press-13-attempt-3",
+    "recording": "recording-3",
+    "press": {
+      "key": "k",
+      "code": "KeyK",
+      "at": 9250.89999999851
+    },
+    "frameIds": [63, 64, 65, 66, 67, 68],
+    "finger": "right-middle",
+    "allowedFingers": ["right-middle"]
+  },
+  {
+    "id": "recording-3/press-14-attempt-3",
+    "recording": "recording-3",
+    "press": {
+      "key": " ",
+      "code": "Space",
+      "at": 9646.20000000298
+    },
+    "frameIds": [67, 68, 69, 70, 71, 72],
+    "finger": "left-thumb",
+    "allowedFingers": ["left-thumb", "right-thumb"]
+  },
+  {
+    "id": "recording-3/press-15-attempt-4",
+    "recording": "recording-3",
+    "press": {
+      "key": "q",
+      "code": "KeyQ",
+      "at": 11651.30000000447
+    },
+    "frameIds": [73, 74, 75, 76, 77, 78],
+    "finger": "left-little",
+    "allowedFingers": ["left-little"]
+  },
+  {
+    "id": "recording-3/press-16-attempt-4",
+    "recording": "recording-3",
+    "press": {
+      "key": "u",
+      "code": "KeyU",
+      "at": 12370.89999999851
+    },
+    "frameIds": [79, 80, 81, 82, 83, 84, 85],
+    "finger": "right-index",
+    "allowedFingers": ["right-index"]
+  },
+  {
+    "id": "recording-3/press-17-attempt-4",
+    "recording": "recording-3",
+    "press": {
+      "key": "i",
+      "code": "KeyI",
+      "at": 12765.39999999851
+    },
+    "frameIds": [84, 85, 86, 87, 88, 89],
+    "finger": "right-middle",
+    "allowedFingers": ["right-middle"]
+  },
+  {
+    "id": "recording-3/press-18-attempt-4",
+    "recording": "recording-3",
+    "press": {
+      "key": "c",
+      "code": "KeyC",
+      "at": 13300.89999999851
+    },
+    "frameIds": [89, 90, 91, 92, 93, 94],
+    "finger": "left-middle",
+    "allowedFingers": ["left-middle"]
+  },
+  {
+    "id": "recording-3/press-19-attempt-4",
+    "recording": "recording-3",
+    "press": {
+      "key": "k",
+      "code": "KeyK",
+      "at": 13766.5
+    },
+    "frameIds": [94, 95, 96, 97, 98, 99],
+    "finger": "right-middle",
+    "allowedFingers": ["right-middle"]
+  },
+  {
+    "id": "recording-3/press-20-attempt-4",
+    "recording": "recording-3",
+    "press": {
+      "key": " ",
+      "code": "Space",
+      "at": 14177.39999999851
+    },
+    "frameIds": [98, 99, 100, 101, 102, 103],
+    "finger": "left-thumb",
+    "allowedFingers": ["left-thumb", "right-thumb"]
+  },
+  {
+    "id": "recording-3/press-21-attempt-5",
+    "recording": "recording-3",
+    "press": {
+      "key": "f",
+      "code": "KeyF",
+      "at": 15355.80000000447
+    },
+    "frameIds": [104, 105, 106, 107, 108, 109, 110],
+    "finger": "left-index",
+    "allowedFingers": ["left-index"]
+  },
+  {
+    "id": "recording-4/press-1-attempt-1",
+    "recording": "recording-4",
+    "press": {
+      "key": "a",
+      "code": "KeyA",
+      "at": 0.0
+    },
+    "frameIds": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+    "finger": "left-little",
+    "allowedFingers": ["left-little"]
+  },
+  {
+    "id": "recording-4/press-2-attempt-1",
+    "recording": "recording-4",
+    "press": {
+      "key": " ",
+      "code": "Space",
+      "at": 269.2000000476837
+    },
+    "frameIds": [7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20],
+    "finger": "left-thumb",
+    "allowedFingers": ["left-thumb", "right-thumb"]
+  },
+  {
+    "id": "recording-4/press-3-attempt-2",
+    "recording": "recording-4",
+    "press": {
+      "key": "q",
+      "code": "KeyQ",
+      "at": 1199.3999999761581
+    },
+    "frameIds": [21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32],
+    "finger": "left-little",
+    "allowedFingers": ["left-little"]
+  },
+  {
+    "id": "recording-4/press-4-attempt-2",
+    "recording": "recording-4",
+    "press": {
+      "key": "u",
+      "code": "KeyU",
+      "at": 1679.2000000476837
+    },
+    "frameIds": [31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42],
+    "finger": "right-index",
+    "allowedFingers": ["right-index"]
+  },
+  {
+    "id": "recording-4/press-5-attempt-2",
+    "recording": "recording-4",
+    "press": {
+      "key": "i",
+      "code": "KeyI",
+      "at": 2040.3999999761581
+    },
+    "frameIds": [39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49],
+    "finger": "right-middle",
+    "allowedFingers": ["right-middle"]
+  },
+  {
+    "id": "recording-4/press-6-attempt-2",
+    "recording": "recording-4",
+    "press": {
+      "key": "c",
+      "code": "KeyC",
+      "at": 2676.7999999523163
+    },
+    "frameIds": [50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62],
+    "finger": "left-middle",
+    "allowedFingers": ["left-middle"]
+  },
+  {
+    "id": "recording-4/press-7-attempt-2",
+    "recording": "recording-4",
+    "press": {
+      "key": "k",
+      "code": "KeyK",
+      "at": 3074.7999999523163
+    },
+    "frameIds": [59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71],
+    "finger": "right-middle",
+    "allowedFingers": ["right-middle"]
+  },
+  {
+    "id": "recording-4/press-8-attempt-2",
+    "recording": "recording-4",
+    "press": {
+      "key": " ",
+      "code": "Space",
+      "at": 3464.7999999523163
+    },
+    "frameIds": [68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80],
+    "finger": "left-thumb",
+    "allowedFingers": ["left-thumb", "right-thumb"]
+  },
+  {
+    "id": "recording-4/press-9-attempt-3",
+    "recording": "recording-4",
+    "press": {
+      "key": "f",
+      "code": "KeyF",
+      "at": 4365.700000047684
+    },
+    "frameIds": [81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93],
+    "finger": "left-index",
+    "allowedFingers": ["left-index"]
+  },
+  {
+    "id": "recording-4/press-10-attempt-3",
+    "recording": "recording-4",
+    "press": {
+      "key": "o",
+      "code": "KeyO",
+      "at": 4740.200000047684
+    },
+    "frameIds": [90, 91, 92, 93, 94, 95, 96, 97, 98, 99],
+    "finger": "right-ring",
+    "allowedFingers": ["right-ring"]
+  },
+  {
+    "id": "recording-4/press-11-attempt-3",
+    "recording": "recording-4",
+    "press": {
+      "key": "s",
+      "code": "KeyS",
+      "at": 5219.700000047684
+    },
+    "frameIds": [99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110],
+    "finger": "left-ring",
+    "allowedFingers": ["left-ring"]
+  },
+  {
+    "id": "recording-4/press-12-attempt-3",
+    "recording": "recording-4",
+    "press": {
+      "key": " ",
+      "code": "Space",
+      "at": 5760.100000023842
+    },
+    "frameIds": [111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121],
+    "finger": "left-thumb",
+    "allowedFingers": ["left-thumb", "right-thumb"]
+  },
+  {
+    "id": "recording-4/press-13-attempt-4",
+    "recording": "recording-4",
+    "press": {
+      "key": "f",
+      "code": "KeyF",
+      "at": 7470.0
+    },
+    "frameIds": [122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132],
+    "finger": "left-index",
+    "allowedFingers": ["left-index"]
+  },
+  {
+    "id": "recording-4/press-14-attempt-4",
+    "recording": "recording-4",
+    "press": {
+      "key": "o",
+      "code": "KeyO",
+      "at": 7695.399999976158
+    },
+    "frameIds": [126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136],
+    "finger": "right-ring",
+    "allowedFingers": ["right-ring"]
+  },
+  {
+    "id": "recording-4/press-15-attempt-4",
+    "recording": "recording-4",
+    "press": {
+      "key": "s",
+      "code": "KeyS",
+      "at": 7994.299999952316
+    },
+    "frameIds": [132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143],
+    "finger": "left-ring",
+    "allowedFingers": ["left-ring"]
+  },
+  {
+    "id": "recording-4/press-16-attempt-4",
+    "recording": "recording-4",
+    "press": {
+      "key": " ",
+      "code": "Space",
+      "at": 9195.600000023842
+    },
+    "frameIds": [144, 145, 146, 147, 148, 149, 150, 151, 152, 153, 154, 155],
+    "finger": "left-thumb",
+    "allowedFingers": ["left-thumb", "right-thumb"]
+  }
+]

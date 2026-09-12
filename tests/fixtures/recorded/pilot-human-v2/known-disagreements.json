@@ -1,0 +1,18 @@
+{
+  "recording-1/press-12-attempt-3": {
+    "recordedPrediction": "left-index",
+    "humanFinger": "left-middle"
+  },
+  "recording-1/press-25-attempt-6": {
+    "recordedPrediction": "left-ring",
+    "humanFinger": "left-little"
+  },
+  "recording-1/press-32-attempt-7": {
+    "recordedPrediction": "left-ring",
+    "humanFinger": "left-little"
+  },
+  "recording-2/press-2-attempt-1": {
+    "recordedPrediction": "left-index",
+    "humanFinger": "left-thumb"
+  }
+}

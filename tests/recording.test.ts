@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { archive, unarchive } from '../src/recording/archive';
 import { validateSample } from '../src/recording/validate';
 import { replaySample } from '../src/recording/replay';
+import { scoreSample, replaceLandmarks } from '../scripts/benchmark/score';
 import { attribute } from '../src/core/observation';
 import { grade } from '../src/core/exercise';
 import { allowedFingers } from '../src/core/keyboard';
@@ -154,5 +155,48 @@ describe('sample contract and replay', () => {
     bytes[0] = 0;
     expect(() => unarchive(bytes)).toThrow('Corrupt');
     await expect(archive({ '../escape': new Blob(['no']) })).rejects.toThrow('Invalid');
+  });
+});
+
+describe('camera benchmark scoring', () => {
+  it('scores fresh landmarks against human labels, ignoring the old observation', async () => {
+    const sample = fixture();
+    sample.labels[0] = {
+      pressId: 1,
+      attemptId: 1,
+      status: 'confirmed',
+      finger: 'left-index',
+      source: 'human test label',
+    };
+    expect((await scoreSample(sample)).accuracy).toBe(1);
+    replaceLandmarks(sample, [frame(1, 11, 'f', 'left-middle', 20)]);
+    const score = await scoreSample(sample);
+    expect(score.accuracy).toBe(0);
+    expect(score.presses[0]?.predicted).toBe('left-middle');
+    expect(score.grading.correctPressesRejected).toBe(1);
+  });
+  it('counts missing inference as unclassified rather than using cached landmarks', async () => {
+    const sample = fixture();
+    sample.labels[0] = {
+      pressId: 1,
+      attemptId: 1,
+      status: 'confirmed',
+      finger: 'left-index',
+      source: 'human test label',
+    };
+    expect(replaceLandmarks(sample, [])).toBe(1);
+    const score = await scoreSample(sample);
+    expect(score).toMatchObject({ labelled: 1, matches: 0, accuracy: 0, unclassified: 1 });
+  });
+  it('excludes unlabelable answers from the accuracy denominator', async () => {
+    const sample = fixture();
+    sample.labels[0] = {
+      pressId: 1,
+      attemptId: 1,
+      status: 'unlabelable',
+      finger: null,
+      source: 'human could not tell',
+    };
+    expect(await scoreSample(sample)).toMatchObject({ labelled: 0, accuracy: null });
   });
 });

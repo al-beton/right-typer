@@ -129,3 +129,15 @@ the imported evidence if earlier edits are needed; future edits use the journal.
 
 Run `pnpm test:dataset` for synthetic integrity, migration and snapshot tests. CI
 runs these without access to private recordings.
+
+## Recorded fixtures in ordinary tests
+
+The reviewed pilot also has a compact numeric copy in
+[`tests/fixtures/recorded`](../tests/fixtures/recorded/README.md). `pnpm test:reference`
+runs the production finger-attribution heuristic against all 77 human labels; these
+checks also run automatically in `pnpm test` and `pnpm check`/CI. Known disagreements
+are explicit, and an optional strict accuracy command fails until they are fixed.
+The first four recordings were subsequently approved for publication and are used by
+the [full camera benchmark](camera-benchmark.md). Other recordings remain private
+unless separately approved. See the fixture guide for regeneration
+and for the distinction between heuristic regression, full replay and vision-model evaluation.

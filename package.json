@@ -22,7 +22,10 @@
     "sample": "vite build --config vite.sample.config.ts && node .sample-cli/sample.mjs",
     "lint": "eslint . --max-warnings 0",
     "dataset": "vite build --config vite.sample.config.ts && python3 scripts/dataset/library.py",
-    "test:dataset": "python3 -m unittest discover -s scripts/dataset -p 'test_*.py'"
+    "test:dataset": "python3 -m unittest discover -s scripts/dataset -p 'test_*.py'",
+    "test:reference": "vitest run tests/recorded-reference.test.ts --silent=false",
+    "test:reference:accuracy": "REFERENCE_STRICT=1 vitest run tests/recorded-reference.test.ts --silent=false",
+    "benchmark:camera": "pnpm assets && pnpm worker && vite build --config vite.benchmark.config.ts && node .benchmark-cli/benchmark.mjs"
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "0.10.32"

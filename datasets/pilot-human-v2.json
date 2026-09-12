@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "name": "pilot-human-v2",
+  "labelledPresses": 77,
+  "participantCount": 1,
+  "split": "development",
+  "recordings": [
+    {
+      "id": "recording-1",
+      "archiveUrl": "https://github.com/al-beton/right-typer/releases/download/reference-pilot-human-v2/recording-1.tar",
+      "archiveSha256": "63a1dc82605a4591c4896be61deae9a5c2aa6849eb136cdb8caa04f36018d2a4",
+      "labels": "pilot-human-v2/recording-1.labels.jsonl",
+      "labelsSha256": "ba5ad893a2556a9bdf4d9a24d9beebf5efddd3919eef3745bb8dbe303e531f4c"
+    },
+    {
+      "id": "recording-2",
+      "archiveUrl": "https://github.com/al-beton/right-typer/releases/download/reference-pilot-human-v2/recording-2.tar",
+      "archiveSha256": "c05993b3f9376e4e67ac09965d3e91daba4fb4494eb88ec4f4c934d49b6567ae",
+      "labels": "pilot-human-v2/recording-2.labels.jsonl",
+      "labelsSha256": "123864a25a63e6232c54419b8c36c3a6a1609e855a3f9b48f787c70ac26f746e"
+    },
+    {
+      "id": "recording-3",
+      "archiveUrl": "https://github.com/al-beton/right-typer/releases/download/reference-pilot-human-v2/recording-3.tar",
+      "archiveSha256": "929950364a9e5c53e263196484c1c29baba70769bb8385b83e3fa6522b86d26b",
+      "labels": "pilot-human-v2/recording-3.labels.jsonl",
+      "labelsSha256": "e2775fd294e68800060e7de45051a8888a06df2e0a7c29101d031bcc69389871"
+    },
+    {
+      "id": "recording-4",
+      "archiveUrl": "https://github.com/al-beton/right-typer/releases/download/reference-pilot-human-v2/recording-4.tar",
+      "archiveSha256": "76e435bf441ba138086b126d87ccaf6ee97a6b5e2da6f977db7fc23f60f498f0",
+      "labels": "pilot-human-v2/recording-4.labels.jsonl",
+      "labelsSha256": "a991703d0bde634760e7b757290da267f2a0b8d8ed60e273f02a2a3c0cd0d7a9"
+    }
+  ]
+}
