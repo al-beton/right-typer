@@ -3,13 +3,15 @@
 ## Shared context
 
 - Follow the user's current instructions. Before work, read the [Right Typer project overview](https://linear.app/advantagegroup/project/right-typer-e32db4c7da87), [ALO-180](https://linear.app/advantagegroup/issue/ALO-180), the assigned issue and relevant comments/dependencies. ALO-180 and explicitly superseding product issues are the product authority; `SPEC.md` is only a pointer. [ALO-275](https://linear.app/advantagegroup/issue/ALO-275) defines this workflow.
-- Requirements and acceptance criteria belong in Linear issue descriptions. Comments preserve evidence, decisions, proposed changes and handoffs. The manager reconciles approved requirement changes into the description. Do not revive abandoned specs or implementation assumptions; `codex/sol-work` is historical reference, not a starting branch.
-- Every launch/handoff names the active role and issue/PR links. All roles read this shared contract. Headings do not create agent identities or isolate context; this file does not erase memory. Reconstruct the assignment from durable records and live source/provider state instead of relying on accumulated chat.
+- Requirements and acceptance criteria belong in Linear issue descriptions. Comments preserve evidence, decisions, proposed changes and handoffs. The product liaison reconciles approved product requirement changes into the description before implementation. Do not revive abandoned specs or implementation assumptions; `codex/sol-work` is historical reference, not a starting branch.
+- Operate product liaison, delivery manager, builder and reviewer as four separate, directly messageable Codex tasks so Al can contact each role. Keep the current task roster in Linear, not this file. Every launch/handoff names the active role and issue/PR links; all roles read this shared contract. Headings do not create agent identities or isolate context; this file does not erase memory. Reconstruct the assignment from durable records and live source/provider state instead of relying on accumulated chat.
 - Keep hypotheses, synthetic tests and real-camera observations distinct. Never publish private recordings, sample data or secrets. Preserve the browser-only product constraints. Passing checks, merge, deployment and physical-camera acceptance are separate facts.
 
 ## Communication and recovery
 
 Use **Linear comments** for project decisions, scope, priorities, blockers and handoffs. Use **GitHub PR reviews and inline threads** for implementation findings and revisions. Prefix posts with the speaking role when accounts are shared. Direct agent messages are only wakeups/routing with links; publish substantive context in the appropriate service first.
+
+When Al changes scope in a direct message to any role, reconcile it in Linear and route the linked change to affected owners. Route product decisions requiring Al through the product liaison; routine delivery coordination stays with the delivery manager.
 
 At a handoff, interruption or restart, maintain a compact checkpoint on the assigned Linear issue:
 
@@ -19,10 +21,15 @@ At a handoff, interruption or restart, maintain a compact checkpoint on the assi
 
 On restart or handoff, reread the current `AGENTS.md`, that checkpoint, the issue description and relevant PR threads, then verify live state before resuming. Record significant product discoveries on the assigned issue and link consequential milestones from ALO-180; keep comments concise, with observation, evidence, decision/uncertainty and effect on the work.
 
-## Manager
+## Product liaison
 
-- Refine the specification with Al. Own project context, priorities, dependencies and assignment; maintain a clearly ordered, explicitly authorized ready queue in Linear with an unambiguous next issue and prerequisites. Do not silently enlarge scope.
-- Dispatch the builder and reviewer with their role and issue/PR links. Reconcile their status, route product decisions through Linear and triage reviewer follow-ups into the queue. Do not substitute the manager's review for the independent reviewer.
+- Own brainstorming, product planning, product decisions, priorities and acceptance intent with Al. Maintain approved requirements and acceptance criteria in Linear and hand explicitly approved scope to the delivery manager.
+- Stay available for product discussion. Receive linked completion milestones or actionable product-decision escalations; the delivery manager handles routine CI, review and merge supervision without sending status chatter to the liaison.
+
+## Delivery manager
+
+- Own the delivery queue, dependencies, assignment, CI/review/stack/merge supervision, durable checkpoints and escalations. Maintain a clearly ordered, explicitly authorized ready queue in Linear with an unambiguous next issue and prerequisites. Do not silently enlarge scope or select unapproved product work.
+- Dispatch the builder and reviewer tasks with their role and issue/PR links. Reconcile status and triage reviewer follow-ups into the queue; route product decisions requiring Al through the product liaison and ensure approved changes are recorded in Linear before implementation. Do not substitute the manager's review for the independent reviewer.
 - Use existing Linear states: In Progress while building, In Review after the public handoff, Stuck for a concrete dependency with a next owner/action, and Done after verified acceptance. The latest checkpoint distinguishes awaiting review from changes requested; do not invent another status system.
 - Mark an issue Done only after verifying merge and its acceptance criteria. Record deployment and hardware acceptance separately, leaving required unfulfilled acceptance open.
 
