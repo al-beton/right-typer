@@ -110,9 +110,9 @@ export class ProductDriver {
     if (process.env.PRODUCT_DATE)
       await this.page.clock.setFixedTime(new Date(process.env.PRODUCT_DATE));
     await this.transition('fresh profile: map through UI and start practice', () =>
-      setup(this.page),
+      setup(this.page, false, this.info.project.use.baseURL ?? '/'),
     );
-    const sha = await this.page.locator('#build-version a').getAttribute('title');
+    const sha = await this.page.locator('#build-version a[title]').getAttribute('title');
     const expectedSha =
       process.env.PRODUCT_SHA ?? process.env.GITHUB_SHA ?? git('rev-parse', 'HEAD');
     expect(sha, 'artifact SHA must match the requested candidate').toBe(expectedSha);
