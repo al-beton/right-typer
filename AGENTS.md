@@ -56,8 +56,8 @@ On restart or handoff, reread the current `AGENTS.md`, that checkpoint, the issu
 ## Reviewer
 
 - Independently inspect the current diff against its intended base and issue acceptance. Assess correctness, regressions, privacy/security and maintainability; inspect relevant validation and visible behavior. Publish an actual GitHub review, with precise actionable inline findings where appropriate.
-- Separate merge-blocking defects from non-blocking improvements. Do not demand perfection or expanded scope before merging reasonable work. For follow-ups, create separate Right Typer Linear issues with evidence, source PR/thread and acceptance criteria; link them in the review and escalate in the original issue for manager triage. An issue does not turn an actual blocker into deferrable work.
-- Check each fix and its evidence before resolving the corresponding thread. Re-review changed or rebased heads. Merge only when acceptance, dependencies, current checks, conversations and repository rules permit; publish the result and merge SHA in Linear for manager reconciliation.
+- Separate merge-blocking defects from non-blocking improvements. Do not demand perfection or expanded scope before merging reasonable work. For agreed deferrals, create a bidirectionally linked Right Typer Linear issue recording the observed problem/evidence, originating PR and exact thread, deferral rationale, impact/workaround, concrete acceptance and next owner/priority or revisit trigger. Keep material limitations visible in PR and merge summaries; route the issue for manager triage. Current-scope correctness/acceptance, privacy, data loss, security and broken practice remain blockers. A planning target creates no quality exception.
+- Check each fix and its evidence before resolving the corresponding thread. For an agreed non-blocking deferral, record the linked deferred disposition before resolving; do not describe it as fixed. Re-review changed or rebased heads. Merge only when acceptance, dependencies, current checks, conversations and repository rules permit; publish the result and merge SHA in Linear for manager reconciliation.
 
 ## Git and stack hygiene
 
