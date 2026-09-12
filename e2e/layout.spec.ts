@@ -46,17 +46,27 @@ test('one stable page from camera off through mapping, optional test, retry and 
   await expect(page.locator('#diagnostic-result')).toContainText('saw left index');
   await page.screenshot({ path: 'test-results/single-page-mapped-synthetic.png', fullPage: true });
   await resumePractice(page);
-  await expect(page.locator('.next-key')).toHaveAttribute('data-key', 'KeyA');
+  const WORDS = await page.locator('.passage > span').allTextContents();
+  await expect(page.locator('.next-key')).toHaveAttribute(
+    'data-key',
+    `Key${WORDS[0]![0]!.toUpperCase()}`,
+  );
   expect(await positions()).toEqual(initial);
   await press(page, 'a', 'left-index');
   await press(page, ' ');
   await expect(page.locator('#feedback')).toContainText('saw left index');
   expect(await positions()).toEqual(initial);
   await page.locator('#typing').press('Space');
-  await expect(page.locator('.next-key')).toHaveAttribute('data-key', 'KeyA');
-  await word(page, 'a');
-  await expect(page.locator('.passage .active')).toHaveText('quick');
-  await expect(page.locator('.next-key')).toHaveAttribute('data-key', 'KeyQ');
+  await expect(page.locator('.next-key')).toHaveAttribute(
+    'data-key',
+    `Key${WORDS[0]![0]!.toUpperCase()}`,
+  );
+  await word(page, WORDS[0]!);
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
+  await expect(page.locator('.next-key')).toHaveAttribute(
+    'data-key',
+    `Key${WORDS[1]![0]!.toUpperCase()}`,
+  );
   expect(await positions()).toEqual(initial);
   await editSetup(page);
   await expect(page.locator('.next-key')).toHaveCount(0);

@@ -1,5 +1,4 @@
 import { test, expect } from '@playwright/test';
-import { WORDS } from '../src/passage';
 import { syntheticCamera, setup, openSettings, resumePractice, word } from './helpers';
 
 test('saved practice, modal ownership, explicit resume and preserved custom draft', async ({
@@ -9,8 +8,9 @@ test('saved practice, modal ownership, explicit resume and preserved custom draf
   await setup(page);
   await page.reload();
   await expect(page.locator('#typing')).toBeEnabled();
-  await page.locator('#typing').pressSequentially('a ');
-  await expect(page.locator('.passage .active')).toHaveText('quick');
+  const WORDS = await page.locator('.passage > span').allTextContents();
+  await page.locator('#typing').pressSequentially(WORDS[0]! + ' ');
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
   const calibration = await page.evaluate(
     () => JSON.parse(localStorage.getItem('right-typer.v1')!).calibration,
   );
@@ -51,7 +51,7 @@ test('saved practice, modal ownership, explicit resume and preserved custom draf
   await page.keyboard.down('Enter');
   await page.keyboard.up('Enter');
   await expect(page.locator('#typing')).toHaveValue('');
-  await expect(page.locator('.passage .active')).toHaveText('quick');
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
   expect(
     await page.evaluate(() => JSON.parse(localStorage.getItem('right-typer.v1')!).calibration),
   ).toMatchObject({ points: calibration.points });
@@ -78,8 +78,9 @@ test('diagnostic only owns its focused field and camera mapping stays recoverabl
   await expect(page.locator('#overlay')).toHaveClass(/calibrating/);
   await page.screenshot({ path: 'test-results/alo281/drawer.png', fullPage: true });
   await resumePractice(page);
-  await word(page, 'a');
-  await expect(page.locator('.passage .active')).toHaveText('quick');
+  const WORDS = await page.locator('.passage > span').allTextContents();
+  await word(page, WORDS[0]!);
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
 });
 
 for (const width of [320, 390, 640])
@@ -119,17 +120,18 @@ test('checking keeps the same input and value; tabbed-away focus stays away', as
   await syntheticCamera(page, []);
   await setup(page);
   const input = await page.locator('#typing').elementHandle();
-  await page.locator('#typing').press('a');
+  const WORDS = await page.locator('.passage > span').allTextContents();
+  await page.locator('#typing').pressSequentially(WORDS[0]!);
   await page.evaluate(() => {
     window.__inferenceDelay = 2000;
   });
   await page.locator('#typing').press('Space');
   await expect(page.locator('#typing')).toHaveAttribute('readonly', '');
   expect(await input!.evaluate((el) => el === document.querySelector('#typing'))).toBe(true);
-  await expect(page.locator('#typing')).toHaveValue('a');
+  await expect(page.locator('#typing')).toHaveValue(WORDS[0]!);
   await expect(page.locator('#typing')).toBeFocused();
   await page.locator('#settings-open').focus();
-  await expect(page.locator('.passage .active')).toHaveText('quick');
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
   await expect(page.locator('#settings-open')).toBeFocused();
   expect(await input!.evaluate((el) => el === document.querySelector('#typing'))).toBe(true);
 });
@@ -169,6 +171,7 @@ test('completed practice starts afresh from the drawer after an earlier pause', 
 }) => {
   await syntheticCamera(page, []);
   await setup(page);
+  let WORDS = await page.locator('.passage > span').allTextContents();
   await page.locator('#typing').pressSequentially(WORDS[0]! + ' ');
   await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
   await openSettings(page);
@@ -184,6 +187,7 @@ test('completed practice starts afresh from the drawer after an earlier pause', 
   await openSettings(page, 'history-group');
   await expect(page.locator('#settings-resume')).toHaveText('Close & practise again');
   await resumePractice(page);
+  WORDS = await page.locator('.passage > span').allTextContents();
   await expect(page.locator('.passage .active')).toHaveText(WORDS[0]!);
   await expect(page.locator('#typing')).toHaveValue('');
   await expect(page.locator('#typing')).toBeFocused();

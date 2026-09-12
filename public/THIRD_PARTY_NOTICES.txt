@@ -18,3 +18,8 @@ Their licenses remain in their installed packages.
 
 Right Typer is not affiliated with Google or TypingTA. No TypingTA code,
 branding, or assets are included.
+
+The curated English practice word list derives from ESDB/SCOWL, revision
+1e5b7d3a72f47a71da5d28686c1dd4b397178485. Applicable upstream copyrights
+and permissions are retained in licenses/ESDB-NOTICE.txt. Source and
+selection provenance: https://github.com/al-beton/right-typer/tree/main/docs/corpus

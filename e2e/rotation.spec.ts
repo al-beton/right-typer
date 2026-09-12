@@ -58,8 +58,9 @@ test.describe('camera view rotation', () => {
             (angle % 180 ? canvasBox.width : canvasBox.height),
         ).toBeLessThanOrEqual(1.01);
       }
-      await word(page, 'a');
-      await expect(page.locator('.passage .active')).toHaveText('quick');
+      const WORDS = await page.locator('.passage > span').allTextContents();
+      await word(page, WORDS[0]!);
+      await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
       // Settings abandons the partial attempt, retaining the current word and tracking.
       await page.locator('#typing').press('q');
       await openSettings(page);

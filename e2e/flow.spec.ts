@@ -27,9 +27,10 @@ test('mapping hands focus to Start without consuming activation as a typing pres
   await expect(page.locator('#typing')).toBeFocused();
   await expect(page.locator('#typing')).toHaveValue('');
   await expect(page.locator('.practice-metrics')).toContainText('0 retries');
-  await page.locator('#typing').press('a');
+  const WORDS = await page.locator('.passage > span').allTextContents();
+  await page.locator('#typing').pressSequentially(WORDS[0]!);
   await page.locator('#typing').press('Space');
-  await expect(page.locator('.passage .active')).toHaveText('quick');
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
   await expect(page.locator('#feedback')).toContainText('could not verify');
 });
 
@@ -38,7 +39,8 @@ test('pause preserves progress, rejects detached input and keeps mapping out of 
 }) => {
   await syntheticCamera(page);
   await setup(page);
-  await word(page, 'a');
+  const WORDS = await page.locator('.passage > span').allTextContents();
+  await word(page, WORDS[0]!);
   const previousInput = await page.locator('#typing').elementHandle();
   await page.locator('#typing').press('Escape');
   await expect(page.getByRole('button', { name: 'Resume practice', exact: true })).toBeFocused();
@@ -49,7 +51,7 @@ test('pause preserves progress, rejects detached input and keeps mapping out of 
   await page.getByRole('button', { name: 'Resume practice', exact: true }).press('Enter');
   await expect(page.locator('#typing')).toBeFocused();
   await expect(page.locator('#typing')).toHaveValue('');
-  await expect(page.locator('.passage .active')).toHaveText('quick');
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
   await expect(page.locator('.practice-metrics')).toContainText('1 /');
   await editSetup(page);
   await expect(page.locator('#mapping-editor')).toBeVisible();
@@ -76,7 +78,8 @@ test('boundary completion preserves focus in controls and editor keys never ente
   await page.evaluate(() => {
     window.__inferenceDelay = 2000;
   });
-  await page.locator('#typing').pressSequentially('a ');
+  const WORDS = await page.locator('.passage > span').allTextContents();
+  await page.locator('#typing').pressSequentially(WORDS[0]! + ' ');
   await page.locator('#settings-open').focus();
   await expect(page.locator('#feedback')).not.toContainText('Checking fingers');
   await expect(page.locator('#settings-open')).toBeFocused();
@@ -140,7 +143,8 @@ for (const control of ['Pause', 'Settings & progress']) {
     await page.evaluate(() => {
       window.__inferenceDelay = 2000;
     });
-    await page.locator('#typing').pressSequentially('a ');
+    const WORDS = await page.locator('.passage > span').allTextContents();
+    await page.locator('#typing').pressSequentially(WORDS[0]! + ' ');
     const button = page.getByRole('button', { name: control, exact: true });
     await button.focus();
     await expect(page.locator('#feedback')).not.toContainText('Checking fingers');

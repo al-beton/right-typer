@@ -34,7 +34,9 @@ import { validCalibration } from './core/calibration';
 import { Exercise, feedback } from './core/exercise';
 import { load, reset, save } from './core/storage';
 import type { Calibration, Frame, Point, Press } from './core/types';
-import { WORDS } from './passage';
+import { Progress, getCohort, signature } from './curriculum/progress';
+import { currentRound, completeRound, roundWords, missingOutputs } from './curriculum/selection';
+import { ProgressStore } from './curriculum/storage';
 
 const $ = <T extends HTMLElement>(selector: string) => document.querySelector<T>(selector)!;
 const escapeHtml = (text: string) =>
@@ -68,7 +70,27 @@ let disconnectedDraft: Calibration | undefined;
 let points: Record<string, Point> = {};
 let selectedKey = 0;
 let swapHands = saved.calibration?.swapHands ?? false;
-let exercise = new Exercise(WORDS, fingeringMode);
+const progressStore = new ProgressStore(showStorageWarning);
+const progressSeed = () => crypto.getRandomValues(new Uint32Array(1))[0]!;
+let progress = new Progress(
+  getCohort(progressStore.data, signature(profile, fingeringMode), progressSeed()),
+  () => progressStore.schedule(),
+);
+let round = currentRound(progress.cohort, profile);
+let exercise = new Exercise(roundWords(round), fingeringMode);
+function selectCourse() {
+  const identity = signature(profile, fingeringMode);
+  if (identity === progress.cohort.signature) return;
+  progress.abandon();
+  progress = new Progress(getCohort(progressStore.data, identity, progressSeed()), () =>
+    progressStore.schedule(),
+  );
+  round = currentRound(progress.cohort, profile);
+  exercise = new Exercise(roundWords(round), fingeringMode);
+  resuming = false;
+  if (phase === 'results') phase = 'verify';
+  progressStore.flush();
+}
 let resuming = false;
 let setupOpen = true;
 let message = saved.migrationNotice ?? '';
@@ -128,6 +150,7 @@ document.addEventListener(
   'keydown',
   (event) => {
     if (event.key === ' ' || event.key === 'Enter') heldActivations.add(event.key);
+    if (blockedActivations.has(event.key)) event.preventDefault();
   },
   true,
 );
@@ -237,12 +260,17 @@ rotationControl.onchange = () => {
   if (camera.latest) drawOverlay(camera.latest);
 };
 
+function showStorageWarning() {
+  const element = document.querySelector<HTMLElement>('#storage-warning');
+  if (!element) return;
+  element.textContent = [storageWarning, progressStore.notice].filter(Boolean).join(' ');
+  element.hidden = !element.textContent;
+}
 function store() {
   if (!save(saved))
     storageWarning =
       'Local storage is unavailable. This session still works; calibration will not survive a reload.';
-  $('#storage-warning').textContent = storageWarning;
-  $('#storage-warning').hidden = !storageWarning;
+  showStorageWarning();
 }
 function keyboard() {
   const key = (draw: HardwareKey) => {
@@ -284,6 +312,8 @@ modeControl.onchange = () => {
   void sample?.stop('fingering-mode-changed');
   fingeringMode = modeControl.value;
   saved.fingeringMode = fingeringMode;
+  selectCourse();
+  progress.abandon();
   exercise.changeMode(fingeringMode);
   diagnosticsId--;
   boundaryKeys = 0;
@@ -327,22 +357,25 @@ function render() {
   const checking = practicing && exercise.state === 'checking';
   const stats = exercise.stats(performance.now());
   const last = saved.results.at(-1);
+  const displayedRound = complete ? progress.cohort.course.round! : round;
+  const focusText = `${complete ? 'Next round' : `Round ${round.sequence}`} · Focus: ${keyName(displayedRound.focus)} · ${progress.cohort.course.included} keys. ${displayedRound.introduced ? `New key: ${keyName(displayedRound.introduced)}. Text and timing readiness earned.` : 'Build steady, accurate responses.'}`;
   const action = practicing
     ? '<button class="text-button" id="pause">Pause</button>'
     : complete
-      ? '<button class="primary" id="restart">Practise again</button>'
+      ? '<button class="primary" id="restart">Next round</button>'
       : `<button class="primary" id="practice" ${ready() ? '' : 'disabled'}>${resuming ? 'Resume practice' : 'Start practice'}</button>`;
   const feedbackText = complete
-    ? `Passage complete · ${stats.wpm.toFixed(1)} WPM · ${stats.retries} retries. All words accepted. Camera detection can be wrong.`
+    ? `Round complete · ${stats.wpm.toFixed(1)} WPM · ${stats.retries} retries. All words accepted. Camera detection can be wrong.`
     : retry
-      ? feedback(exercise.lastVerdict!, WORDS[exercise.index]!, exercise.attempt.mode)
+      ? feedback(exercise.lastVerdict!, exercise.words[exercise.index]!, exercise.attempt.mode)
       : checking
         ? 'Checking fingers. Wait for the next word.'
         : practicing
           ? message || 'Type the whole word, then Space.'
           : flowMessage();
   content.innerHTML = `<section class="practice${complete ? ' results' : ''}">
-    <div class="practice-top"><span class="practice-metrics">Practice · <span>${exercise.index} / ${WORDS.length} words</span><span>${stats.retries} retries</span></span>${action}</div>
+    <div class="practice-top"><span class="practice-metrics">Practice · <span>${exercise.index} / ${exercise.words.length} words</span><span>${stats.retries} retries</span></span>${action}</div>
+    <p id="round-focus" class="recent">${escapeHtml(focusText)}${displayedRound.diagnostic ? ` ${escapeHtml(displayedRound.diagnostic)}` : ''}</p>
     ${passageMarkup()}
     <div class="entry-heading"><label for="typing">${complete ? 'Completed' : retry ? 'Try again' : 'Your word'}</label><span id="word-hint">Space finishes each word.</span></div>
     <div class="word-entry ${retry ? 'needs-retry' : ''}"><input id="typing" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type the current word" aria-describedby="word-hint${complete ? '' : ' current-target'}" placeholder="${complete ? 'Passage complete' : practicing ? 'type here' : resuming ? 'Paused' : 'Ready when you are'}" /></div>
@@ -365,6 +398,7 @@ function render() {
   input.readOnly = retry || checking;
   input.value = complete ? '' : exercise.attempt.text;
   input.onkeydown = typing;
+  input.onblur = () => progress.breakTiming();
   input.onkeyup = (event) => recordKey(event, 'keyup');
   input.onbeforeinput = (event) => event.preventDefault();
   if (!previousInput)
@@ -388,7 +422,10 @@ function render() {
       void sample?.stop('passage-restarted');
       disableAutoStart();
       resuming = false;
-      exercise = new Exercise(WORDS, fingeringMode);
+      exercise = new Exercise(
+        roundWords((round = currentRound(progress.cohort, profile))),
+        fingeringMode,
+      );
       message = '';
       if (ready()) startPractice();
       else setPhase(camera.status === 'ready' ? 'verify' : 'setup');
@@ -413,8 +450,9 @@ function render() {
       : 'Close & start practice';
   $('#data-notice').textContent =
     storageWarning ||
+    progressStore.notice ||
     saved.migrationNotice ||
-    'Reset clears calibration, preferences, custom profiles and result history on this device.';
+    'Reset clears calibration, preferences, custom profiles, adaptive progress and result history on this device.';
   renderHistory();
   if (!practicing)
     document
@@ -485,17 +523,21 @@ function startCalibration() {
   setPhase('calibrate');
 }
 function ready() {
-  return camera.status === 'ready' && coverage(profile).length === 0 && draftValid();
+  return (
+    camera.status === 'ready' &&
+    missingOutputs(progress.cohort, profile).length === 0 &&
+    draftValid()
+  );
 }
 function passageMarkup() {
-  return `<div class="passage" aria-label="Practice passage">${WORDS.map((w, i) => `<span class="${i < exercise.index ? 'passed' : i === exercise.index ? 'active' : ''}" ${i === exercise.index ? 'id="current-target" aria-current="step"' : ''}>${w}</span>`).join(' ')}</div>`;
+  return `<div class="passage" aria-label="Practice passage">${exercise.words.map((w, i) => `<span class="${i < exercise.index ? 'passed' : i === exercise.index ? 'active' : ''}" ${i === exercise.index ? 'id="current-target" aria-current="step"' : ''}>${w}</span>`).join(' ')}</div>`;
 }
 function flowMessage() {
   if (camera.status === 'loading') return 'Starting camera…';
   if (camera.status !== 'ready')
     return camera.status === 'error' ? camera.error : 'Connect the camera to practise.';
-  if (coverage(profile).length)
-    return `Missing passage characters: ${coverage(profile).join(' ')}. Edit your keyboard profile.`;
+  if (missingOutputs(progress.cohort, profile).length)
+    return `Missing practice characters: ${missingOutputs(progress.cohort, profile).join(' ')}. Adjust your keyboard profile; saved progress is preserved.`;
   if (!draftValid())
     return Object.keys(points).length === CALIBRATION_KEYS.length
       ? 'Adjust overlapping dots or flat rows in the camera image.'
@@ -509,10 +551,14 @@ function editSetup() {
   void sample?.stop('edit-setup');
   disableAutoStart();
   if (phase === 'practice') {
+    progress.abandon();
     exercise.pause();
     resuming = true;
   } else if (phase === 'results') {
-    exercise = new Exercise(WORDS, fingeringMode);
+    exercise = new Exercise(
+      roundWords((round = currentRound(progress.cohort, profile))),
+      fingeringMode,
+    );
     resuming = false;
   }
   setupOpen = true;
@@ -582,11 +628,16 @@ function startPractice() {
   saved.practiceEnabled = true;
   autoStartPending = false;
   store();
+  progress.abandon();
   camera.evidence.reset();
   message = '';
   boundaryKeys = 0;
   if (resuming && exercise.state !== 'complete') exercise.retry();
-  else exercise = new Exercise(WORDS, fingeringMode);
+  else
+    exercise = new Exercise(
+      roundWords((round = currentRound(progress.cohort, profile))),
+      fingeringMode,
+    );
   resuming = false;
   setPhase('practice');
   $('#typing').focus({ preventScroll: true });
@@ -658,6 +709,7 @@ function cameraChanged() {
     if (!cameraErrorHandled && ['practice', 'verify', 'calibrate'].includes(phase)) {
       cameraErrorHandled = true;
       if (phase === 'practice') {
+        progress.abandon();
         exercise.pause();
         resuming = true;
       }
@@ -898,15 +950,25 @@ $('#reset').onclick = () => {
   }
   void sample?.stop('local-data-reset');
   camera.stop();
+  progress.abandon();
+  const progressReset = progressStore.reset();
   profile = PRESETS[0]!;
   CALIBRATION_KEYS = calibrationCodes(profile);
   saved.profileId = profile.id;
   profilesUI.reset();
   fingeringMode = 'standard';
   modeControl.value = fingeringMode;
+  progress = new Progress(
+    getCohort(progressStore.data, signature(profile, fingeringMode), progressSeed()),
+    () => progressStore.schedule(),
+  );
+  round = currentRound(progress.cohort, profile);
   $('#policy-status').textContent = '';
   $('#finger-map').innerHTML = keyboard();
-  exercise = new Exercise(WORDS, fingeringMode);
+  exercise = new Exercise(
+    roundWords((round = currentRound(progress.cohort, profile))),
+    fingeringMode,
+  );
   saved = { results: [] };
   disconnectedDraft = undefined;
   autoStartPending = false;
@@ -918,10 +980,9 @@ $('#reset').onclick = () => {
   calibration = undefined;
   points = {};
   resuming = false;
-  if (!reset())
+  if (!reset() || !progressReset)
     storageWarning = 'Browser storage could not be cleared. Clear site data in Chrome settings.';
-  $('#storage-warning').textContent = storageWarning;
-  $('#storage-warning').hidden = !storageWarning;
+  showStorageWarning();
   resetArmed = false;
   $('#reset').textContent = 'Reset local data';
   setPhase('setup');
@@ -970,6 +1031,7 @@ function typing(event: KeyboardEvent) {
     return;
   }
   if (event.key === 'Backspace') {
+    progress.correction();
     exercise.backspace();
     updateTyped();
     return;
@@ -989,6 +1051,18 @@ function typing(event: KeyboardEvent) {
     $('#input-message').textContent = resolved.error;
     return;
   }
+  const word = exercise.words[exercise.index]!;
+  const buffer = exercise.attempt.text;
+  const expectedCharacter =
+    buffer.length < word.length
+      ? word[buffer.length]
+      : buffer.length === word.length
+        ? ' '
+        : undefined;
+  const expectedCode =
+    expectedCharacter === undefined ? undefined : characterKey(profile, expectedCharacter)?.code;
+  const correct = event.key === expectedCharacter;
+  const correctPrefix = correct && word.startsWith(buffer);
   const press = exercise.press(
     event.key,
     keyTime(event, performance.now(), performance.timeOrigin),
@@ -996,10 +1070,26 @@ function typing(event: KeyboardEvent) {
   if (!press) return;
   press.code = resolved.code;
   press.allowedFingers = profileFingers(profile, resolved.code, fingeringMode);
+  const progressOwner = progress;
+  const progressPress = progressOwner.accept({
+    code: resolved.code,
+    expected:
+      expectedCharacter !== undefined && expectedCode
+        ? { character: expectedCharacter, code: expectedCode }
+        : undefined,
+    correct,
+    correctPrefix,
+    allowed: press.allowedFingers,
+    word: round.slots[exercise.index]!.word,
+    round: round.sequence,
+    at: press.at,
+  });
+  if (event.key === ' ') progressOwner.breakTiming();
   if (event.key === ' ') render();
   else updateTyped();
   const owner = exercise;
   void camera.evidence.request(press, calibration!).then((observation) => {
+    progressOwner.observe(progressPress, observation);
     if (owner !== exercise) return;
     const accepted = exercise.observe(press.id, press.attemptId, observation);
     sample?.event({
@@ -1024,11 +1114,14 @@ function typing(event: KeyboardEvent) {
       sample.event({
         type: 'verdict',
         attempt,
-        word: WORDS[attempt.wordIndex]!,
+        word: exercise.words[attempt.wordIndex]!,
         verdict: replayVerdict,
       });
     }
     if (exercise.state === 'complete') {
+      for (const key of heldActivations) blockedActivations.add(key);
+      completeRound(progress.cohort, profile);
+      progressStore.flush();
       saved.results.push({
         ...exercise.stats(performance.now()),
         date: new Date().toISOString(),
@@ -1053,7 +1146,7 @@ function typing(event: KeyboardEvent) {
 function updateTyped() {
   const input = $<HTMLInputElement>('#typing');
   input.value = exercise.attempt.text;
-  const next = WORDS[exercise.index]?.[exercise.attempt.text.length] ?? ' ';
+  const next = exercise.words[exercise.index]?.[exercise.attempt.text.length] ?? ' ';
   const nextOutput = characterKey(profile, next)?.outputs.find((o) => o.text === next);
   const modifiers = [nextOutput?.shift ? 'Shift' : '', nextOutput?.altGr ? 'AltGr' : '']
     .filter(Boolean)
@@ -1067,6 +1160,7 @@ function updateTyped() {
     );
 }
 function retryWord() {
+  progress.abandon();
   sample?.event({ type: 'lifecycle', name: 'retry' });
   exercise.retry();
   message = 'Type the whole word, then space.';
@@ -1076,6 +1170,7 @@ function retryWord() {
 function pause(remember = true) {
   void sample?.stop('practice-paused');
   if (remember) disableAutoStart();
+  progress.abandon();
   exercise.pause();
   resuming = true;
   setupOpen = false;
@@ -1164,6 +1259,7 @@ const profilesUI = profileControls(
   (next, customs) => {
     void sample?.stop('keyboard-profile-changed');
     disableAutoStart();
+    progress.abandon();
     exercise.pause();
     resuming = phase === 'practice' || resuming;
     diagnosticsId--;
@@ -1173,6 +1269,7 @@ const profilesUI = profileControls(
       saved.calibrations = { ...saved.calibrations, [profile.id]: structuredClone(calibration) };
     const previous = makeCalibration();
     profile = next;
+    selectCourse();
     CALIBRATION_KEYS = calibrationCodes(profile);
     selectedKey = 0;
     saved.profileId = profile.id;
@@ -1196,7 +1293,11 @@ const profilesUI = profileControls(
       : 'This keyboard needs its own key positions. Previous calibration is retained locally; map the keys before starting.';
     $('#profile-status').textContent = message;
     phase = camera.status === 'ready' ? (calibration ? 'verify' : 'calibrate') : 'setup';
-    if (!resuming) exercise = new Exercise(WORDS, fingeringMode);
+    if (!resuming)
+      exercise = new Exercise(
+        roundWords((round = currentRound(progress.cohort, profile))),
+        fingeringMode,
+      );
     $('#finger-map').innerHTML = keyboard();
     store();
     render();
@@ -1208,7 +1309,10 @@ $('#profile-status').textContent = coverage(profile).length
 document.addEventListener('visibilitychange', () => {
   if (document.hidden && phase === 'practice') pause(false);
 });
+window.addEventListener('blur', () => progress.breakTiming());
 window.addEventListener('pagehide', () => {
+  progress.abandon();
+  progressStore.flush();
   sample?.discard();
   camera.stop();
 });
@@ -1281,7 +1385,7 @@ function updateSampleControls() {
         {
           calibration: makeCalibration(),
           mode: fingeringMode,
-          words: WORDS,
+          words: roundWords(currentRound(progress.cohort, profile)),
           rotation: cameraRotation,
           participantId: $<HTMLInputElement>('#sample-person').value,
           setupId: $<HTMLInputElement>('#sample-setup').value,
@@ -1305,6 +1409,7 @@ function updateSampleControls() {
 }
 $('#finger-map').innerHTML = keyboard();
 render();
+showStorageWarning();
 updateCameraChoices();
 
 if (saved.cameraDisconnected) cameraChanged();

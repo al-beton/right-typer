@@ -2,13 +2,26 @@ import { hardwareKeys } from '../src/view/hardware';
 import { test, expect } from '@playwright/test';
 import { syntheticCamera, openSettings, resumePractice, editSetup } from './helpers';
 import { PRESETS, calibrationCodes, characterKey } from '../src/core/profile';
-import { WORDS } from '../src/passage';
 import { calibration } from '../tests/fixtures';
+import { emptyData, getCohort, signature, ORDER } from '../src/curriculum/progress';
+import { generateRound } from '../src/curriculum/selection';
+import { PROGRESS_KEY } from '../src/curriculum/storage';
 
 test('presets update physical labels; French shifted punctuation completes passage with unknown evidence', async ({
   page,
 }) => {
   test.setTimeout(120000);
+  // This existing keyboard-mapping regression explicitly exercises the final
+  // punctuation stage. The separate adaptive journey earns its own first unlock.
+  const progress = emptyData();
+  const french = getCohort(progress, signature(PRESETS[4]!, 'standard'), 40);
+  french.course.included = ORDER.length;
+  french.course.qualified = ORDER.slice(0, -1);
+  generateRound(french, PRESETS[4]!);
+  await page.addInitScript(
+    ({ key, progress }) => localStorage.setItem(key, JSON.stringify(progress)),
+    { key: PROGRESS_KEY, progress },
+  );
   await syntheticCamera(page);
   await page.goto('./');
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
@@ -46,6 +59,8 @@ test('presets update physical labels; French shifted punctuation completes passa
     window.__hands = [];
   });
   await page.waitForTimeout(550);
+  const WORDS = await page.locator('.passage > span').allTextContents();
+  expect(WORDS.some((word) => word.endsWith('.'))).toBe(true);
   for (const word of WORDS) {
     for (const text of word + ' ') {
       const key = characterKey(p, text)!;
@@ -56,7 +71,7 @@ test('presets update physical labels; French shifted punctuation completes passa
     }
     await expect(page.locator('#typing[readonly]')).toHaveCount(0);
   }
-  await expect(page.locator('.results')).toContainText('Passage complete');
+  await expect(page.locator('.results')).toContainText('Round complete');
   const result = await page.evaluate(() =>
     JSON.parse(localStorage.getItem('right-typer.v1')!).results.at(-1),
   );

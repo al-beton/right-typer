@@ -14,8 +14,9 @@ test('disconnect cancels boundary grading, releases tracks and persists until re
     };
   });
   await setup(page);
-  await word(page, 'a');
-  await expect(page.locator('.passage .active')).toHaveText('quick');
+  const WORDS = await page.locator('.passage > span').allTextContents();
+  await word(page, WORDS[0]!);
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
   await openSettings(page, 'camera-group');
   await page.getByLabel('Rotate camera view').selectOption('90');
   await resumePractice(page);
@@ -25,7 +26,7 @@ test('disconnect cancels boundary grading, releases tracks and persists until re
   await page.evaluate(() => {
     window.__inferenceDelay = 2000;
   });
-  await page.locator('#typing').pressSequentially('quick ');
+  await page.locator('#typing').pressSequentially(WORDS[1]! + ' ');
   await expect(page.locator('#typing')).toHaveAttribute('readonly', '');
   await openSettings(page, 'camera-group');
   await page.getByRole('button', { name: 'Disconnect camera', exact: true }).click();
@@ -37,7 +38,7 @@ test('disconnect cancels boundary grading, releases tracks and persists until re
   expect(await page.locator('video').evaluate((v) => (v as HTMLVideoElement).srcObject)).toBeNull();
   await page.waitForTimeout(2100);
   await expect(page.locator('#typing')).toBeDisabled();
-  await expect(page.locator('.passage .active')).toHaveText('quick');
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
   await openSettings(page, 'camera-group');
   await page.getByRole('button', { name: 'Reconnect camera' }).click();
   await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeEnabled();

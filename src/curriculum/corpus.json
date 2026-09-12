@@ -1,0 +1,8852 @@
+{
+  "schemaVersion": 1,
+  "corpusId": "english-curated-v1",
+  "language": "en",
+  "spelling": "GB",
+  "words": [
+    {
+      "id": "en-v1-0000",
+      "text": "able",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0001",
+      "text": "about",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0002",
+      "text": "above",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0003",
+      "text": "abroad",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0004",
+      "text": "absent",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0005",
+      "text": "absorb",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0006",
+      "text": "abstract",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0007",
+      "text": "ace",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0008",
+      "text": "aces",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0009",
+      "text": "ache",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0010",
+      "text": "acid",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0011",
+      "text": "act",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0012",
+      "text": "action",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0013",
+      "text": "active",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0014",
+      "text": "actor",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0015",
+      "text": "acts",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0016",
+      "text": "acute",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0017",
+      "text": "add",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0018",
+      "text": "added",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0019",
+      "text": "adds",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0020",
+      "text": "adjust",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0021",
+      "text": "ado",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0022",
+      "text": "again",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0023",
+      "text": "against",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0024",
+      "text": "age",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0025",
+      "text": "ages",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0026",
+      "text": "agile",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0027",
+      "text": "ago",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0028",
+      "text": "agree",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0029",
+      "text": "agreed",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0030",
+      "text": "ahead",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0031",
+      "text": "aid",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0032",
+      "text": "aids",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0033",
+      "text": "aim",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0034",
+      "text": "aims",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0035",
+      "text": "air",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-0036",
+      "text": "algae",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0037",
+      "text": "align",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0038",
+      "text": "all",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0039",
+      "text": "almost",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0040",
+      "text": "alone",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0041",
+      "text": "along",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0042",
+      "text": "already",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0043",
+      "text": "also",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0044",
+      "text": "always",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0045",
+      "text": "am",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0046",
+      "text": "an",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-0047",
+      "text": "and",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0048",
+      "text": "angle",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0049",
+      "text": "angry",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0050",
+      "text": "annex",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0051",
+      "text": "another",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0052",
+      "text": "answer",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0053",
+      "text": "ant",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-0054",
+      "text": "ants",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0055",
+      "text": "any",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0056",
+      "text": "apart",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0057",
+      "text": "apex",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0058",
+      "text": "appeal",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0059",
+      "text": "appear",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0060",
+      "text": "apple",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0061",
+      "text": "apply",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0062",
+      "text": "appoint",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0063",
+      "text": "apron",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0064",
+      "text": "are",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-0065",
+      "text": "area",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0066",
+      "text": "arena",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0067",
+      "text": "arise",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0068",
+      "text": "arm",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0069",
+      "text": "arms",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0070",
+      "text": "around",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0071",
+      "text": "arrange",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0072",
+      "text": "arrive",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0073",
+      "text": "art",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-0074",
+      "text": "artist",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0075",
+      "text": "as",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0076",
+      "text": "ask",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0077",
+      "text": "asked",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0078",
+      "text": "asks",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0079",
+      "text": "asleep",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0080",
+      "text": "aspect",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0081",
+      "text": "assist",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0082",
+      "text": "at",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-0083",
+      "text": "attach",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0084",
+      "text": "attend",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0085",
+      "text": "attire",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0086",
+      "text": "aunt",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0087",
+      "text": "author",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0088",
+      "text": "autumn",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0089",
+      "text": "avocado",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0090",
+      "text": "avoid",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0091",
+      "text": "away",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0092",
+      "text": "axe",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0093",
+      "text": "axis",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0094",
+      "text": "axle",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0095",
+      "text": "axles",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0096",
+      "text": "baby",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0097",
+      "text": "back",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0098",
+      "text": "bad",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0099",
+      "text": "bag",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0100",
+      "text": "bake",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0101",
+      "text": "baker",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0102",
+      "text": "ball",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0103",
+      "text": "band",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0104",
+      "text": "bank",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0105",
+      "text": "bar",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0106",
+      "text": "bark",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0107",
+      "text": "barn",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0108",
+      "text": "base",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0109",
+      "text": "basic",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0110",
+      "text": "basin",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0111",
+      "text": "basket",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0112",
+      "text": "bat",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0113",
+      "text": "bath",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0114",
+      "text": "bay",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0115",
+      "text": "be",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0116",
+      "text": "beach",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0117",
+      "text": "bear",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0118",
+      "text": "beard",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0119",
+      "text": "beat",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0120",
+      "text": "beauty",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0121",
+      "text": "beaver",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0122",
+      "text": "bed",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0123",
+      "text": "bee",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0124",
+      "text": "been",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0125",
+      "text": "before",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0126",
+      "text": "began",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0127",
+      "text": "begin",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0128",
+      "text": "begun",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0129",
+      "text": "behave",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0130",
+      "text": "behind",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0131",
+      "text": "being",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0132",
+      "text": "believe",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0133",
+      "text": "bell",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0134",
+      "text": "below",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0135",
+      "text": "belt",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0136",
+      "text": "bench",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0137",
+      "text": "bend",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0138",
+      "text": "berry",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0139",
+      "text": "best",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0140",
+      "text": "better",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0141",
+      "text": "between",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0142",
+      "text": "beyond",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0143",
+      "text": "bicycle",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0144",
+      "text": "big",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0145",
+      "text": "bike",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0146",
+      "text": "bird",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0147",
+      "text": "bit",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0148",
+      "text": "bite",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0149",
+      "text": "bitter",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0150",
+      "text": "black",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0151",
+      "text": "blame",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0152",
+      "text": "blank",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0153",
+      "text": "blast",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0154",
+      "text": "blaze",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0155",
+      "text": "blend",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0156",
+      "text": "bless",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0157",
+      "text": "blind",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0158",
+      "text": "blink",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0159",
+      "text": "block",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0160",
+      "text": "bloom",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0161",
+      "text": "blow",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0162",
+      "text": "blue",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0163",
+      "text": "board",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0164",
+      "text": "boat",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0165",
+      "text": "body",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0166",
+      "text": "boil",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0167",
+      "text": "bold",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0168",
+      "text": "bolt",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0169",
+      "text": "bond",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0170",
+      "text": "bone",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0171",
+      "text": "book",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0172",
+      "text": "boot",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0173",
+      "text": "border",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0174",
+      "text": "born",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0175",
+      "text": "borrow",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0176",
+      "text": "boss",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0177",
+      "text": "both",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0178",
+      "text": "bottle",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0179",
+      "text": "bottom",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0180",
+      "text": "bowl",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0181",
+      "text": "box",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0182",
+      "text": "boy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0183",
+      "text": "bread",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0184",
+      "text": "break",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0185",
+      "text": "breath",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0186",
+      "text": "breeze",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0187",
+      "text": "brick",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0188",
+      "text": "bride",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0189",
+      "text": "bridge",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0190",
+      "text": "brief",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0191",
+      "text": "bright",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0192",
+      "text": "bring",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0193",
+      "text": "broad",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0194",
+      "text": "broken",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0195",
+      "text": "bronze",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0196",
+      "text": "brown",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0197",
+      "text": "brush",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0198",
+      "text": "bubble",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0199",
+      "text": "bucket",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0200",
+      "text": "bug",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0201",
+      "text": "build",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0202",
+      "text": "built",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0203",
+      "text": "bulb",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0204",
+      "text": "bunch",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0205",
+      "text": "bundle",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0206",
+      "text": "bunny",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0207",
+      "text": "burn",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0208",
+      "text": "burst",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0209",
+      "text": "bus",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0210",
+      "text": "bush",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0211",
+      "text": "busy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0212",
+      "text": "butter",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0213",
+      "text": "button",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0214",
+      "text": "buy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0215",
+      "text": "buzz",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0216",
+      "text": "cabin",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0217",
+      "text": "cable",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0218",
+      "text": "cage",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0219",
+      "text": "cake",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0220",
+      "text": "call",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0221",
+      "text": "calm",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0222",
+      "text": "came",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0223",
+      "text": "camel",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0224",
+      "text": "camera",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0225",
+      "text": "camp",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0226",
+      "text": "camping",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0227",
+      "text": "can",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0228",
+      "text": "canal",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0229",
+      "text": "canary",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0230",
+      "text": "candle",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0231",
+      "text": "candy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0232",
+      "text": "cane",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0233",
+      "text": "canoe",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0234",
+      "text": "cap",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0235",
+      "text": "cape",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0236",
+      "text": "caps",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0237",
+      "text": "car",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0238",
+      "text": "card",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0239",
+      "text": "cards",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0240",
+      "text": "care",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0241",
+      "text": "carrot",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0242",
+      "text": "carry",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0243",
+      "text": "cars",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0244",
+      "text": "cart",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0245",
+      "text": "case",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0246",
+      "text": "cash",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0247",
+      "text": "cast",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0248",
+      "text": "castle",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0249",
+      "text": "cat",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0250",
+      "text": "catch",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0251",
+      "text": "cats",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0252",
+      "text": "cause",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0253",
+      "text": "cave",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0254",
+      "text": "cell",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0255",
+      "text": "cellar",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0256",
+      "text": "central",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0257",
+      "text": "centre",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0258",
+      "text": "cereal",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0259",
+      "text": "chain",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0260",
+      "text": "chair",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0261",
+      "text": "chance",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0262",
+      "text": "change",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0263",
+      "text": "charm",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0264",
+      "text": "chart",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0265",
+      "text": "chat",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0266",
+      "text": "cheap",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0267",
+      "text": "cheek",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0268",
+      "text": "cheer",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0269",
+      "text": "cheese",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0270",
+      "text": "chest",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0271",
+      "text": "chick",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0272",
+      "text": "chief",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0273",
+      "text": "child",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0274",
+      "text": "chin",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0275",
+      "text": "chip",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0276",
+      "text": "choice",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0277",
+      "text": "choose",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0278",
+      "text": "chose",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0279",
+      "text": "chosen",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0280",
+      "text": "city",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0281",
+      "text": "civil",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0282",
+      "text": "claim",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0283",
+      "text": "class",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0284",
+      "text": "clean",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0285",
+      "text": "clear",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0286",
+      "text": "clever",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0287",
+      "text": "click",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0288",
+      "text": "climb",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0289",
+      "text": "clock",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0290",
+      "text": "close",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0291",
+      "text": "cloth",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0292",
+      "text": "cloud",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0293",
+      "text": "clover",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0294",
+      "text": "club",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0295",
+      "text": "clue",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0296",
+      "text": "coach",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0297",
+      "text": "coal",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0298",
+      "text": "coast",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0299",
+      "text": "coat",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0300",
+      "text": "cocoa",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0301",
+      "text": "code",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0302",
+      "text": "coin",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0303",
+      "text": "cold",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0304",
+      "text": "collar",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0305",
+      "text": "colour",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0306",
+      "text": "comb",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0307",
+      "text": "come",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0308",
+      "text": "comic",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0309",
+      "text": "common",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0310",
+      "text": "complex",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0311",
+      "text": "cook",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0312",
+      "text": "cool",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0313",
+      "text": "copy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0314",
+      "text": "core",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0315",
+      "text": "corn",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0316",
+      "text": "corner",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0317",
+      "text": "correct",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0318",
+      "text": "cost",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0319",
+      "text": "cotton",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0320",
+      "text": "couch",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0321",
+      "text": "cough",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0322",
+      "text": "could",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0323",
+      "text": "council",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0324",
+      "text": "count",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0325",
+      "text": "couple",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0326",
+      "text": "course",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0327",
+      "text": "court",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0328",
+      "text": "cousin",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0329",
+      "text": "cover",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0330",
+      "text": "cow",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0331",
+      "text": "crab",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0332",
+      "text": "crack",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0333",
+      "text": "craft",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0334",
+      "text": "cream",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0335",
+      "text": "create",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0336",
+      "text": "creek",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0337",
+      "text": "crew",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0338",
+      "text": "crisp",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0339",
+      "text": "cross",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0340",
+      "text": "crowd",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0341",
+      "text": "crown",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0342",
+      "text": "cry",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0343",
+      "text": "cube",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0344",
+      "text": "cup",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0345",
+      "text": "cups",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0346",
+      "text": "cure",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0347",
+      "text": "curl",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0348",
+      "text": "cut",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0349",
+      "text": "cute",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0350",
+      "text": "cuts",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0351",
+      "text": "cycle",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0352",
+      "text": "dad",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0353",
+      "text": "daily",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0354",
+      "text": "dairy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0355",
+      "text": "dance",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0356",
+      "text": "dancer",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0357",
+      "text": "dare",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0358",
+      "text": "dared",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0359",
+      "text": "dark",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0360",
+      "text": "darn",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0361",
+      "text": "dart",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0362",
+      "text": "dash",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0363",
+      "text": "data",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0364",
+      "text": "date",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0365",
+      "text": "dates",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0366",
+      "text": "dawn",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0367",
+      "text": "day",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0368",
+      "text": "daydream",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0369",
+      "text": "days",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0370",
+      "text": "daze",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0371",
+      "text": "dear",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0372",
+      "text": "deck",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0373",
+      "text": "deep",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0374",
+      "text": "deer",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0375",
+      "text": "delay",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0376",
+      "text": "desk",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0377",
+      "text": "detail",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0378",
+      "text": "dial",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0379",
+      "text": "did",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0380",
+      "text": "diet",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0381",
+      "text": "dime",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0382",
+      "text": "dine",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0383",
+      "text": "diner",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0384",
+      "text": "dining",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0385",
+      "text": "dinner",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0386",
+      "text": "dirt",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0387",
+      "text": "dish",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0388",
+      "text": "dishes",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0389",
+      "text": "ditch",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0390",
+      "text": "dive",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0391",
+      "text": "diver",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0392",
+      "text": "divide",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0393",
+      "text": "do",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0394",
+      "text": "does",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0395",
+      "text": "dog",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0396",
+      "text": "dogs",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0397",
+      "text": "doing",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0398",
+      "text": "done",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0399",
+      "text": "door",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0400",
+      "text": "doors",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0401",
+      "text": "dot",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0402",
+      "text": "dots",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0403",
+      "text": "doubt",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0404",
+      "text": "down",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0405",
+      "text": "dozen",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0406",
+      "text": "drain",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0407",
+      "text": "draw",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0408",
+      "text": "drawer",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0409",
+      "text": "drawn",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0410",
+      "text": "dream",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0411",
+      "text": "dress",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0412",
+      "text": "drew",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0413",
+      "text": "drink",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0414",
+      "text": "drip",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0415",
+      "text": "drive",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0416",
+      "text": "driver",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0417",
+      "text": "drop",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0418",
+      "text": "drove",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0419",
+      "text": "drum",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0420",
+      "text": "dry",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0421",
+      "text": "duck",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0422",
+      "text": "due",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0423",
+      "text": "dull",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0424",
+      "text": "dune",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0425",
+      "text": "during",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0426",
+      "text": "dusk",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0427",
+      "text": "dust",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0428",
+      "text": "duty",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0429",
+      "text": "dye",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0430",
+      "text": "dyed",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0431",
+      "text": "each",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0432",
+      "text": "ear",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-0433",
+      "text": "early",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0434",
+      "text": "earn",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-0435",
+      "text": "easy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0436",
+      "text": "eat",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-0437",
+      "text": "egg",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0438",
+      "text": "eighteen",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0439",
+      "text": "either",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0440",
+      "text": "eleven",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0441",
+      "text": "else",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0442",
+      "text": "enjoy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0443",
+      "text": "enter",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-0444",
+      "text": "entered",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0445",
+      "text": "enters",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0446",
+      "text": "entire",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-0447",
+      "text": "entry",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0448",
+      "text": "equal",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0449",
+      "text": "equip",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0450",
+      "text": "equity",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0451",
+      "text": "era",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-0452",
+      "text": "even",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0453",
+      "text": "event",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0454",
+      "text": "ever",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0455",
+      "text": "every",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0456",
+      "text": "exact",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0457",
+      "text": "exam",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0458",
+      "text": "example",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0459",
+      "text": "except",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0460",
+      "text": "excite",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0461",
+      "text": "excuse",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0462",
+      "text": "exist",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0463",
+      "text": "exit",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0464",
+      "text": "exotic",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0465",
+      "text": "expect",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0466",
+      "text": "expert",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0467",
+      "text": "export",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0468",
+      "text": "expose",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0469",
+      "text": "extend",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0470",
+      "text": "extent",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0471",
+      "text": "extra",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0472",
+      "text": "extreme",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0473",
+      "text": "eye",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0474",
+      "text": "fair",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0475",
+      "text": "fairy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0476",
+      "text": "fall",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0477",
+      "text": "family",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0478",
+      "text": "far",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0479",
+      "text": "fare",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0480",
+      "text": "farm",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0481",
+      "text": "farmer",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0482",
+      "text": "fast",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0483",
+      "text": "fate",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0484",
+      "text": "fault",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0485",
+      "text": "favour",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0486",
+      "text": "fear",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0487",
+      "text": "feast",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0488",
+      "text": "feather",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0489",
+      "text": "feature",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0490",
+      "text": "feed",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0491",
+      "text": "feel",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0492",
+      "text": "feet",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0493",
+      "text": "fell",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0494",
+      "text": "felt",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0495",
+      "text": "female",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0496",
+      "text": "fence",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0497",
+      "text": "fern",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0498",
+      "text": "ferry",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0499",
+      "text": "fetch",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0500",
+      "text": "fever",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0501",
+      "text": "few",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0502",
+      "text": "fibre",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0503",
+      "text": "field",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0504",
+      "text": "fifteen",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0505",
+      "text": "fifth",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0506",
+      "text": "fifty",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0507",
+      "text": "fig",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0508",
+      "text": "figure",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0509",
+      "text": "file",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0510",
+      "text": "fill",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0511",
+      "text": "film",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0512",
+      "text": "filter",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0513",
+      "text": "final",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0514",
+      "text": "find",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0515",
+      "text": "fine",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0516",
+      "text": "finger",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0517",
+      "text": "finish",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0518",
+      "text": "fire",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0519",
+      "text": "firm",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0520",
+      "text": "first",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0521",
+      "text": "fish",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0522",
+      "text": "fit",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0523",
+      "text": "fitness",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0524",
+      "text": "five",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0525",
+      "text": "fix",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0526",
+      "text": "flag",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0527",
+      "text": "flash",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0528",
+      "text": "flat",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0529",
+      "text": "fleet",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0530",
+      "text": "flew",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0531",
+      "text": "flight",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0532",
+      "text": "flip",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0533",
+      "text": "float",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0534",
+      "text": "flood",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0535",
+      "text": "floor",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0536",
+      "text": "flour",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0537",
+      "text": "flow",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0538",
+      "text": "flower",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0539",
+      "text": "fly",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0540",
+      "text": "foam",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0541",
+      "text": "fog",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0542",
+      "text": "fold",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0543",
+      "text": "folk",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0544",
+      "text": "follow",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0545",
+      "text": "food",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0546",
+      "text": "foot",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0547",
+      "text": "for",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0548",
+      "text": "force",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0549",
+      "text": "foreign",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0550",
+      "text": "forest",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0551",
+      "text": "fork",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0552",
+      "text": "form",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0553",
+      "text": "formal",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0554",
+      "text": "format",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0555",
+      "text": "forty",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0556",
+      "text": "forward",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0557",
+      "text": "fossil",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0558",
+      "text": "foster",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0559",
+      "text": "found",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0560",
+      "text": "four",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0561",
+      "text": "fox",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0562",
+      "text": "fraction",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0563",
+      "text": "frame",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0564",
+      "text": "free",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0565",
+      "text": "freedom",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0566",
+      "text": "freeze",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0567",
+      "text": "freezer",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0568",
+      "text": "fresh",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0569",
+      "text": "fridge",
+      "sourceTier": 50,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0570",
+      "text": "friend",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0571",
+      "text": "fright",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0572",
+      "text": "frog",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0573",
+      "text": "from",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0574",
+      "text": "front",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0575",
+      "text": "frost",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0576",
+      "text": "frozen",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0577",
+      "text": "fruit",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0578",
+      "text": "fuel",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0579",
+      "text": "full",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0580",
+      "text": "fun",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0581",
+      "text": "fund",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0582",
+      "text": "funny",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0583",
+      "text": "fur",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0584",
+      "text": "further",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0585",
+      "text": "future",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0586",
+      "text": "fuzzy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0587",
+      "text": "game",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0588",
+      "text": "gap",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0589",
+      "text": "garage",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0590",
+      "text": "garden",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0591",
+      "text": "garlic",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0592",
+      "text": "gas",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0593",
+      "text": "gate",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0594",
+      "text": "gather",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0595",
+      "text": "gauge",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0596",
+      "text": "gave",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0597",
+      "text": "gaze",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0598",
+      "text": "gear",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0599",
+      "text": "gem",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0600",
+      "text": "gentle",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0601",
+      "text": "get",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0602",
+      "text": "giant",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0603",
+      "text": "gift",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0604",
+      "text": "giggle",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0605",
+      "text": "ginger",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0606",
+      "text": "girl",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0607",
+      "text": "give",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0608",
+      "text": "given",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0609",
+      "text": "glad",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0610",
+      "text": "glass",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0611",
+      "text": "glaze",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0612",
+      "text": "globe",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0613",
+      "text": "glove",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0614",
+      "text": "glow",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0615",
+      "text": "glue",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0616",
+      "text": "go",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0617",
+      "text": "goal",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0618",
+      "text": "goat",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0619",
+      "text": "goes",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0620",
+      "text": "going",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0621",
+      "text": "gold",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0622",
+      "text": "golf",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0623",
+      "text": "gone",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0624",
+      "text": "good",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0625",
+      "text": "goose",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0626",
+      "text": "got",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0627",
+      "text": "govern",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0628",
+      "text": "grab",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0629",
+      "text": "grace",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0630",
+      "text": "grade",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0631",
+      "text": "grain",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0632",
+      "text": "grand",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0633",
+      "text": "grant",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0634",
+      "text": "grape",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0635",
+      "text": "graph",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0636",
+      "text": "grasp",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0637",
+      "text": "grass",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0638",
+      "text": "great",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0639",
+      "text": "green",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0640",
+      "text": "greet",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0641",
+      "text": "grew",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0642",
+      "text": "grey",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0643",
+      "text": "grid",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0644",
+      "text": "grin",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0645",
+      "text": "grip",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0646",
+      "text": "group",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0647",
+      "text": "grow",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0648",
+      "text": "grown",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0649",
+      "text": "growth",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0650",
+      "text": "guard",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0651",
+      "text": "guess",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0652",
+      "text": "guest",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0653",
+      "text": "guide",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0654",
+      "text": "gulf",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0655",
+      "text": "gum",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0656",
+      "text": "gust",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0657",
+      "text": "gym",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0658",
+      "text": "habit",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0659",
+      "text": "had",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0660",
+      "text": "hair",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0661",
+      "text": "hand",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0662",
+      "text": "hands",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0663",
+      "text": "happy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0664",
+      "text": "hard",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0665",
+      "text": "harp",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0666",
+      "text": "has",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0667",
+      "text": "hat",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0668",
+      "text": "hats",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0669",
+      "text": "have",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0670",
+      "text": "hay",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0671",
+      "text": "hazel",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0672",
+      "text": "he",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0673",
+      "text": "head",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0674",
+      "text": "heap",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0675",
+      "text": "hear",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0676",
+      "text": "heard",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0677",
+      "text": "heart",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0678",
+      "text": "heat",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0679",
+      "text": "heater",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0680",
+      "text": "heavy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0681",
+      "text": "held",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0682",
+      "text": "help",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0683",
+      "text": "hen",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0684",
+      "text": "hence",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0685",
+      "text": "hens",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0686",
+      "text": "her",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0687",
+      "text": "here",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0688",
+      "text": "hers",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0689",
+      "text": "hey",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0690",
+      "text": "hike",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0691",
+      "text": "hill",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0692",
+      "text": "hills",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0693",
+      "text": "hint",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0694",
+      "text": "hip",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0695",
+      "text": "hire",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0696",
+      "text": "hired",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0697",
+      "text": "his",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0698",
+      "text": "hit",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0699",
+      "text": "hits",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0700",
+      "text": "hobby",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0701",
+      "text": "hold",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0702",
+      "text": "hole",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0703",
+      "text": "hollow",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0704",
+      "text": "home",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0705",
+      "text": "homes",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0706",
+      "text": "honest",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0707",
+      "text": "honey",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0708",
+      "text": "hood",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0709",
+      "text": "hook",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0710",
+      "text": "hope",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0711",
+      "text": "horn",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0712",
+      "text": "horse",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0713",
+      "text": "hose",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0714",
+      "text": "host",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0715",
+      "text": "hot",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0716",
+      "text": "hotel",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0717",
+      "text": "hour",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0718",
+      "text": "hours",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0719",
+      "text": "house",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0720",
+      "text": "hover",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0721",
+      "text": "how",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0722",
+      "text": "however",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0723",
+      "text": "hue",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0724",
+      "text": "hug",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0725",
+      "text": "huge",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0726",
+      "text": "human",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0727",
+      "text": "hungry",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0728",
+      "text": "hunt",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0729",
+      "text": "hurry",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0730",
+      "text": "hush",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0731",
+      "text": "hut",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0732",
+      "text": "if",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0733",
+      "text": "improve",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0734",
+      "text": "in",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-0735",
+      "text": "index",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0736",
+      "text": "inject",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0737",
+      "text": "inner",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0738",
+      "text": "into",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0739",
+      "text": "invite",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0740",
+      "text": "involve",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0741",
+      "text": "iron",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0742",
+      "text": "is",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0743",
+      "text": "it",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-0744",
+      "text": "jacket",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0745",
+      "text": "jar",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0746",
+      "text": "jelly",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0747",
+      "text": "jet",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0748",
+      "text": "jewel",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0749",
+      "text": "jigsaw",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0750",
+      "text": "job",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0751",
+      "text": "jog",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0752",
+      "text": "join",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0753",
+      "text": "joiner",
+      "sourceTier": 50,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0754",
+      "text": "joint",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0755",
+      "text": "joke",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0756",
+      "text": "journey",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0757",
+      "text": "joy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0758",
+      "text": "judge",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0759",
+      "text": "jug",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0760",
+      "text": "juice",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0761",
+      "text": "juicy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0762",
+      "text": "jump",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0763",
+      "text": "junior",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0764",
+      "text": "jury",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0765",
+      "text": "just",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0766",
+      "text": "justice",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0767",
+      "text": "kale",
+      "sourceTier": 50,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0768",
+      "text": "kayak",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0769",
+      "text": "keen",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0770",
+      "text": "keep",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0771",
+      "text": "keeper",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0772",
+      "text": "keeps",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0773",
+      "text": "kelp",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0774",
+      "text": "kept",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0775",
+      "text": "kernel",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0776",
+      "text": "kettle",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0777",
+      "text": "key",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0778",
+      "text": "kick",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0779",
+      "text": "kid",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0780",
+      "text": "kind",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0781",
+      "text": "king",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0782",
+      "text": "kit",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0783",
+      "text": "kitchen",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0784",
+      "text": "kite",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0785",
+      "text": "kitten",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0786",
+      "text": "kiwi",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0787",
+      "text": "knee",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0788",
+      "text": "kneel",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0789",
+      "text": "knew",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0790",
+      "text": "knife",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0791",
+      "text": "knit",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0792",
+      "text": "knob",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0793",
+      "text": "knock",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0794",
+      "text": "know",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0795",
+      "text": "known",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0796",
+      "text": "koala",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0797",
+      "text": "label",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0798",
+      "text": "lack",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0799",
+      "text": "lag",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0800",
+      "text": "lake",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0801",
+      "text": "law",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0802",
+      "text": "lay",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0803",
+      "text": "lazy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0804",
+      "text": "leak",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0805",
+      "text": "leap",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0806",
+      "text": "leave",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0807",
+      "text": "leg",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0808",
+      "text": "level",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0809",
+      "text": "like",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0810",
+      "text": "link",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0811",
+      "text": "lip",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0812",
+      "text": "liquid",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0813",
+      "text": "live",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0814",
+      "text": "lizard",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0815",
+      "text": "lock",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0816",
+      "text": "log",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0817",
+      "text": "look",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0818",
+      "text": "love",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0819",
+      "text": "low",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0820",
+      "text": "luck",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0821",
+      "text": "made",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0822",
+      "text": "magic",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0823",
+      "text": "magnet",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0824",
+      "text": "mail",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0825",
+      "text": "main",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0826",
+      "text": "major",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0827",
+      "text": "make",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0828",
+      "text": "man",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0829",
+      "text": "manage",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0830",
+      "text": "manner",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0831",
+      "text": "many",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0832",
+      "text": "map",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0833",
+      "text": "maps",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0834",
+      "text": "marble",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0835",
+      "text": "margin",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0836",
+      "text": "mark",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0837",
+      "text": "market",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0838",
+      "text": "mask",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0839",
+      "text": "master",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0840",
+      "text": "match",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0841",
+      "text": "mate",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0842",
+      "text": "matter",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0843",
+      "text": "maximum",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0844",
+      "text": "may",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0845",
+      "text": "maybe",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0846",
+      "text": "maze",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0847",
+      "text": "me",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0848",
+      "text": "meal",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0849",
+      "text": "mean",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0850",
+      "text": "meant",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0851",
+      "text": "meat",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0852",
+      "text": "medal",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0853",
+      "text": "medium",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0854",
+      "text": "meet",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0855",
+      "text": "melon",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0856",
+      "text": "melt",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0857",
+      "text": "member",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0858",
+      "text": "memory",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0859",
+      "text": "mend",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0860",
+      "text": "menu",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0861",
+      "text": "mercy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0862",
+      "text": "merit",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0863",
+      "text": "mess",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0864",
+      "text": "metal",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0865",
+      "text": "method",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0866",
+      "text": "metre",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0867",
+      "text": "mice",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0868",
+      "text": "middle",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0869",
+      "text": "mighty",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0870",
+      "text": "mild",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0871",
+      "text": "mile",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0872",
+      "text": "milk",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0873",
+      "text": "mill",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0874",
+      "text": "mind",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0875",
+      "text": "mine",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0876",
+      "text": "minor",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0877",
+      "text": "minute",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0878",
+      "text": "mirror",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0879",
+      "text": "mix",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0880",
+      "text": "mixed",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0881",
+      "text": "mobile",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0882",
+      "text": "mode",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0883",
+      "text": "model",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0884",
+      "text": "modern",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0885",
+      "text": "moment",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0886",
+      "text": "money",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0887",
+      "text": "month",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0888",
+      "text": "mood",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0889",
+      "text": "moon",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0890",
+      "text": "more",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0891",
+      "text": "most",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0892",
+      "text": "mother",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0893",
+      "text": "motion",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0894",
+      "text": "motor",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0895",
+      "text": "mount",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0896",
+      "text": "mouse",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0897",
+      "text": "mouth",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0898",
+      "text": "move",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0899",
+      "text": "movie",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0900",
+      "text": "moving",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0901",
+      "text": "much",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0902",
+      "text": "mud",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0903",
+      "text": "muffin",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0904",
+      "text": "mug",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0905",
+      "text": "mule",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0906",
+      "text": "museum",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0907",
+      "text": "music",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0908",
+      "text": "must",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0909",
+      "text": "mutual",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0910",
+      "text": "my",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0911",
+      "text": "mystery",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0912",
+      "text": "nap",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0913",
+      "text": "near",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-0914",
+      "text": "neat",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-0915",
+      "text": "neck",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0916",
+      "text": "neither",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0917",
+      "text": "net",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-0918",
+      "text": "never",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0919",
+      "text": "new",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0920",
+      "text": "next",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0921",
+      "text": "nice",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0922",
+      "text": "nine",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0923",
+      "text": "nineteen",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0924",
+      "text": "no",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0925",
+      "text": "noise",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0926",
+      "text": "none",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0927",
+      "text": "noon",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0928",
+      "text": "nor",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0929",
+      "text": "not",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0930",
+      "text": "note",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0931",
+      "text": "novel",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0932",
+      "text": "now",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0933",
+      "text": "number",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0934",
+      "text": "oak",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0935",
+      "text": "oar",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0936",
+      "text": "oat",
+      "sourceTier": 50,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0937",
+      "text": "oats",
+      "sourceTier": 50,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0938",
+      "text": "object",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0939",
+      "text": "ocean",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0940",
+      "text": "of",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0941",
+      "text": "off",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0942",
+      "text": "often",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0943",
+      "text": "oil",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0944",
+      "text": "old",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0945",
+      "text": "olive",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0946",
+      "text": "on",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0947",
+      "text": "once",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0948",
+      "text": "one",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0949",
+      "text": "onion",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0950",
+      "text": "only",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0951",
+      "text": "onto",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0952",
+      "text": "open",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0953",
+      "text": "opera",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0954",
+      "text": "option",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0955",
+      "text": "or",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0956",
+      "text": "oral",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0957",
+      "text": "orange",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0958",
+      "text": "order",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0959",
+      "text": "ore",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0960",
+      "text": "origin",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0961",
+      "text": "other",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0962",
+      "text": "otter",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0963",
+      "text": "our",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0964",
+      "text": "out",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0965",
+      "text": "outer",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0966",
+      "text": "over",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0967",
+      "text": "own",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0968",
+      "text": "oxen",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0969",
+      "text": "oxygen",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0970",
+      "text": "pack",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0971",
+      "text": "pad",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0972",
+      "text": "page",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0973",
+      "text": "paid",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0974",
+      "text": "paint",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0975",
+      "text": "pair",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0976",
+      "text": "pale",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0977",
+      "text": "pan",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0978",
+      "text": "panel",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0979",
+      "text": "pants",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0980",
+      "text": "paper",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0981",
+      "text": "park",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0982",
+      "text": "part",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0983",
+      "text": "party",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0984",
+      "text": "pass",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0985",
+      "text": "past",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0986",
+      "text": "paste",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0987",
+      "text": "path",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0988",
+      "text": "pause",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0989",
+      "text": "pay",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0990",
+      "text": "peace",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0991",
+      "text": "peach",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0992",
+      "text": "peak",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0993",
+      "text": "pear",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0994",
+      "text": "pen",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0995",
+      "text": "pencil",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0996",
+      "text": "penny",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0997",
+      "text": "people",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0998",
+      "text": "pepper",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-0999",
+      "text": "perfect",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1000",
+      "text": "period",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1001",
+      "text": "person",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1002",
+      "text": "pet",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1003",
+      "text": "phase",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1004",
+      "text": "phone",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1005",
+      "text": "photo",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1006",
+      "text": "piano",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1007",
+      "text": "pick",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1008",
+      "text": "picnic",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1009",
+      "text": "piece",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1010",
+      "text": "pig",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1011",
+      "text": "pile",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1012",
+      "text": "pilot",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1013",
+      "text": "pin",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1014",
+      "text": "pine",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1015",
+      "text": "pink",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1016",
+      "text": "pipe",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1017",
+      "text": "pitch",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1018",
+      "text": "pixel",
+      "sourceTier": 50,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1019",
+      "text": "pizza",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1020",
+      "text": "place",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1021",
+      "text": "plain",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1022",
+      "text": "plan",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1023",
+      "text": "plane",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1024",
+      "text": "plant",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1025",
+      "text": "plate",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1026",
+      "text": "play",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1027",
+      "text": "please",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1028",
+      "text": "plenty",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1029",
+      "text": "plot",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1030",
+      "text": "plug",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1031",
+      "text": "plus",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1032",
+      "text": "pocket",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1033",
+      "text": "poem",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1034",
+      "text": "poet",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1035",
+      "text": "point",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1036",
+      "text": "pole",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1037",
+      "text": "pond",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1038",
+      "text": "pool",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1039",
+      "text": "poor",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1040",
+      "text": "pop",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1041",
+      "text": "port",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1042",
+      "text": "pose",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1043",
+      "text": "post",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1044",
+      "text": "pot",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1045",
+      "text": "potato",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1046",
+      "text": "pound",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1047",
+      "text": "pour",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1048",
+      "text": "power",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1049",
+      "text": "press",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1050",
+      "text": "pretty",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1051",
+      "text": "prevent",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1052",
+      "text": "price",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1053",
+      "text": "pride",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1054",
+      "text": "prime",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1055",
+      "text": "print",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1056",
+      "text": "private",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1057",
+      "text": "prize",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1058",
+      "text": "proof",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1059",
+      "text": "proper",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1060",
+      "text": "proud",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1061",
+      "text": "prove",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1062",
+      "text": "provide",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1063",
+      "text": "provoke",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1064",
+      "text": "proxy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1065",
+      "text": "pull",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1066",
+      "text": "pump",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1067",
+      "text": "pupil",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1068",
+      "text": "pure",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1069",
+      "text": "purple",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1070",
+      "text": "push",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1071",
+      "text": "put",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1072",
+      "text": "puzzle",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1073",
+      "text": "quack",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1074",
+      "text": "quake",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1075",
+      "text": "quart",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1076",
+      "text": "quartz",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1077",
+      "text": "queen",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1078",
+      "text": "quest",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1079",
+      "text": "queue",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1080",
+      "text": "quick",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1081",
+      "text": "quiet",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1082",
+      "text": "quill",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1083",
+      "text": "quilt",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1084",
+      "text": "quirky",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1085",
+      "text": "quite",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1086",
+      "text": "quiz",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1087",
+      "text": "quota",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1088",
+      "text": "quote",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1089",
+      "text": "rabbit",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1090",
+      "text": "race",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1091",
+      "text": "rag",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1092",
+      "text": "rail",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1093",
+      "text": "rails",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1094",
+      "text": "rain",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-1095",
+      "text": "rains",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1096",
+      "text": "rainy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1097",
+      "text": "raise",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1098",
+      "text": "ran",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-1099",
+      "text": "rang",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1100",
+      "text": "rapid",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1101",
+      "text": "rare",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1102",
+      "text": "rat",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-1103",
+      "text": "rate",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-1104",
+      "text": "rates",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1105",
+      "text": "rather",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1106",
+      "text": "rats",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1107",
+      "text": "raven",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1108",
+      "text": "raw",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1109",
+      "text": "ray",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1110",
+      "text": "reach",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1111",
+      "text": "react",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1112",
+      "text": "read",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1113",
+      "text": "reader",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1114",
+      "text": "ready",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1115",
+      "text": "real",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1116",
+      "text": "rear",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1117",
+      "text": "receive",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1118",
+      "text": "red",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1119",
+      "text": "reed",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1120",
+      "text": "reflex",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1121",
+      "text": "reject",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1122",
+      "text": "relax",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1123",
+      "text": "remove",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1124",
+      "text": "rent",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-1125",
+      "text": "rents",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1126",
+      "text": "request",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1127",
+      "text": "require",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1128",
+      "text": "reserve",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1129",
+      "text": "resolve",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1130",
+      "text": "rest",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1131",
+      "text": "retain",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-1132",
+      "text": "retainer",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1133",
+      "text": "retire",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1134",
+      "text": "retired",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1135",
+      "text": "reveal",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1136",
+      "text": "reverse",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1137",
+      "text": "review",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1138",
+      "text": "revive",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1139",
+      "text": "rib",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1140",
+      "text": "rice",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1141",
+      "text": "ride",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1142",
+      "text": "right",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1143",
+      "text": "ring",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1144",
+      "text": "ripe",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1145",
+      "text": "rise",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1146",
+      "text": "risen",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1147",
+      "text": "river",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1148",
+      "text": "road",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1149",
+      "text": "robe",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1150",
+      "text": "rode",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1151",
+      "text": "roof",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1152",
+      "text": "room",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1153",
+      "text": "root",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1154",
+      "text": "rope",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1155",
+      "text": "rose",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1156",
+      "text": "round",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1157",
+      "text": "row",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1158",
+      "text": "rubber",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1159",
+      "text": "rug",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1160",
+      "text": "rung",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1161",
+      "text": "sage",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1162",
+      "text": "sang",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1163",
+      "text": "sat",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1164",
+      "text": "saw",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1165",
+      "text": "say",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1166",
+      "text": "seat",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1167",
+      "text": "see",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1168",
+      "text": "seed",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1169",
+      "text": "seen",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1170",
+      "text": "send",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1171",
+      "text": "sense",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1172",
+      "text": "sent",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1173",
+      "text": "set",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1174",
+      "text": "seven",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1175",
+      "text": "ship",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1176",
+      "text": "shop",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1177",
+      "text": "show",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1178",
+      "text": "sign",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1179",
+      "text": "silver",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1180",
+      "text": "since",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1181",
+      "text": "sing",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1182",
+      "text": "sister",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1183",
+      "text": "sit",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1184",
+      "text": "six",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1185",
+      "text": "sixteen",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1186",
+      "text": "size",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1187",
+      "text": "sky",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1188",
+      "text": "sleep",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1189",
+      "text": "slip",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1190",
+      "text": "slope",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1191",
+      "text": "slow",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1192",
+      "text": "snow",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1193",
+      "text": "so",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1194",
+      "text": "soap",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1195",
+      "text": "son",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1196",
+      "text": "song",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1197",
+      "text": "soon",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1198",
+      "text": "sore",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1199",
+      "text": "sort",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1200",
+      "text": "soup",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1201",
+      "text": "space",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1202",
+      "text": "spare",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1203",
+      "text": "speak",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1204",
+      "text": "speed",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1205",
+      "text": "spell",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1206",
+      "text": "spend",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1207",
+      "text": "split",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1208",
+      "text": "sport",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1209",
+      "text": "spring",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1210",
+      "text": "spy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1211",
+      "text": "square",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1212",
+      "text": "squash",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1213",
+      "text": "squeeze",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1214",
+      "text": "stable",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1215",
+      "text": "stage",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1216",
+      "text": "stair",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1217",
+      "text": "stairs",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1218",
+      "text": "stamp",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1219",
+      "text": "stand",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1220",
+      "text": "star",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1221",
+      "text": "stare",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1222",
+      "text": "start",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1223",
+      "text": "stay",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1224",
+      "text": "steel",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1225",
+      "text": "steer",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1226",
+      "text": "step",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1227",
+      "text": "stone",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1228",
+      "text": "stood",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1229",
+      "text": "stop",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1230",
+      "text": "store",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1231",
+      "text": "stray",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1232",
+      "text": "stream",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1233",
+      "text": "street",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1234",
+      "text": "stress",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1235",
+      "text": "stripe",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1236",
+      "text": "style",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1237",
+      "text": "sugar",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1238",
+      "text": "sung",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1239",
+      "text": "super",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1240",
+      "text": "support",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1241",
+      "text": "survive",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1242",
+      "text": "swallow",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1243",
+      "text": "swan",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1244",
+      "text": "sweep",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1245",
+      "text": "sweet",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1246",
+      "text": "swept",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1247",
+      "text": "swift",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1248",
+      "text": "swim",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1249",
+      "text": "swing",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1250",
+      "text": "table",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1251",
+      "text": "tablet",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1252",
+      "text": "tag",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1253",
+      "text": "take",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1254",
+      "text": "tar",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-1255",
+      "text": "tax",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1256",
+      "text": "taxi",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1257",
+      "text": "tea",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-1258",
+      "text": "teach",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1259",
+      "text": "teacher",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1260",
+      "text": "tear",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-1261",
+      "text": "ten",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-1262",
+      "text": "terrain",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-1263",
+      "text": "text",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1264",
+      "text": "than",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1265",
+      "text": "that",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1266",
+      "text": "their",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1267",
+      "text": "then",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1268",
+      "text": "there",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1269",
+      "text": "these",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1270",
+      "text": "third",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1271",
+      "text": "thirteen",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1272",
+      "text": "thirty",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1273",
+      "text": "this",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1274",
+      "text": "those",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1275",
+      "text": "three",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1276",
+      "text": "tie",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-1277",
+      "text": "tier",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-1278",
+      "text": "tiger",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1279",
+      "text": "tin",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-1280",
+      "text": "tiny",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1281",
+      "text": "tip",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1282",
+      "text": "tire",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-1283",
+      "text": "to",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1284",
+      "text": "toe",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1285",
+      "text": "toes",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1286",
+      "text": "tone",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1287",
+      "text": "tones",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1288",
+      "text": "top",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1289",
+      "text": "torn",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1290",
+      "text": "town",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1291",
+      "text": "toy",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1292",
+      "text": "trace",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1293",
+      "text": "train",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-1294",
+      "text": "trained",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1295",
+      "text": "trainer",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1296",
+      "text": "trains",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1297",
+      "text": "travel",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1298",
+      "text": "tray",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1299",
+      "text": "tree",
+      "sourceTier": 35,
+      "originalStarter": true
+    },
+    {
+      "id": "en-v1-1300",
+      "text": "trip",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1301",
+      "text": "truck",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1302",
+      "text": "true",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1303",
+      "text": "trunk",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1304",
+      "text": "trust",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1305",
+      "text": "truth",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1306",
+      "text": "try",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1307",
+      "text": "tub",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1308",
+      "text": "tube",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1309",
+      "text": "tug",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1310",
+      "text": "tulip",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1311",
+      "text": "tune",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1312",
+      "text": "tuned",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1313",
+      "text": "tunes",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1314",
+      "text": "tunnel",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1315",
+      "text": "turn",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1316",
+      "text": "turns",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1317",
+      "text": "turtle",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1318",
+      "text": "twelve",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1319",
+      "text": "type",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1320",
+      "text": "under",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1321",
+      "text": "undo",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1322",
+      "text": "union",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1323",
+      "text": "unique",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1324",
+      "text": "unit",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1325",
+      "text": "unite",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1326",
+      "text": "unlike",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1327",
+      "text": "until",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1328",
+      "text": "up",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1329",
+      "text": "upon",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1330",
+      "text": "upper",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1331",
+      "text": "upset",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1332",
+      "text": "urban",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1333",
+      "text": "urge",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1334",
+      "text": "urgent",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1335",
+      "text": "us",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1336",
+      "text": "use",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1337",
+      "text": "used",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1338",
+      "text": "useful",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1339",
+      "text": "user",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1340",
+      "text": "uses",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1341",
+      "text": "usual",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1342",
+      "text": "valley",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1343",
+      "text": "value",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1344",
+      "text": "valve",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1345",
+      "text": "van",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1346",
+      "text": "various",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1347",
+      "text": "vase",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1348",
+      "text": "vast",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1349",
+      "text": "vehicle",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1350",
+      "text": "velvet",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1351",
+      "text": "verse",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1352",
+      "text": "very",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1353",
+      "text": "vest",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1354",
+      "text": "vet",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1355",
+      "text": "video",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1356",
+      "text": "view",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1357",
+      "text": "village",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1358",
+      "text": "violin",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1359",
+      "text": "visit",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1360",
+      "text": "vivid",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1361",
+      "text": "voice",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1362",
+      "text": "volume",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1363",
+      "text": "vote",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1364",
+      "text": "voyage",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1365",
+      "text": "wagon",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1366",
+      "text": "walkway",
+      "sourceTier": 50,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1367",
+      "text": "waltz",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1368",
+      "text": "want",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1369",
+      "text": "warm",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1370",
+      "text": "was",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1371",
+      "text": "wash",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1372",
+      "text": "waste",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1373",
+      "text": "watch",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1374",
+      "text": "water",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1375",
+      "text": "waterway",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1376",
+      "text": "wave",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1377",
+      "text": "wax",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1378",
+      "text": "way",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1379",
+      "text": "we",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1380",
+      "text": "weak",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1381",
+      "text": "wear",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1382",
+      "text": "weather",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1383",
+      "text": "weave",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1384",
+      "text": "web",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1385",
+      "text": "week",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1386",
+      "text": "weekday",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1387",
+      "text": "weekend",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1388",
+      "text": "weight",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1389",
+      "text": "welcome",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1390",
+      "text": "well",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1391",
+      "text": "went",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1392",
+      "text": "were",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1393",
+      "text": "west",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1394",
+      "text": "western",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1395",
+      "text": "wet",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1396",
+      "text": "whale",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1397",
+      "text": "what",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1398",
+      "text": "whatever",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1399",
+      "text": "wheat",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1400",
+      "text": "wheel",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1401",
+      "text": "when",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1402",
+      "text": "whenever",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1403",
+      "text": "where",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1404",
+      "text": "wherever",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1405",
+      "text": "which",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1406",
+      "text": "while",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1407",
+      "text": "whisper",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1408",
+      "text": "whistle",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1409",
+      "text": "white",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1410",
+      "text": "who",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1411",
+      "text": "whole",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1412",
+      "text": "whom",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1413",
+      "text": "whose",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1414",
+      "text": "why",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1415",
+      "text": "wide",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1416",
+      "text": "wife",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1417",
+      "text": "wild",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1418",
+      "text": "wildlife",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1419",
+      "text": "will",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1420",
+      "text": "win",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1421",
+      "text": "wind",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1422",
+      "text": "window",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1423",
+      "text": "wing",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1424",
+      "text": "winner",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1425",
+      "text": "winter",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1426",
+      "text": "wire",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1427",
+      "text": "wise",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1428",
+      "text": "wish",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1429",
+      "text": "wishful",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1430",
+      "text": "with",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1431",
+      "text": "within",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1432",
+      "text": "without",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1433",
+      "text": "witness",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1434",
+      "text": "wolf",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1435",
+      "text": "woman",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1436",
+      "text": "women",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1437",
+      "text": "wonder",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1438",
+      "text": "wood",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1439",
+      "text": "wool",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1440",
+      "text": "word",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1441",
+      "text": "work",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1442",
+      "text": "world",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1443",
+      "text": "worm",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1444",
+      "text": "worn",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1445",
+      "text": "worry",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1446",
+      "text": "worse",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1447",
+      "text": "worth",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1448",
+      "text": "would",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1449",
+      "text": "woven",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1450",
+      "text": "wrap",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1451",
+      "text": "wrist",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1452",
+      "text": "write",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1453",
+      "text": "wrong",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1454",
+      "text": "yard",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1455",
+      "text": "year",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1456",
+      "text": "yearly",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1457",
+      "text": "yellow",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1458",
+      "text": "yes",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1459",
+      "text": "yet",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1460",
+      "text": "you",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1461",
+      "text": "young",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1462",
+      "text": "your",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1463",
+      "text": "youth",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1464",
+      "text": "zebra",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1465",
+      "text": "zero",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1466",
+      "text": "zest",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1467",
+      "text": "zigzag",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1468",
+      "text": "zinc",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1469",
+      "text": "zip",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1470",
+      "text": "zipper",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1471",
+      "text": "zone",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1472",
+      "text": "zoo",
+      "sourceTier": 35,
+      "originalStarter": false
+    },
+    {
+      "id": "en-v1-1473",
+      "text": "zoom",
+      "sourceTier": 35,
+      "originalStarter": false
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "policy": "Positive manual everyday-word selection; lowercase ASCII 2\u20138 letters; no proper names, abbreviations, obscure specialist terms, slurs, sexual or violent terms. Not a claim of exhaustive context-sensitive moderation.",
+  "excludedDraftEntries": {
+    "apprise": "Unnecessarily formal for everyday early practice.",
+    "hotelier": "Narrow occupational vocabulary.",
+    "zonal": "Technical adjective; other z words provide everyday coverage.",
+    "retiredness": "Outside the accepted 2\u20138-letter content range.",
+    "april": "Proper month name would need a capital.",
+    "cozy": "American variant omitted from this single British-spelling corpus.",
+    "auto": "Clipped form; avoid ambiguity about abbreviations.",
+    "pa": "Informal clipped family term.",
+    "army": "Military topic omitted from this quiet practice selection.",
+    "bomb": "Violent topic omitted.",
+    "fight": "Violent topic omitted.",
+    "war": "Violent topic omitted.",
+    "harm": "Harm-related topic omitted.",
+    "die": "Death-related topic omitted.",
+    "rob": "Crime-related topic omitted.",
+    "fool": "Can be a personal insult.",
+    "cheat": "Dishonesty-related term omitted.",
+    "guy": "Informal label for a person.",
+    "absurd": "Unnecessary evaluative term.",
+    "remix": "Absent from the pinned tier-50 British extract.",
+    "yesterday": "Outside the accepted 2\u20138-letter content range.",
+    "workbench": "Outside the accepted 2\u20138-letter content range."
+  },
+  "scopeNote": "The candidate input was written independently as everyday vocabulary and checked against pinned ESDB. The final generic supplement was not selected because the earlier manually reviewed groups already provided sufficient vocabulary and all stage coverage."
+}
