@@ -102,6 +102,8 @@ export class ProductDriver {
         label.style.cssText =
           'position:fixed;bottom:0;left:0;z-index:2147483647;background:#111;color:#fff;font:11px monospace;padding:3px;pointer-events:none;max-width:100vw;box-sizing:border-box';
         document.body.append(label);
+        // Native modal dialogs paint above body overlays. Keep their evidence labeled too.
+        document.querySelector('#settings')?.append(label.cloneNode(true));
       });
     });
     // Date-only control leaves performance.now(), capture timestamps and timers real.
@@ -252,6 +254,8 @@ export const test = base.extend<{ product: ProductDriver }>({
       throw new Error('PRODUCT_SEED must be a uint32');
     const driver = new ProductDriver(page, info, seed);
     const startedAt = new Date().toISOString();
+    const runnerSha = git('rev-parse', 'HEAD');
+    const runnerChanges = git('status', '--short');
     const errors: string[] = [];
     page.on('pageerror', (error) => errors.push(error.message));
     try {
@@ -294,8 +298,10 @@ export const test = base.extend<{ product: ProductDriver }>({
             seed,
             browser: browser.version(),
             date: process.env.PRODUCT_DATE ?? 'real browser wall clock',
-            runnerSha: git('rev-parse', 'HEAD'),
-            runnerChanges: git('status', '--short'),
+            runnerSha,
+            runnerChanges,
+            runnerChangedDuringRun:
+              runnerSha !== git('rev-parse', 'HEAD') || runnerChanges !== git('status', '--short'),
             status: info.status,
             errors,
             events: driver.events,
