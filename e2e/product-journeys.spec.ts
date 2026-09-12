@@ -149,7 +149,8 @@ test('product: complete exercise, inspect history, restart and reload a real sav
   await p.press('a', 'left-little');
   await p.pause();
   await p.resume();
-  await p.session(rounds, 'traditional-right-thumb');
+  const exactWordBound = await page.locator('.passage > span').count();
+  await p.session(rounds, 'traditional-right-thumb', exactWordBound);
   await expect(page.locator('#feedback')).toContainText('Passage complete');
   const saved = await p.persisted();
   expect(saved.results).toHaveLength(rounds);
@@ -171,4 +172,16 @@ test('product: complete exercise, inspect history, restart and reload a real sav
   });
   expect((await p.persisted()).calibration.points).toEqual(calibration.points);
   expect((await p.persisted()).results).toEqual(saved.results);
+});
+
+// A bound must stop real work; it must not silently claim exercise completion.
+test('product: incomplete exercise bounds fail without skipping words', async ({ product: p }) => {
+  await expect(p.exercise('traditional-right-thumb', 1)).rejects.toThrow(
+    'Exercise did not complete within 1 words',
+  );
+  await p.check('only the permitted first word was completed', {
+    target: 'quick',
+    input: '',
+    focus: 'typing',
+  });
 });

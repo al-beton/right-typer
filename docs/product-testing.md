@@ -84,7 +84,7 @@ test('a wrong finger survives correction', async ({ product: p, page }) => {
   Seeded cadence adds 0–40 ms by default; browser/capture timing remains real.
   Reproducible inputs do not promise deterministic OS scheduling.
 - `exercise(policy, maxWords)` reads targets until real completion, with a bound
-  (80 by default); `session(count, policy)` runs 1–5 exercises using the existing
+  (80 by default, 1–1000 allowed); `session(count, policy, maxWords)` runs 1–5 exercises using the existing
   Practise again button. No stage/counter/threshold is written. Fresh calibration
   is clicked through UI; reload exercises the state that the app actually saved.
 - `check(label, expected)` records expected and actual visible target, input,

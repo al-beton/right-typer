@@ -217,6 +217,8 @@ export class ProductDriver {
   }
   /** Bounded real UI completion; no imported passage or state/counter writes. */
   async exercise(policy: FixturePolicy, maxWords = 80) {
+    if (!Number.isInteger(maxWords) || maxWords < 1 || maxWords > 1000)
+      throw new Error('Exercise bound must be 1–1000 words');
     for (let count = 0; count < maxWords; count++) {
       if ((await this.snapshot()).feedback.includes('Passage complete')) return count;
       const before = await this.snapshot();
@@ -232,14 +234,15 @@ export class ProductDriver {
           );
         })
         .toBe(true);
+      if ((await this.snapshot()).feedback.includes('Passage complete')) return count + 1;
     }
     throw new Error(`Exercise did not complete within ${maxWords} words`);
   }
-  async session(exercises: number, policy: FixturePolicy) {
+  async session(exercises: number, policy: FixturePolicy, maxWords = 80) {
     if (!Number.isInteger(exercises) || exercises < 1 || exercises > 5)
       throw new Error('Session must contain 1–5 exercises');
     for (let round = 0; round < exercises; round++) {
-      await this.exercise(policy);
+      await this.exercise(policy, maxWords);
       await this.checkpoint(`exercise-${round + 1}-complete`);
       if (round + 1 < exercises)
         await this.page.getByRole('button', { name: 'Practise again', exact: true }).click();
