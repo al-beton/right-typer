@@ -1,6 +1,6 @@
 # Contributing to Right Typer
 
-Human contributions are welcome. You do not need Linear membership or six agents to contribute.
+Human contributions are welcome. You do not need Linear membership or a team of agents to contribute.
 
 ## From proposal to merge
 
@@ -13,8 +13,8 @@ Human contributions are welcome. You do not need Linear membership or six agents
 
 ## Current assisted delivery workflow
 
-The product liaison turns discussion with Al into scoped work, uses researcher and product designer advice, and authorizes increments within the approved initiative. The delivery manager assigns ready work and supervises status, dependencies, CI and review. The builder implements; the independent reviewer checks the PR and handles merge. Research/design helpers advise unless separately assigned implementation.
+The product liaison turns discussion with Al into scoped work, uses researcher and product designer advice, and authorizes increments within the approved initiative. The delivery manager assigns ready work and supervises status, dependencies, CI and review. The builder implements; the independent reviewer checks the PR and handles merge. Research/design helpers advise unless separately assigned implementation. The Product tester independently exercises current-head journeys and supplies reviewer evidence using the [product simulation guide](docs/product-testing.md); explicitly assigned test tooling can be implemented in a focused PR.
 
 Research/design issues finish when the liaison accepts the brief/artifacts and reconciles their decisions into product issues; they need no implementation PR. Code and documentation work require reviewer-owned merge and verified acceptance.
 
-[AGENTS.md](AGENTS.md) holds the shared role, autonomy, escalation, recovery and Git rules. Current owners and the ready queue live in Linear. Project decisions and handoffs belong in Linear; implementation findings and revisions belong in public GitHub threads. Shared-account posts identify their role; an independent agent's COMMENT review is not an independent-account approval. Contributors can follow this same public review path without reproducing the agent setup.
+[AGENTS.md](AGENTS.md) holds the shared role, autonomy, escalation, recovery and Git rules. Current owners and the ready queue live in Linear. Linear discussion holds the specification, acceptance intent and product/scope decisions. Implementation, review, fixes, QA, CI, stack coordination, recovery context and delivery updates belong on the GitHub PR. Route PR/comment links directly between tasks; do not add mirrored Linear checkpoint or relay comments. Maintain ordinary issue fields and PR associations; use contextualized Linear issues for genuinely deferred future scope. Shared-account posts identify their role; an independent agent's COMMENT review is not an independent-account approval. Contributors can follow this same public review path without reproducing the agent setup.
