@@ -23,7 +23,11 @@ Open the printed localhost address. Watch each half-speed frame loop, then choos
 a finger with the buttons or keys **1–0**. **Space** means “can't tell.” Each choice
 saves before advancing. Back edits the preceding answer; reload resumes at the
 first unlabelled press. A small circle flashes at the calibrated key when the press
-happens. It marks the key location, not a predicted finger. No model answer or
+happens. The review automatically orients the keyboard with Q on the left and P
+on the right, using calibrated key positions rather than trusting the recorded
+preview rotation. The footage and circle rotate together; original pixels and
+calibration stay unchanged. If Q/P positions are unavailable, the recorded rotation
+is retained. The circle marks the key location, not a predicted finger. No model answer or
 standard typing finger is shown. Images are cached for only the current/next clip.
 
 Nearby presses intentionally share overlapping footage, but each case has a unique

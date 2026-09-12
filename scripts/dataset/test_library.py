@@ -70,6 +70,22 @@ class LibraryTests(unittest.TestCase):
         self.assertEqual(case['keyPoint'], {'x': .2, 'y': .3})
         self.assertEqual([f['id'] for f in case['frames']], [3, 4])
 
+    def test_review_orientation_uses_keys_not_capture_preview_rotation(self):
+        camera = {'width': 960, 'height': 720, 'rotation': 0}
+        for q, p, expected in [
+            ((.8, .7), (.2, .7), 180),
+            ((.2, .7), (.8, .7), 0),
+            ((.5, .2), (.5, .8), 270),
+            ((.5, .8), (.5, .2), 90),
+        ]:
+            points = {'KeyQ': dict(zip(('x', 'y'), q)), 'KeyP': dict(zip(('x', 'y'), p))}
+            with self.subTest(expected=expected):
+                self.assertEqual(lib.review_rotation(camera, points), expected)
+                self.assertEqual(lib.review_rotation({**camera, 'rotation': 180}, points), expected)
+        self.assertEqual(camera['rotation'], 0)
+        self.assertEqual(lib.review_rotation(camera, {'q': {'x': .8, 'y': .7}, 'p': {'x': .2, 'y': .7}}), 180)
+        self.assertEqual(lib.review_rotation({**camera, 'rotation': 90}, {}), 90)
+
     def test_vote_history_and_snapshot_exclusions(self):
         first, second = self.fixture()
         lib.append_vote(self.root, 'al', first, 'left-index', 'human visual review')

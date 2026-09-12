@@ -154,6 +154,21 @@ def import_recording(root, archive, participant, setup, split):
             return row
 
 
+def review_rotation(camera, points):
+    """Orient the keyboard for the reviewer, independently of the capture preview."""
+    q = points.get('KeyQ') or points.get('q')
+    p = points.get('KeyP') or points.get('p')
+    if q is None or p is None:
+        return camera['rotation']
+    dx = (p['x'] - q['x']) * camera['width']
+    dy = (p['y'] - q['y']) * camera['height']
+    if dx == 0 and dy == 0:
+        return camera['rotation']
+    # CSS rotates clockwise: pick the quarter-turn with the strongest Q-to-P
+    # left-to-right direction. Native pixels and calibration remain untouched.
+    return max(((0, dx), (90, -dy), (180, -dx), (270, dy)), key=lambda pair: pair[1])[0]
+
+
 def cases(root):
     result = []
     for record in catalog(root)['recordings']:
@@ -174,7 +189,8 @@ def cases(root):
             result.append({'id': record['sessionId'] + '/' + str(press['attemptId']) + '/' + str(press['id']),
                            'sessionId': record['sessionId'], 'attemptId': press['attemptId'], 'pressId': press['id'],
                            'atMs': press['at'], 'key': press['key'], 'code': code, 'frames': selected,
-                           'keyPoint': point, 'camera': manifest['camera']})
+                           'keyPoint': point, 'camera': manifest['camera'],
+                           'reviewRotation': review_rotation(manifest['camera'], points)})
     require(len({c['id'] for c in result}) == len(result), 'Duplicate press identity')
     return result
 
