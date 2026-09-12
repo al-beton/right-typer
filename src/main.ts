@@ -150,6 +150,7 @@ document.addEventListener(
   'keydown',
   (event) => {
     if (event.key === ' ' || event.key === 'Enter') heldActivations.add(event.key);
+    if (blockedActivations.has(event.key)) event.preventDefault();
   },
   true,
 );
@@ -356,6 +357,8 @@ function render() {
   const checking = practicing && exercise.state === 'checking';
   const stats = exercise.stats(performance.now());
   const last = saved.results.at(-1);
+  const displayedRound = complete ? progress.cohort.course.round! : round;
+  const focusText = `${complete ? 'Next round' : `Round ${round.sequence}`} · Focus: ${keyName(displayedRound.focus)} · ${progress.cohort.course.included} keys. ${displayedRound.introduced ? `New key: ${keyName(displayedRound.introduced)}. Text and timing readiness earned.` : 'Build steady, accurate responses.'}`;
   const action = practicing
     ? '<button class="text-button" id="pause">Pause</button>'
     : complete
@@ -372,7 +375,7 @@ function render() {
           : flowMessage();
   content.innerHTML = `<section class="practice${complete ? ' results' : ''}">
     <div class="practice-top"><span class="practice-metrics">Practice · <span>${exercise.index} / ${exercise.words.length} words</span><span>${stats.retries} retries</span></span>${action}</div>
-    <p id="round-focus" class="recent">${escapeHtml(`${complete ? 'Next round' : `Round ${round.sequence}`} · Focus: ${keyName((complete ? progress.cohort.course.round! : round).focus)} · ${progress.cohort.course.included} keys. ${(complete ? progress.cohort.course.round! : round).introduced ? `New key: ${keyName((complete ? progress.cohort.course.round! : round).introduced!)}. Text and timing readiness earned.` : 'Build steady, accurate responses.'}`)}</p>
+    <p id="round-focus" class="recent">${escapeHtml(focusText)}${displayedRound.diagnostic ? ` ${escapeHtml(displayedRound.diagnostic)}` : ''}</p>
     ${passageMarkup()}
     <div class="entry-heading"><label for="typing">${complete ? 'Completed' : retry ? 'Try again' : 'Your word'}</label><span id="word-hint">Space finishes each word.</span></div>
     <div class="word-entry ${retry ? 'needs-retry' : ''}"><input id="typing" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type the current word" aria-describedby="word-hint${complete ? '' : ' current-target'}" placeholder="${complete ? 'Passage complete' : practicing ? 'type here' : resuming ? 'Paused' : 'Ready when you are'}" /></div>
@@ -1116,6 +1119,7 @@ function typing(event: KeyboardEvent) {
       });
     }
     if (exercise.state === 'complete') {
+      for (const key of heldActivations) blockedActivations.add(key);
       completeRound(progress.cohort, profile);
       progressStore.flush();
       saved.results.push({

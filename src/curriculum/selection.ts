@@ -1,5 +1,5 @@
-import corpus from './corpus.json';
-import fallbacks from './fallback-pools.json';
+import corpus from './corpus.json' with { type: 'json' };
+import fallbacks from './fallback-pools.json' with { type: 'json' };
 import { characterKey, type KeyboardProfile } from '../core/profile';
 import { ORDER, median, targetId, type Cohort, type Round, type Slot } from './progress';
 

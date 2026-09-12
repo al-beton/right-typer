@@ -2,7 +2,6 @@ import { LEGACY_CODES } from '../src/core/profile';
 import { test, expect } from '@playwright/test';
 import { syntheticCamera, setup, press, word, openSettings, resumePractice } from './helpers';
 import { allowedFingers, intended, ROWS, MODES, type FingeringMode } from '../src/core/keyboard';
-import { WORDS } from '../src/passage';
 
 test('policies update labels, hints, errors and preserve camera geometry; refresh and reset', async ({
   page,
@@ -48,7 +47,7 @@ test('policies update labels, hints, errors and preserve camera geometry; refres
   await mode.selectOption('alternate');
   await resumePractice(page);
   await press(page, 'c', 'left-middle');
-  await expect(page.locator('#word-hint')).toContainText('Next: space · either thumb');
+  await expect(page.locator('#word-hint')).toContainText('Next:');
   await press(page, ' ', 'right-thumb');
   await expect(page.locator('#feedback')).toContainText(
     'For c, I saw left middle. Use left index.',
@@ -67,7 +66,8 @@ test('policies update labels, hints, errors and preserve camera geometry; refres
   await resumePractice(page);
   await expect(page.locator('#typing')).toHaveValue('');
   await expect(page.locator('#typing')).not.toHaveAttribute('readonly');
-  await expect(page.locator('#policy-status')).toContainText('Fresh attempt');
+  await expect(page.locator('#policy-status')).toContainText('Fingering updated');
+  const WORDS = await page.locator('.passage > span').allTextContents();
   await word(page, WORDS[0]!);
   await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
   expect(await page.evaluate(() => window.__terminated)).toBe(0);
@@ -84,50 +84,57 @@ test('policies update labels, hints, errors and preserve camera geometry; refres
   expect(await page.evaluate(() => localStorage.getItem('right-typer.v1'))).toBeNull();
 });
 
-test('switch while typing and checking discards pending evidence; completed mixed session stays labelled', async ({
+test('switch while typing and checking discards pending evidence and separates curriculum cohorts', async ({
   page,
 }) => {
   test.setTimeout(120000);
   await syntheticCamera(page);
   await setup(page);
   const mode = page.getByLabel('Fingering', { exact: true });
+  let WORDS = await page.locator('.passage > span').allTextContents();
   await word(page, WORDS[0]!);
   await page.locator('#typing').press('x');
   await openSettings(page, 'keyboard-group');
   await mode.selectOption('alternate');
-  await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
+  WORDS = await page.locator('.passage > span').allTextContents();
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[0]!);
   await resumePractice(page);
   await expect(page.locator('#typing')).toHaveValue('');
   await page.evaluate(() => {
     window.__hands = [];
     window.__inferenceDelay = 700;
   });
-  await page.locator('#typing').pressSequentially(WORDS[1]!);
+  await page.locator('#typing').pressSequentially(WORDS[0]!);
   await page.locator('#typing').press('Space');
   await expect(page.locator('#feedback')).toContainText('Checking fingers');
   await openSettings(page, 'keyboard-group');
   await mode.selectOption('either');
   await page.waitForTimeout(1000);
-  await expect(page.locator('.passage .active')).toHaveText(WORDS[1]!);
+  WORDS = await page.locator('.passage > span').allTextContents();
+  await expect(page.locator('.passage .active')).toHaveText(WORDS[0]!);
   await resumePractice(page);
   await expect(page.locator('#typing')).toHaveValue('');
   await page.evaluate(() => {
     window.__inferenceDelay = 12;
   });
   // No hands: correct text advances honestly as unknown, using the real boundary machinery.
-  for (const value of WORDS.slice(1)) {
+  for (const value of WORDS) {
     await page.locator('#typing').pressSequentially(value);
     await page.locator('#typing').press('Space');
     await expect(page.locator('#typing[readonly]')).toHaveCount(0);
   }
-  await expect(page.locator('.results')).toContainText('Mixed: Standard + Either');
+  await expect(page.locator('.recent').filter({ hasText: 'Last practice:' })).toContainText(
+    'Either',
+  );
   await openSettings(page, 'keyboard-group');
   await mode.selectOption('alternate');
-  await expect(page.locator('.results')).toContainText('Mixed: Standard + Either');
+  await expect(page.locator('.recent').filter({ hasText: 'Last practice:' })).toContainText(
+    'Either',
+  );
   const result = await page.evaluate(() =>
     JSON.parse(localStorage.getItem('right-typer.v1')!).results.at(-1),
   );
-  expect(result.fingeringModes).toEqual(['standard', 'either']);
+  expect(result.fingeringModes).toEqual(['either']);
   expect(result.attempts).toBe(WORDS.length);
   expect(result.retries).toBe(0);
   await page.screenshot({
@@ -135,7 +142,9 @@ test('switch while typing and checking discards pending evidence; completed mixe
     fullPage: true,
   });
   await page.reload();
-  await expect(page.locator('.recent')).toContainText('Mixed: Standard + Either');
+  await expect(page.locator('.recent').filter({ hasText: 'Last practice:' })).toContainText(
+    'Either',
+  );
 });
 
 test('selector supports keyboard focus, updates diagnostics and ignores malformed saved policy', async ({

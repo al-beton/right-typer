@@ -226,3 +226,34 @@ describe('accepted progress accounting', () => {
     ).toThrow();
   });
 });
+
+it('ships sufficient original starter and noninitial coverage with same-level finite fallbacks', async () => {
+  const { default: corpus } = await import('../src/curriculum/corpus.json');
+  const { default: fallbacks } = await import('../src/curriculum/fallback-pools.json');
+  expect(corpus.words.length).toBeGreaterThanOrEqual(500);
+  expect(corpus.words.length).toBeLessThanOrEqual(1500);
+  expect(corpus.words.filter((w) => w.originalStarter).length).toBeGreaterThanOrEqual(30);
+  for (let included = 7; included <= ORDER.length; included++) {
+    const allowed = ORDER.slice(0, included);
+    const eligible = corpus.words.filter((w) => [...w.text].every((k) => allowed.includes(k)));
+    if (included === 7) expect(eligible.length).toBeGreaterThanOrEqual(30);
+    for (const target of allowed.filter((k) => /[a-z]/.test(k))) {
+      expect(eligible.filter((w) => w.text.includes(target)).length).toBeGreaterThanOrEqual(5);
+      expect(
+        eligible.filter((w) => w.text.slice(1).includes(target)).length,
+      ).toBeGreaterThanOrEqual(3);
+    }
+    const pools = fallbacks.stages[included - 7]!.targets as Record<
+      string,
+      { wordId: string; text: string }[]
+    >;
+    for (const target of allowed) {
+      expect(pools[target]!.length).toBeGreaterThanOrEqual(5);
+      for (const entry of pools[target]!) {
+        expect(WORDS_BY_ID.has(entry.wordId)).toBe(true);
+        expect([...entry.text].every((k) => allowed.includes(k))).toBe(true);
+        expect(target === ' ' || entry.text.includes(target)).toBe(true);
+      }
+    }
+  }
+});

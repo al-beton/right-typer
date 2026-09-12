@@ -2,7 +2,6 @@ import { hardwareKeys } from '../src/view/hardware';
 import { test, expect } from '@playwright/test';
 import { syntheticCamera, openSettings, resumePractice, editSetup } from './helpers';
 import { PRESETS, calibrationCodes, characterKey } from '../src/core/profile';
-import { WORDS } from '../src/passage';
 import { calibration } from '../tests/fixtures';
 
 test('presets update physical labels; French shifted punctuation completes passage with unknown evidence', async ({
@@ -46,6 +45,7 @@ test('presets update physical labels; French shifted punctuation completes passa
     window.__hands = [];
   });
   await page.waitForTimeout(550);
+  const WORDS = await page.locator('.passage > span').allTextContents();
   for (const word of WORDS) {
     for (const text of word + ' ') {
       const key = characterKey(p, text)!;
@@ -56,7 +56,7 @@ test('presets update physical labels; French shifted punctuation completes passa
     }
     await expect(page.locator('#typing[readonly]')).toHaveCount(0);
   }
-  await expect(page.locator('.results')).toContainText('Passage complete');
+  await expect(page.locator('.results')).toContainText('Round complete');
   const result = await page.evaluate(() =>
     JSON.parse(localStorage.getItem('right-typer.v1')!).results.at(-1),
   );

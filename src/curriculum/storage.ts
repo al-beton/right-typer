@@ -154,6 +154,8 @@ export class ProgressStore {
   data = emptyData();
   notice = 'Starting local progress saving…';
   private writable = false;
+  private owned = false;
+  private unreadable = false;
   private timer?: ReturnType<typeof setTimeout>;
   private original: string | null = null;
   constructor(private changed: () => void = () => {}) {
@@ -163,7 +165,7 @@ export class ProgressStore {
     } catch {
       this.notice =
         'Saved progress could not be read. Practice continues in memory; existing data is preserved. Reset local data to start a new saved history.';
-      return;
+      this.unreadable = true;
     }
     if (!navigator.locks) {
       this.notice =
@@ -172,14 +174,15 @@ export class ProgressStore {
     }
     void navigator.locks
       .request(PROGRESS_KEY, { ifAvailable: true }, async (lock) => {
-        if (!lock || localStorage.getItem(PROGRESS_KEY) !== this.original) {
+        if (!lock || (!this.unreadable && localStorage.getItem(PROGRESS_KEY) !== this.original)) {
           this.notice =
             'Another tab owns saved progress. This tab practises in memory; close the other tab and reload to resume saving.';
           this.changed();
           return;
         }
-        this.writable = true;
-        this.notice = '';
+        this.owned = true;
+        this.writable = !this.unreadable;
+        if (!this.unreadable) this.notice = '';
         this.flush();
         this.changed();
         await new Promise<void>(() => {});
@@ -218,9 +221,11 @@ export class ProgressStore {
   }
   reset() {
     this.data = emptyData();
-    if (!this.writable) return false;
+    if (!this.owned) return false;
     try {
       localStorage.removeItem(PROGRESS_KEY);
+      this.writable = true;
+      this.unreadable = false;
       this.notice = '';
       return true;
     } catch {
