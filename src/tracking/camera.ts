@@ -1,6 +1,7 @@
 import { EvidenceBuffer } from '../core/observation';
 import type { Frame } from '../core/types';
 import { frameTime } from './timing';
+import { displayOptions, displayError, DisplayDiagnostics } from './display';
 export type CameraStatus = 'off' | 'loading' | 'ready' | 'error';
 export class Camera {
   // Optional local recorder; pixels are copied before the production bitmap is transferred.
@@ -16,6 +17,9 @@ export class Camera {
   ) => void;
   recordSkip?: (reason: string, metadata: { mediaTime: number; presentedFrames: number }) => void;
   stream?: MediaStream;
+  source: 'camera' | 'window' = 'camera';
+  sourceId = '';
+  diagnostics = new DisplayDiagnostics();
   status: CameraStatus = 'off';
   error = '';
   latest?: Frame;
@@ -34,8 +38,11 @@ export class Camera {
     private changed: () => void,
     private onFrame: (frame: Frame) => void,
   ) {}
-  async start(deviceId = '') {
+  async start(deviceId = '', source: 'camera' | 'window' = 'camera') {
     this.stop();
+    this.source = source;
+    this.sourceId = source === 'window' ? `window-session-${this.generation}` : deviceId;
+    this.diagnostics = new DisplayDiagnostics();
     const generation = this.generation;
     this.status = 'loading';
     this.error = '';
@@ -45,23 +52,42 @@ export class Camera {
         throw new Error(
           'Open this page in current Chrome on HTTPS or localhost to use the camera.',
         );
-      const stream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: {
-          deviceId: deviceId ? { exact: deviceId } : undefined,
-          width: { ideal: 960 },
-          height: { ideal: 720 },
-          frameRate: { ideal: 30 },
-        },
-      });
+      if (source === 'window' && !navigator.mediaDevices.getDisplayMedia)
+        throw new Error(
+          'Window sharing is unavailable in this browser. Open this page in current Chrome on HTTPS or localhost.',
+        );
+      const stream =
+        source === 'window'
+          ? await navigator.mediaDevices.getDisplayMedia(displayOptions)
+          : await navigator.mediaDevices.getUserMedia({
+              audio: false,
+              video: {
+                deviceId: deviceId ? { exact: deviceId } : undefined,
+                width: { ideal: 960 },
+                height: { ideal: 720 },
+                frameRate: { ideal: 30 },
+              },
+            });
       if (generation !== this.generation) {
         stream.getTracks().forEach((t) => t.stop());
         return;
       }
       this.stream = stream;
+      // Audio is never consumed, including if a provider ignores audio:false.
+      stream
+        .getTracks()
+        .filter((t) => t.kind === 'audio')
+        .forEach((t) => {
+          t.stop();
+          stream.removeTrack(t);
+        });
       stream.getVideoTracks()[0]!.onended = () => {
         if (generation === this.generation)
-          this.fail('The camera disconnected. Reconnect it, then check the keyboard alignment.');
+          this.fail(
+            source === 'window'
+              ? 'Window sharing ended. Choose Share window again, then map the keyboard for the new share.'
+              : 'The camera disconnected. Reconnect it, then check the keyboard alignment.',
+          );
       };
       this.video.srcObject = stream;
       await this.video.play();
@@ -95,6 +121,7 @@ export class Camera {
             hands: message.hands,
             receivedAt: this.lastArrival,
           };
+          this.diagnostics.results++;
           this.latest = frame;
           this.evidence.add(frame);
           this.onFrame(frame);
@@ -118,21 +145,27 @@ export class Camera {
           performance.now() - this.lastArrival > 6000 &&
           !document.hidden
         )
-          this.fail('Camera frames stopped arriving. Restart the camera and recheck the setup.');
+          this.fail(
+            this.source === 'window'
+              ? 'Window frames stopped arriving. Restore the Desk View window, then choose Share window again and remap.'
+              : 'Camera frames stopped arriving. Restart the camera and recheck the setup.',
+          );
       }, 25);
     } catch (error) {
       if (generation !== this.generation) return;
       const e = error as DOMException;
       this.fail(
-        e.name === 'NotAllowedError'
-          ? 'Camera permission is blocked. In Chrome, open the site controls beside the address, allow Camera, then try again.'
-          : e.name === 'OverconstrainedError'
-            ? 'The saved camera is unavailable. Reconnect it or choose another camera below.'
-            : e.name === 'NotFoundError'
-              ? 'No camera was found. Connect or enable the MacBook camera, then try again.'
-              : e.name === 'NotReadableError'
-                ? 'Chrome could not open the camera. Close another app using it, then try again.'
-                : e.message,
+        source === 'window'
+          ? displayError(e)
+          : e.name === 'NotAllowedError'
+            ? 'Camera permission is blocked. In Chrome, open the site controls beside the address, allow Camera, then try again.'
+            : e.name === 'OverconstrainedError'
+              ? 'The saved camera is unavailable. Reconnect it or choose another camera below.'
+              : e.name === 'NotFoundError'
+                ? 'No camera was found. Connect or enable the MacBook camera, then try again.'
+                : e.name === 'NotReadableError'
+                  ? 'Chrome could not open the camera. Close another app using it, then try again.'
+                  : e.message,
       );
     }
   }
@@ -141,21 +174,33 @@ export class Camera {
     this.callbackId = this.video.requestVideoFrameCallback((_now, metadata) => {
       if (generation !== this.generation || this.status !== 'ready') return;
       this.capture();
+      const callbackTime = performance.now();
+      const nativeCaptureTime = frameTime(metadata, callbackTime);
+      if (this.source === 'window')
+        this.diagnostics.observe(this.video, metadata, callbackTime, nativeCaptureTime);
       if (this.busy || document.hidden) {
         this.recordSkip?.(document.hidden ? 'hidden' : 'worker-busy', metadata);
         return;
       }
       // rVFC's `now` can be the earlier render-tick timestamp, even before captureTime.
       // Validate against the clock sampled here, not that scheduling timestamp.
-      const callbackTime = performance.now();
-      const captureTime = frameTime(metadata, callbackTime);
+      // A screen-capture clock cannot identify Desk View's upstream camera exposure.
+      const captureTime = this.source === 'window' ? null : nativeCaptureTime;
       const at = captureTime ?? callbackTime;
       if (at <= this.lastFrameAt) return;
       this.lastFrameAt = at;
       this.busy = true;
       const id = ++this.sequence;
       // Snapshot pixels synchronously inside rVFC so the metadata belongs to these pixels.
-      const frozen = new VideoFrame(this.video, { timestamp: Math.round(at * 1000) });
+      let frozen: VideoFrame | undefined;
+      try {
+        frozen = new VideoFrame(this.video, { timestamp: Math.round(at * 1000) });
+        if (this.source === 'window') this.diagnostics.sample(this.video, callbackTime);
+      } catch {
+        frozen?.close();
+        this.fail('Could not snapshot video frames. Restart the video input in current Chrome.');
+        return;
+      }
       this.evidence.startFrame(id, at);
       createImageBitmap(frozen)
         .then((bitmap) => {
@@ -185,7 +230,7 @@ export class Camera {
           if (generation === this.generation)
             this.fail('Could not read camera frames. Restart the camera.');
         })
-        .finally(() => frozen.close());
+        .finally(() => frozen?.close());
     });
   }
   settings() {

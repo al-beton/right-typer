@@ -124,6 +124,8 @@ let progressResetArmed = false;
 let selectedProgress = '';
 let progressResetTimer: ReturnType<typeof setTimeout> | undefined;
 let sample: SampleRecorder | undefined;
+const windowTrial = new URLSearchParams(location.search).get('input') === 'window';
+let windowDimensions = '';
 const openDebugging = new URLSearchParams(location.search).get('record') === '1';
 
 $('#app').innerHTML = `
@@ -148,7 +150,9 @@ $('#app').innerHTML = `
         <div class="view-wrap" id="view-wrap"><div id="camera-image"><video id="camera" autoplay playsinline muted aria-label="Live view of your keyboard"></video><canvas id="overlay" aria-label="Keyboard calibration. Click the center of the requested key, or use arrow keys and Enter." tabindex="0"></canvas></div><div class="camera-empty" id="camera-empty"><strong>Allow camera access</strong><span>Tilt your MacBook screen toward the keyboard.<br/>Use your external display for this page.</span></div></div>
         </div><aside>
           <div class="camera-options"><label for="camera-rotation">Rotate camera view</label><select id="camera-rotation"><option value="0">0°</option><option value="90">90° clockwise</option><option value="180">180°</option><option value="270">270° clockwise</option></select><button id="swap" aria-pressed="false">Swap left/right hand labels</button></div>
-          <div id="camera-controls"><label for="device">Camera</label><select id="device"><option value="">MacBook / default camera</option></select><button id="start-camera">Enable camera</button><button id="disconnect-camera" hidden>Disconnect camera</button></div>
+          <div id="camera-controls"><label for="device">Camera</label><select id="device"><option value="">MacBook / default camera</option></select><button id="start-camera">Enable camera</button><button id="share-window">Share window (Desk View)</button><button id="disconnect-camera" hidden>Disconnect camera</button></div>
+          <p id="window-help">For Desk View, open its window, then choose it in the browser’s Window picker. Choose again after every reconnect. Keep its size, crop and zoom fixed after mapping. Window finger grades stay unknown because the original camera clock is unavailable.</p>
+          <details id="window-diagnostics" hidden><summary>Window input diagnostics</summary><pre id="window-readout" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre><p>No footage is recorded. Unchanged pixels can mean still hands or a frozen source; move your fingers to check.</p></details>
           <div id="setup-panel"></div>
           <p id="tracking-readout">Camera frames stay in this browser.</p>
         </aside>
@@ -279,6 +283,7 @@ function layoutCameraView() {
 }
 new ResizeObserver(layoutCameraView).observe($('#view-wrap'));
 video.addEventListener('loadedmetadata', layoutCameraView);
+video.addEventListener('resize', layoutCameraView);
 rotationControl.onchange = () => {
   const angle = Number(rotationControl.value);
   if (!isCameraRotation(angle)) return;
@@ -716,7 +721,7 @@ function sameCamera(c: Calibration) {
   return (
     !!c.profile &&
     calibrationGeometrySignature(c.profile) === calibrationGeometrySignature(profile) &&
-    s?.deviceId === c.deviceId &&
+    (camera.source === 'window' ? camera.sourceId : s?.deviceId) === c.deviceId &&
     video.videoWidth === c.width &&
     video.videoHeight === c.height
   );
@@ -726,7 +731,7 @@ function makeCalibration(): Calibration {
     version: 1,
     profile: structuredClone(profile),
     points: structuredClone(points),
-    deviceId: camera.settings()?.deviceId ?? '',
+    deviceId: camera.source === 'window' ? camera.sourceId : (camera.settings()?.deviceId ?? ''),
     width: video.videoWidth,
     height: video.videoHeight,
     swapHands,
@@ -847,9 +852,12 @@ function startPractice() {
   for (const key of heldActivations) blockedActivations.add(key);
   setupOpen = false;
   calibration = makeCalibration();
-  saved.calibration = calibration;
-  saved.calibrations = { ...saved.calibrations, [profile.id]: calibration };
-  saved.practiceEnabled = true;
+  // Window identity is per-share; never overwrite a saved webcam map with screen geometry.
+  if (camera.source === 'camera') {
+    saved.calibration = calibration;
+    saved.calibrations = { ...saved.calibrations, [profile.id]: calibration };
+  }
+  saved.practiceEnabled = camera.source === 'camera';
   autoStartPending = false;
   store();
   abandonProgress();
@@ -897,10 +905,21 @@ function updateCameraChoices() {
     .catch(() => {});
 }
 function cameraChanged() {
+  const sharing = camera.source === 'window';
+  $('#window-diagnostics').hidden = !sharing;
+  $('#disconnect-camera').textContent = sharing ? 'Stop sharing' : 'Disconnect camera';
+  $<HTMLButtonElement>('#share-window').disabled = camera.status === 'loading';
   $('#disconnect-camera').hidden = !['loading', 'ready'].includes(camera.status);
-  $('#camera-empty strong').textContent = saved.cameraDisconnected
-    ? 'Camera disconnected'
-    : 'Allow camera access';
+  $('#camera-empty span').textContent =
+    sharing || windowTrial
+      ? 'Open Desk View, then choose Share window below. Select its window in the browser picker.'
+      : 'Tilt your MacBook screen toward the keyboard. Use your external display for this page.';
+  $('#camera-empty strong').textContent =
+    sharing || windowTrial
+      ? 'Share the Desk View window'
+      : saved.cameraDisconnected
+        ? 'Camera disconnected'
+        : 'Allow camera access';
   if (camera.status !== 'ready') {
     canvas.getContext('2d')!.clearRect(0, 0, canvas.width, canvas.height);
     $('#camera-badge').classList.remove('good');
@@ -942,11 +961,16 @@ function cameraChanged() {
   }
   if (camera.status === 'ready') {
     cameraErrorHandled = false;
-    selectedCamera = camera.settings()?.deviceId ?? selectedCamera;
-    saved.cameraDeviceId = selectedCamera;
+    windowDimensions = `${video.videoWidth}x${video.videoHeight}`;
+    if (!sharing) {
+      selectedCamera = camera.settings()?.deviceId ?? selectedCamera;
+      saved.cameraDeviceId = selectedCamera;
+    }
     store();
     message = 'Mark the key centres in the camera image. Keep the camera still.';
-    const previous = disconnectedDraft ?? saved.calibration ?? saved.calibrations?.[profile.id];
+    const previous = sharing
+      ? undefined
+      : (disconnectedDraft ?? saved.calibration ?? saved.calibrations?.[profile.id]);
     disconnectedDraft = undefined;
     if (previous && sameCamera(previous)) {
       calibration = { ...structuredClone(previous), profile: structuredClone(profile) };
@@ -972,15 +996,30 @@ function cameraChanged() {
   if (phase !== 'practice' && phase !== 'results') render();
 }
 function drawFrame(frame: Frame) {
+  if (
+    camera.source === 'window' &&
+    windowDimensions !== `${video.videoWidth}x${video.videoHeight}`
+  ) {
+    windowDimensions = `${video.videoWidth}x${video.videoHeight}`;
+    if (phase === 'practice') pause(false);
+    camera.evidence.reset();
+    startCalibration();
+    message = 'Shared window dimensions changed. Map the key centres again before resuming.';
+    render();
+  }
   $('#camera-badge').textContent =
     frame.clock === 'unavailable'
-      ? 'Capture timing unavailable'
+      ? camera.source === 'window'
+        ? `${frame.hands.length} hands · window timing unknown`
+        : 'Capture timing unavailable'
       : `${frame.hands.length} hands detected`;
   $('#camera-badge').classList.toggle('good', frame.clock === 'capture');
   $('#tracking-readout').textContent =
     frame.clock === 'capture'
       ? `Capture → result ${Math.max(0, Math.round(frame.receivedAt - frame.at))} ms · ${frame.hands.length} hands`
-      : 'Capture timing unavailable. Finger observations stay unknown.';
+      : camera.source === 'window'
+        ? `${frame.hands.length} hands detected. Window frames have no original camera exposure time; finger grades stay unknown.`
+        : 'Capture timing unavailable. Finger observations stay unknown.';
   drawOverlay(frame);
 }
 function drawOverlay(frame: Frame) {
@@ -1133,7 +1172,8 @@ canvas.onkeydown = (event) => {
 };
 function disconnectCamera() {
   void sample?.stop('camera-disconnected');
-  if (camera.status === 'ready') disconnectedDraft = makeCalibration();
+  if (camera.status === 'ready' && camera.source === 'camera')
+    disconnectedDraft = makeCalibration();
   // Invalidate practice before stop resolves pending evidence promises.
   if (phase === 'practice') pause();
   if (phase !== 'results') phase = 'setup';
@@ -1141,7 +1181,10 @@ function disconnectCamera() {
   boundaryKeys = 0;
   saved.cameraDisconnected = true;
   disableAutoStart();
-  message = 'Camera disconnected. Select Reconnect camera to resume.';
+  message =
+    camera.source === 'window'
+      ? 'Sharing stopped. Choose Share window and map again to reconnect.'
+      : 'Camera disconnected. Select Reconnect camera to resume.';
   camera.stop();
 }
 $('#disconnect-camera').onclick = disconnectCamera;
@@ -1156,6 +1199,18 @@ function restartCamera() {
   void camera.start(selectedCamera);
 }
 $('#start-camera').onclick = restartCamera;
+$('#share-window').onclick = () => {
+  disableAutoStart();
+  void sample?.stop('input-changed');
+  if (phase === 'practice') pause(false);
+  calibration = undefined;
+  disconnectedDraft = undefined;
+  points = {};
+  phase = 'setup';
+  message = 'Choose the Desk View window in the browser picker. Audio is off.';
+  // This call must stay synchronous with the click to preserve transient activation.
+  void camera.start('', 'window');
+};
 $('#device').onchange = () => {
   selectedCamera = $<HTMLSelectElement>('#device').value;
   saved.cameraDeviceId = selectedCamera;
@@ -1502,7 +1557,7 @@ const profilesUI = profileControls(
     diagnosticsId--;
     boundaryKeys = 0;
     camera.evidence.reset();
-    if (calibration && validCalibration(calibration))
+    if (camera.source === 'camera' && calibration && validCalibration(calibration))
       saved.calibrations = { ...saved.calibrations, [profile.id]: structuredClone(calibration) };
     const previous = makeCalibration();
     profile = next;
@@ -1523,7 +1578,7 @@ const profilesUI = profileControls(
       : undefined;
     points = calibration?.points ?? {};
     disconnectedDraft = undefined;
-    saved.calibration = calibration;
+    if (camera.source === 'camera') saved.calibration = calibration;
     setupOpen = !calibration;
     message = calibration
       ? 'Compatible key positions kept. Start or resume when ready.'
@@ -1591,7 +1646,8 @@ function updateSampleControls() {
       : sample?.state === 'stopping'
         ? 'Stopping sample'
         : 'Sample retained';
-  $<HTMLButtonElement>('#sample-start').disabled = !!active || !ready();
+  $<HTMLButtonElement>('#sample-start').disabled =
+    !!active || !ready() || camera.source === 'window';
   $<HTMLButtonElement>('#sample-stop').disabled = sample?.state !== 'recording';
   $<HTMLButtonElement>('#sample-download').disabled = sample?.state !== 'ready';
   $<HTMLButtonElement>('#sample-discard').disabled = !active || sample?.state === 'stopping';
@@ -1615,7 +1671,7 @@ function updateSampleControls() {
     <div class="sample-actions"><button id="sample-start">Start sample (fresh passage)</button><button id="sample-stop" disabled>Stop sample</button><button id="sample-download" disabled>Download sample</button><button id="sample-discard" disabled>Discard sample</button></div>
     <p id="sample-status" role="status"></p><small>Stops at five minutes or 256 MiB, or when setup/fingering changes. Use a short pilot first.</small>`;
   $('#sample-start').onclick = () => {
-    if (!ready() || (sample && sample.state !== 'discarded')) return;
+    if (camera.source === 'window' || !ready() || (sample && sample.state !== 'discarded')) return;
     try {
       sample = new SampleRecorder(
         camera,
@@ -1649,12 +1705,32 @@ render();
 showStorageWarning();
 updateCameraChoices();
 
-if (saved.cameraDisconnected) cameraChanged();
+if (windowTrial || saved.cameraDisconnected) cameraChanged();
 else restartCamera();
 moveCamera();
 if (openDebugging) openSettings('debugging');
+if (windowTrial) openSettings('camera-group');
 
 // Refresh local-day/timezone presentation only; never accumulate time on a timer.
 setInterval(renderGoal, 1000);
 window.addEventListener('focus', renderGoal);
 document.addEventListener('visibilitychange', renderGoal);
+
+// Update text only: do not re-render mapping or move keyboard focus as diagnostics arrive.
+setInterval(() => {
+  if (camera.source !== 'window') return;
+  const d = camera.diagnostics,
+    now = performance.now();
+  const track = camera.stream?.getVideoTracks()[0];
+  const settings = track?.getSettings();
+  $('#window-readout').textContent = [
+    `Source: ${track?.label || 'no active share'} (${settings?.displaySurface ?? 'surface unspecified'})`,
+    `Stream: ${camera.status} · track ${track?.readyState ?? 'none'} · muted ${track?.muted ?? false} · audio tracks ${camera.stream?.getAudioTracks().length ?? 0}`,
+    `Frames: ${d.width} × ${d.height} · delivered ${d.fps(now).toFixed(1)} fps · requested 30 · track ${settings?.frameRate?.toFixed(1) ?? '?'} fps`,
+    `Callbacks ${d.callbacks} · model results ${d.results} · hands ${camera.latest?.hands.length ?? 0}`,
+    `Last frame ${d.callbackAt ? Math.round(now - d.callbackAt) + ' ms ago' : 'pending'} · media time ${d.mediaTime.toFixed(3)} s · presented ${d.presentedFrames}`,
+    `Repeated media times ${d.repeatedMediaTimes} · unchanged thumbnails ${d.unchangedThumbnails} · last pixel change ${d.changedAt ? Math.round(now - d.changedAt) + ' ms ago' : 'pending'}`,
+    `Browser captureTime: ${d.nativeCaptureTime === null ? 'absent/invalid' : d.nativeCaptureTime.toFixed(1) + ' ms (screen capture only)'}`,
+    `Model turnaround: ${camera.latest ? Math.round(camera.latest.receivedAt - camera.latest.at) + ' ms from callback' : 'pending'} · original camera exposure: unavailable · attribution: unknown`,
+  ].join('\n');
+}, 500);
