@@ -1956,6 +1956,6 @@ setInterval(() => {
     `Repeated media times ${d.repeatedMediaTimes} · unchanged thumbnails ${d.unchangedThumbnails} · last pixel change ${d.changedAt ? Math.round(now - d.changedAt) + ' ms ago' : 'pending'}`,
     ...(camera.error ? [`Error: ${camera.error}`] : []),
     `Browser captureTime: ${d.nativeCaptureTime === null ? 'absent/invalid' : d.nativeCaptureTime.toFixed(1) + ' ms (browser pipeline; not sensor exposure)'}`,
-    `Model turnaround: ${camera.latest ? Math.round(camera.latest.receivedAt - camera.latest.at) + ' ms from source timestamp' : 'pending'} · original camera exposure: unavailable · attribution: estimated (unmeasured error bound)`,
+    `Callback to result: ${camera.latest?.timing ? Math.round(camera.latest.receivedAt - camera.latest.timing.callbackAt) + ' ms' : 'pending'} · additional camera delay: ${camera.delayMs} ms · original camera exposure: unavailable · attribution: estimated (unmeasured error bound)`,
   ].join('\n');
 }, 500);
