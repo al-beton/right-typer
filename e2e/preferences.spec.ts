@@ -104,6 +104,8 @@ test('legacy Go maps auto-start, but changed dimensions cannot auto-start', asyn
     const saved = JSON.parse(localStorage.getItem('right-typer.v1')!);
     delete saved.practiceEnabled;
     delete saved.cameraDeviceId;
+    delete saved.cameraCalibrations;
+    delete saved.calibrations;
     localStorage.setItem('right-typer.v1', JSON.stringify(saved));
   });
   await page.reload();
@@ -111,10 +113,44 @@ test('legacy Go maps auto-start, but changed dimensions cannot auto-start', asyn
   await page.evaluate(() => {
     const saved = JSON.parse(localStorage.getItem('right-typer.v1')!);
     saved.calibration.width += 10;
+    // Recreate the flat legacy shape: the preceding reload migrated it and
+    // regenerated modern collections, whose compatible fallback is intentional.
+    delete saved.cameraCalibrations;
+    delete saved.calibrations;
     localStorage.setItem('right-typer.v1', JSON.stringify(saved));
   });
   await page.reload();
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
   await expect(page.locator('#typing')).toBeDisabled();
   await expect(page.locator('.cal-key.mapped')).toHaveCount(0);
+});
+
+test('changed delivered video dimensions reject all saved camera maps on reload', async ({
+  page,
+}) => {
+  await syntheticCamera(page);
+  await page.addInitScript(() => {
+    const get = navigator.mediaDevices.getUserMedia.bind(navigator.mediaDevices);
+    navigator.mediaDevices.getUserMedia = (constraints) => {
+      if (!localStorage.getItem('test-resize-camera')) return get(constraints);
+      const video = typeof constraints?.video === 'object' ? constraints.video : {};
+      return get({
+        ...constraints,
+        video: { ...video, width: { exact: 800 }, height: { exact: 600 } },
+      });
+    };
+  });
+  await setup(page);
+  await page.evaluate(() => localStorage.setItem('test-resize-camera', '1'));
+  await page.reload();
+  await expect(page.locator('#camera-badge')).toContainText('hands detected');
+  expect(
+    await page
+      .locator('#camera')
+      .evaluate((v) => [(v as HTMLVideoElement).videoWidth, (v as HTMLVideoElement).videoHeight]),
+  ).toEqual([800, 600]);
+  await expect(page.locator('#typing')).toBeDisabled();
+  await openSettings(page, 'camera-group');
+  await expect(page.locator('.cal-key.mapped')).toHaveCount(0);
+  await expect(page.locator('#settings-resume')).toBeDisabled();
 });

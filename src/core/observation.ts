@@ -9,7 +9,7 @@ export function nearestFrame(at: number, frames: Frame[]): Frame | undefined {
   return frames
     .filter(
       (f) =>
-        f.clock === 'capture' &&
+        (f.clock === 'capture' || f.clock === 'estimated') &&
         Number.isFinite(f.at) &&
         f.hands.length > 0 &&
         Math.abs(f.at - at) <= SEARCH_MS,
@@ -77,6 +77,7 @@ export function attribute(
     frameIds: [frame.id],
     distance: best.distance,
     offsetMs: frame.at - press.at,
+    ...(frame.timing ? { timing: structuredClone(frame.timing) } : {}),
   };
 }
 // Owns evidence by immutable press/attempt identity. Late results cannot re-grade settled presses.
