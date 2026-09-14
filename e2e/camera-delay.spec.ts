@@ -71,6 +71,11 @@ test('same clip aligns actual red/green pixels at 0/50 ms and supports replay an
   }, base);
   await page.waitForTimeout(150);
   await page.locator('#stop-delay-clip').click();
+  // The oracle freezes basis values only during capture. Live metadata must
+  // resume advancing, or its age correctly invalidates the basis and clip.
+  await page.evaluate(() => {
+    window.__clipRawAt = undefined;
+  });
   await expect(page.locator('#delay-clip-review')).toBeVisible();
   await page.locator('#clip-markers button').click();
   const layout = await page.locator('#delay-clip-view').evaluate((el) => {
