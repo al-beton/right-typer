@@ -46,3 +46,26 @@ test('explicit one-press inspection survives resume, preserves metadata, and cle
   await page.reload();
   await expect(readout).toHaveText('No decision captured.');
 });
+
+test('arming ignores an older pending press and captures the first new request', async ({
+  page,
+}) => {
+  await syntheticCamera(page);
+  await setup(page);
+  await page.evaluate(() => {
+    window.__inferenceDelay = 1400;
+  });
+  await page.waitForTimeout(120);
+  await page.locator('#typing').press('a');
+  await openSettings(page);
+  await page.locator('#decision-inspector summary').click();
+  await page.getByRole('button', { name: 'Inspect next press', exact: true }).click();
+  const readout = page.locator('[data-decision]');
+  await page.waitForTimeout(1200);
+  await expect(readout).toContainText('Waiting for the next');
+  await page.locator('#diagnostic').press('s');
+  await page.locator('#diagnostic').press('d');
+  await expect(readout).toContainText('"key": "s"');
+  await page.waitForTimeout(1500);
+  expect(JSON.parse((await readout.textContent())!).press.key).toBe('s');
+});

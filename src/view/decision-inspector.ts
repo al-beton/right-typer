@@ -11,20 +11,30 @@ export function decisionInspector(host: HTMLElement) {
   </details>`;
   const readout = host.querySelector<HTMLElement>('[data-decision]')!;
   let armed = false;
+  let selected: Pick<Press, 'id' | 'attemptId'> | null = null;
   const clear = () => {
     armed = false;
+    selected = null;
     readout.textContent = 'No decision captured.';
   };
   host.querySelector<HTMLButtonElement>('[data-arm]')!.onclick = () => {
     armed = true;
+    selected = null;
     readout.textContent = 'Waiting for the next practice or finger-check press…';
   };
   host.querySelector<HTMLButtonElement>('[data-clear]')!.onclick = clear;
   return {
-    clear,
-    capture(press: Press, calibration: Calibration, decision: AttributionDecision, source: object) {
+    reset(preserveInspection = false) {
+      if (!preserveInspection || selected) clear();
+    },
+    request(press: Press) {
       if (!armed) return;
       armed = false;
+      selected = { id: press.id, attemptId: press.attemptId };
+    },
+    capture(press: Press, calibration: Calibration, decision: AttributionDecision, source: object) {
+      if (selected?.id !== press.id || selected.attemptId !== press.attemptId) return;
+      selected = null;
       const key = press.code ?? press.key;
       readout.textContent = JSON.stringify(
         {

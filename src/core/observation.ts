@@ -138,7 +138,8 @@ export type EvidenceEvent =
 export class EvidenceBuffer {
   trace?: (event: EvidenceEvent) => void;
   inspectDecision?: (press: Press, calibration: Calibration, decision: AttributionDecision) => void;
-  clearInspection?: () => void;
+  inspectRequest?: (press: Press) => void;
+  clearInspection?: (preserveInspection?: boolean) => void;
   frames: Frame[] = [];
   private pending = new Map<
     number,
@@ -160,6 +161,7 @@ export class EvidenceBuffer {
   }
   request(press: Press, calibration: Calibration): Promise<Observation> {
     this.trace?.({ type: 'request', press });
+    this.inspectRequest?.(press);
     return new Promise((resolve) => this.pending.set(press.id, { press, calibration, resolve }));
   }
   // Settle once a frame after the press has landed and no in-flight frame could be nearer,
@@ -179,7 +181,7 @@ export class EvidenceBuffer {
     }
   }
   reset(options: { preserveInspection?: boolean } = {}) {
-    if (!options.preserveInspection) this.clearInspection?.();
+    this.clearInspection?.(options.preserveInspection);
     this.trace?.({ type: 'reset' });
     for (const p of this.pending.values())
       p.resolve({

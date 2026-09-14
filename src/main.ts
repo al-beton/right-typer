@@ -179,7 +179,8 @@ const video = $<HTMLVideoElement>('#camera');
 const canvas = $<HTMLCanvasElement>('#overlay');
 const camera = new Camera(video, cameraChanged, drawFrame);
 const inspector = decisionInspector($('#decision-inspector'));
-camera.evidence.clearInspection = inspector.clear;
+camera.evidence.clearInspection = inspector.reset;
+camera.evidence.inspectRequest = inspector.request;
 camera.evidence.inspectDecision = (press, calibration, decision) =>
   inspector.capture(press, calibration, decision, {
     build: import.meta.env.VITE_BUILD_SHA,

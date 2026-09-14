@@ -85,8 +85,8 @@ it('inspects the settled frame once, excludes images/hands, and cannot alter the
   evidence.tick(1200);
   expect(decisions).toHaveLength(1);
   let cleared = 0;
-  evidence.clearInspection = () => {
-    cleared++;
+  evidence.clearInspection = (preserve) => {
+    if (!preserve) cleared++;
   };
   evidence.reset({ preserveInspection: true });
   expect(cleared).toBe(0);
