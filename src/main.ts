@@ -125,7 +125,7 @@ let selectedProgress = '';
 let progressResetTimer: ReturnType<typeof setTimeout> | undefined;
 let sample: SampleRecorder | undefined;
 const windowEntry = new URLSearchParams(location.search).get('input') === 'window';
-let videoDimensions = '';
+let mappingGeometry: Pick<Calibration, 'deviceId' | 'width' | 'height'> | undefined;
 const openDebugging = new URLSearchParams(location.search).get('record') === '1';
 
 $('#app').innerHTML = `
@@ -738,14 +738,21 @@ function sameCamera(c: Calibration) {
     video.videoHeight === c.height
   );
 }
+function sourceGeometry(): Pick<Calibration, 'deviceId' | 'width' | 'height'> {
+  return {
+    deviceId: camera.source === 'window' ? camera.sourceId : (camera.settings()?.deviceId ?? ''),
+    width: video.videoWidth,
+    height: video.videoHeight,
+  };
+}
 function makeCalibration(): Calibration {
   return {
     version: 1,
     profile: structuredClone(profile),
     points: structuredClone(points),
-    deviceId: camera.source === 'window' ? camera.sourceId : (camera.settings()?.deviceId ?? ''),
-    width: video.videoWidth,
-    height: video.videoHeight,
+    // Points belong to the source that was mapped. Do not re-label old points
+    // from mutable live track settings while saving before a source restart.
+    ...(mappingGeometry ?? sourceGeometry()),
     swapHands,
     savedAt: Date.now(),
   };
@@ -983,7 +990,7 @@ function cameraChanged() {
   }
   if (camera.status === 'ready') {
     cameraErrorHandled = false;
-    videoDimensions = `${video.videoWidth}x${video.videoHeight}`;
+    mappingGeometry = sourceGeometry();
     if (!sharing) {
       selectedCamera = camera.settings()?.deviceId ?? selectedCamera;
       saved.cameraDeviceId = selectedCamera;
@@ -1023,12 +1030,18 @@ function cameraChanged() {
   if (phase !== 'practice' && phase !== 'results') render();
 }
 function checkVideoDimensions() {
-  if (camera.status === 'ready' && videoDimensions !== `${video.videoWidth}x${video.videoHeight}`) {
-    videoDimensions = `${video.videoWidth}x${video.videoHeight}`;
+  if (camera.status !== 'ready' || !mappingGeometry) return;
+  const current = sourceGeometry();
+  if (
+    current.deviceId !== mappingGeometry.deviceId ||
+    current.width !== mappingGeometry.width ||
+    current.height !== mappingGeometry.height
+  ) {
+    mappingGeometry = current;
     if (phase === 'practice') pause(false);
     camera.evidence.reset();
     startCalibration();
-    message = 'Video dimensions changed. Map the key centres again before resuming.';
+    message = 'Video source or dimensions changed. Map the key centres again before resuming.';
     render();
   }
 }
