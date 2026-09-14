@@ -22,10 +22,12 @@ export async function replaySample(
       if (event.type === 'reset') buffer.reset();
       if (event.type === 'tick') buffer.tick(event.at);
       if (event.type === 'request') {
-        void buffer.request(structuredClone(event.press), sample.calibration).then((o) => {
-          observed.set(`${event.press.attemptId}/${event.press.id}`, o);
-          onObservation?.(event.press, o);
-        });
+        void buffer
+          .request(structuredClone(event.press), sample.calibration, event.delayMs)
+          .then((o) => {
+            observed.set(`${event.press.attemptId}/${event.press.id}`, o);
+            onObservation?.(event.press, o);
+          });
       }
       // Preserve microtask delivery before subsequent recorded callbacks.
       await Promise.resolve();

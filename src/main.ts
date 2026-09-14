@@ -1,3 +1,5 @@
+import { cameraDelayControls } from './view/camera-delay';
+import { cameraDelayKey } from './core/camera-delay';
 import { decisionInspector } from './view/decision-inspector';
 import { hardwareKeys, HARDWARE, type HardwareKey } from './view/hardware';
 import {
@@ -157,6 +159,7 @@ $('#app').innerHTML = `
           <p id="window-help">For Desk View, open its window, then choose it in the browser’s Window picker. Choose again after every reconnect. Keep its size, crop and zoom fixed after mapping. In Safari, you can also select the Desk View camera above after allowing camera access. Remap if the view changes.</p>
           <details id="window-diagnostics" hidden><summary>Input timing diagnostics</summary><pre id="window-readout" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre><p>No footage is recorded. Unchanged pixels can mean still hands or a frozen source; move your fingers to check.</p></details>
           <div id="setup-panel"></div>
+          <div id="camera-delay-controls"></div>
           <div id="decision-inspector"></div>
           <p id="tracking-readout">Camera frames stay in this browser.</p>
         </aside>
@@ -179,7 +182,9 @@ const video = $<HTMLVideoElement>('#camera');
 const canvas = $<HTMLCanvasElement>('#overlay');
 const camera = new Camera(video, cameraChanged, drawFrame);
 const inspector = decisionInspector($('#decision-inspector'));
-camera.evidence.clearInspection = inspector.reset;
+camera.evidence.clearInspection = (preserve) => {
+  inspector.reset(preserve);
+};
 camera.evidence.inspectRequest = inspector.request;
 camera.evidence.inspectDecision = (press, calibration, decision) =>
   inspector.capture(press, calibration, decision, {
@@ -239,6 +244,7 @@ function openSettings(
   summary.scrollIntoView({ block: 'nearest' });
 }
 function closeSettings(resume = false) {
+  delayUI.discard();
   for (const key of heldActivations) blockedActivations.add(key);
   settings.close();
   document.body.classList.remove('settings-open');
@@ -325,6 +331,61 @@ const cropUI = cropControls(
     canvas.focus({ preventScroll: true });
   },
 );
+function currentDelayKey() {
+  return cameraDelayKey(
+    camera.timingSource,
+    camera.settings()?.deviceId ?? '',
+    video.videoWidth,
+    video.videoHeight,
+    camera.timingBasis,
+  );
+}
+let delayBasisNotice = false;
+const delayUI = cameraDelayControls(
+  $('#camera-delay-controls'),
+  () => ({
+    ready: camera.status === 'ready',
+    adjustable: camera.timingSource !== 'camera' && camera.timingBasis !== undefined,
+    delayMs: camera.delayMs,
+    scope: delayBasisNotice
+      ? 'Camera timing changed. Delay reset to 0; recheck before applying a value.'
+      : camera.timingSource === 'camera'
+        ? 'Ordinary cameras keep automatic browser timing. Manual adjustment is for Desk View and shared windows.'
+        : currentDelayKey()
+          ? 'Saved for this camera, video size and timing basis in this browser.'
+          : 'This share starts at 0. Reuse a previous window value only if it is appropriate for this source.',
+    reusable: camera.source === 'window' ? saved.lastWindowDelayMs : undefined,
+  }),
+  applyCameraDelay,
+);
+function restoreCameraDelay(changedBasis = false) {
+  delayUI.discard();
+  delayBasisNotice = changedBasis;
+  const key = currentDelayKey();
+  camera.setDelay(key && !changedBasis ? (saved.cameraDelays?.[key] ?? 0) : 0);
+  delayUI.refresh();
+}
+camera.setupFrame = (video, timing) => delayUI.capture(video, timing, camera.crop, cameraRotation);
+camera.timingChanged = (changedBasis) => {
+  if (changedBasis && phase === 'practice') pause(false);
+  diagnosticsId--;
+  restoreCameraDelay(changedBasis);
+};
+function applyCameraDelay(value: number) {
+  if (camera.timingSource === 'camera') return;
+  delayBasisNotice = false;
+  if (camera.status !== 'ready') return;
+  if (phase === 'practice') pause(false);
+  disableAutoStart();
+  void sample?.stop('camera-timing-changed');
+  diagnosticsId--;
+  camera.setDelay(value);
+  const key = currentDelayKey();
+  if (key) saved.cameraDelays = { ...saved.cameraDelays, [key]: value };
+  else if (camera.source === 'window') saved.lastWindowDelayMs = value;
+  store();
+  delayUI.refresh();
+}
 $('#crop-view').onclick = () => {
   openSettings('camera-group');
   cropUI.open();
@@ -340,6 +401,7 @@ function restoreCameraCrop() {
   layoutCameraView();
 }
 function applyCameraCrop(crop: Crop) {
+  delayUI.discard();
   if (camera.status !== 'ready') return;
   if (phase === 'practice') pause(false);
   disableAutoStart();
@@ -373,6 +435,7 @@ rotationControl.onchange = () => {
   if (!isCameraRotation(angle)) return;
   void sample?.stop('camera-view-changed');
   inspector.reset();
+  delayUI.discard();
   cameraRotation = angle;
   saved.cameraRotation = angle;
   store();
@@ -843,6 +906,7 @@ function draftValid() {
   return validCalibration(makeCalibration()) && !cropHidesKeys();
 }
 function startCalibration() {
+  delayUI.discard();
   disableAutoStart();
   setupOpen = true;
   void sample?.stop('calibration-changed');
@@ -879,6 +943,7 @@ function flowMessage() {
     : 'Key positions ready. Start when you’re ready to type.';
 }
 function editSetup() {
+  delayUI.discard();
   openSettings('camera-group');
   void sample?.stop('edit-setup');
   disableAutoStart();
@@ -925,6 +990,7 @@ function renderSetup() {
     .forEach((el) => {
       el.onclick = () => {
         void sample?.stop('calibration-changed');
+        delayUI.discard();
         selectedKey = Number(el.dataset.cal);
         phase = 'calibrate';
         render();
@@ -1011,6 +1077,7 @@ function updateCameraChoices() {
     .catch(() => {});
 }
 function cameraChanged() {
+  delayUI.discard();
   cropUI.refresh();
   layoutCameraView();
   const sharing = camera.source === 'window';
@@ -1078,6 +1145,7 @@ function cameraChanged() {
   if (camera.status === 'ready') {
     cameraErrorHandled = false;
     restoreCameraCrop();
+    restoreCameraDelay();
     mappingGeometry = sourceGeometry();
     if (!sharing) {
       selectedCamera = camera.settings()?.deviceId ?? selectedCamera;
@@ -1114,6 +1182,7 @@ function cameraChanged() {
       else disableAutoStart();
     }
   }
+  delayUI.refresh();
   if (camera.status === 'ready' || camera.status === 'error') updateCameraChoices();
   if (phase !== 'practice' && phase !== 'results') render();
 }
@@ -1126,6 +1195,7 @@ function checkVideoDimensions() {
     current.height !== mappingGeometry.height
   ) {
     restoreCameraCrop();
+    restoreCameraDelay();
     mappingGeometry = current;
     if (phase === 'practice') pause(false);
     camera.evidence.reset();
@@ -1510,7 +1580,7 @@ function typing(event: KeyboardEvent) {
   if (event.key === ' ') render();
   else updateTyped();
   const owner = exercise;
-  void camera.evidence.request(press, calibration!).then((observation) => {
+  void camera.evidence.request(press, calibration!, camera.delayMs).then((observation) => {
     progressOwner.observe(progressPress, observation);
     renderHeatmap();
     if (owner !== exercise) return;
@@ -1661,7 +1731,7 @@ function diagnostic(event: KeyboardEvent) {
   };
   const id = press.id;
   $('#diagnostic-result').textContent = `Checking ${keyName(event.key)}…`;
-  camera.evidence.request(press, checkCalibration).then((o) => {
+  camera.evidence.request(press, checkCalibration, camera.delayMs).then((o) => {
     if (phase === 'practice' || phase === 'results' || id !== diagnosticsId + 1) return;
     $('#diagnostic-result').textContent =
       o.kind === 'finger'
@@ -1876,6 +1946,6 @@ setInterval(() => {
     `Repeated media times ${d.repeatedMediaTimes} · unchanged thumbnails ${d.unchangedThumbnails} · last pixel change ${d.changedAt ? Math.round(now - d.changedAt) + ' ms ago' : 'pending'}`,
     ...(camera.error ? [`Error: ${camera.error}`] : []),
     `Browser captureTime: ${d.nativeCaptureTime === null ? 'absent/invalid' : d.nativeCaptureTime.toFixed(1) + ' ms (browser pipeline; not sensor exposure)'}`,
-    `Model turnaround: ${camera.latest ? Math.round(camera.latest.receivedAt - camera.latest.at) + ' ms from source timestamp' : 'pending'} · original camera exposure: unavailable · attribution: estimated (unmeasured error bound)`,
+    `Callback to result: ${camera.latest?.timing ? Math.round(camera.latest.receivedAt - camera.latest.timing.callbackAt) + ' ms' : 'pending'} · additional camera delay: ${camera.delayMs} ms · original camera exposure: unavailable · attribution: estimated (unmeasured error bound)`,
   ].join('\n');
 }, 500);

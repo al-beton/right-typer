@@ -288,6 +288,25 @@ test('real model and cropped full app run on synthetic media with no external re
     path: `test-results/live-view-${browserName}-settings.png`,
     fullPage: true,
   });
+  // Exercise actual MediaPipe after both directions of a timing adjustment. Its
+  // model clock must remain monotonic while the attribution clock moves.
+  for (const value of ['500', '0']) {
+    const before = Number(
+      (await page.locator('#window-readout').textContent())!.match(/model results (\d+)/)?.[1] ?? 0,
+    );
+    await page.locator('#camera-delay').fill(value);
+    await page.locator('#apply-camera-delay').click();
+    await expect
+      .poll(async () =>
+        Number(
+          (await page.locator('#window-readout').textContent())!.match(
+            /model results (\d+)/,
+          )?.[1] ?? 0,
+        ),
+      )
+      .toBeGreaterThan(before);
+    await expect(page.locator('#camera-badge')).toContainText('0 hands detected');
+  }
   expect(errors).toEqual([]);
   expect(requests.filter((url) => new URL(url).origin !== new URL(page.url()).origin)).toEqual([]);
   await page.locator('#disconnect-camera').click();

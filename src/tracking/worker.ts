@@ -40,7 +40,7 @@ self.onmessage = async (event: MessageEvent) => {
         canvas.height = bitmap.height;
       }
       context.drawImage(bitmap, 0, 0);
-      const result = model.detectForVideo(canvas, message.at);
+      const result = model.detectForVideo(canvas, message.modelAt ?? message.at);
       const hands: SeenHand[] = result.landmarks.map((points, i) => ({
         side: result.handedness[i]?.[0]?.categoryName.toLowerCase() === 'left' ? 'left' : 'right',
         score: result.handedness[i]?.[0]?.score ?? 0,

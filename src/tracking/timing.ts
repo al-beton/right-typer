@@ -1,3 +1,4 @@
+import { isCameraDelay } from '../core/camera-delay';
 import type { Frame, FrameTiming } from '../core/types';
 // Both values are DOMHighResTimeStamp on the Window performance timeline.
 // Presentation time is not a substitute for capture time: it hides camera delay.
@@ -30,12 +31,18 @@ export function sourceFrameTime(
   metadata: VideoFrameCallbackMetadata,
   now: number,
   source: FrameTiming['source'],
+  residualDelayMs = 0,
 ): Pick<Frame, 'at' | 'clock' | 'timing'> {
   const nativeCaptureTime = frameTime(metadata, now);
+  const delay = source !== 'camera' && isCameraDelay(residualDelayMs) ? residualDelayMs : 0;
   return {
-    at: nativeCaptureTime ?? now,
+    at: (nativeCaptureTime ?? now) - delay,
     clock:
-      source === 'camera' ? (nativeCaptureTime === null ? 'unavailable' : 'capture') : 'estimated',
+      source === 'camera' && delay === 0
+        ? nativeCaptureTime === null
+          ? 'unavailable'
+          : 'capture'
+        : 'estimated',
     timing: {
       source,
       basis: nativeCaptureTime === null ? 'callback' : 'browser-capture',
@@ -46,7 +53,8 @@ export function sourceFrameTime(
       callbackAt: now,
       mediaTime: metadata.mediaTime,
       presentedFrames: metadata.presentedFrames,
-      offsetMs: 0,
+      offsetMs: delay ? -delay : 0,
+      residualDelayMs: delay,
       uncertaintyMs: null,
     },
   };

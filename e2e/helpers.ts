@@ -11,13 +11,40 @@ declare global {
     __deviceId: string;
     __cameraRequests: number;
     __denyCamera: boolean;
+    __clipPixel?: string;
   }
 }
 // Test-only replacement at the worker boundary. Production code exposes no simulation mode.
 // A real browser fake camera still supplies rVFC capture timestamps and pixels.
-export async function syntheticCamera(page: Page, initialHands = handsAt('f', 'left-index')) {
+export async function syntheticCamera(
+  page: Page,
+  initialHands = handsAt('f', 'left-index'),
+  canvasSource = false,
+) {
   await page.addInitScript(
-    ({ hands }) => {
+    ({ hands, canvasSource }) => {
+      if (canvasSource) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 960;
+        canvas.height = 720;
+        const ctx = canvas.getContext('2d')!;
+        const draw = () => {
+          ctx.fillStyle = window.__clipPixel ?? '#315944';
+          ctx.fillRect(0, 0, 960, 720);
+          ctx.fillStyle = 'white';
+          ctx.font = '24px system-ui';
+          ctx.fillText('SYNTHETIC CAMERA', 150, 260);
+          requestAnimationFrame(draw);
+        };
+        draw();
+        const stream = async () => {
+          const s = canvas.captureStream(30);
+          Object.defineProperty(s.getVideoTracks()[0]!, 'label', { value: 'Synthetic Desk View' });
+          return s;
+        };
+        navigator.mediaDevices.getUserMedia = stream;
+        navigator.mediaDevices.getDisplayMedia = stream;
+      }
       // Incognito fake cameras rotate their opaque IDs on reload. Supply a stable
       // identity for the persistence scenario; real-camera identity changes are tested separately.
       window.__deviceId = 'synthetic-macbook-camera';
@@ -98,7 +125,7 @@ export async function syntheticCamera(page: Page, initialHands = handsAt('f', 'l
       }
       window.Worker = SyntheticWorker as unknown as typeof Worker;
     },
-    { hands: initialHands },
+    { hands: initialHands, canvasSource },
   );
 }
 export async function openSettings(page: Page, group = 'camera-group') {
@@ -117,8 +144,12 @@ export async function resumePractice(page: Page) {
     await page.locator('#settings-resume').click();
   else await page.getByRole('button', { name: /^(Start|Resume) practice$/ }).click();
 }
-export async function setup(page: Page, saved = false, startURL = '/') {
+export async function setup(page: Page, saved = false, startURL = '/', startWithGesture = false) {
   await page.goto(startURL);
+  if (startWithGesture) {
+    await openSettings(page);
+    await page.locator('#start-camera').click();
+  }
   await expect(page.locator('#camera-badge')).toContainText('hands detected');
   if (!saved) {
     await expect(page.getByRole('button', { name: /^(Start|Resume) practice$/ })).toBeDisabled();

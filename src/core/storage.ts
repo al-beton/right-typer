@@ -1,3 +1,4 @@
+import { isCameraDelay } from './camera-delay';
 import {
   PRESETS,
   parseProfile,
@@ -28,6 +29,8 @@ export type Saved = {
   customProfiles?: KeyboardProfile[];
   calibrations?: Record<string, Calibration>;
   cameraCrops?: Record<string, Crop>;
+  cameraDelays?: Record<string, number>;
+  lastWindowDelayMs?: number;
   cameraCalibrations?: Record<string, Calibration>;
   legacyCalibration?: unknown;
   calibrationHistory?: Record<string, Calibration>;
@@ -187,6 +190,14 @@ export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
           .slice(-28)
           .filter(([key, value]) => key.length <= 1024 && isCrop(value)),
       ) as Record<string, Crop>,
+      cameraDelays: Object.fromEntries(
+        Object.entries(parsed.cameraDelays ?? {})
+          .slice(-28)
+          .filter(([key, value]) => key.length <= 1024 && isCameraDelay(value)),
+      ) as Record<string, number>,
+      ...(isCameraDelay(parsed.lastWindowDelayMs)
+        ? { lastWindowDelayMs: parsed.lastWindowDelayMs }
+        : {}),
       legacyCalibration,
       calibrationHistory,
       migrationNotice,
@@ -221,6 +232,8 @@ export function save(data: Saved, storage: Pick<Storage, 'setItem'> = localStora
         calibrations: data.calibrations,
         cameraCalibrations: data.cameraCalibrations,
         cameraCrops: data.cameraCrops,
+        cameraDelays: data.cameraDelays,
+        lastWindowDelayMs: data.lastWindowDelayMs,
         legacyCalibration: data.legacyCalibration,
         calibrationHistory: data.calibrationHistory,
         migrationNotice: data.migrationNotice,
