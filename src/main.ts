@@ -1,3 +1,4 @@
+import { decisionInspector } from './view/decision-inspector';
 import { hardwareKeys, HARDWARE, type HardwareKey } from './view/hardware';
 import {
   PRESETS,
@@ -156,6 +157,7 @@ $('#app').innerHTML = `
           <p id="window-help">For Desk View, open its window, then choose it in the browser’s Window picker. Choose again after every reconnect. Keep its size, crop and zoom fixed after mapping. In Safari, you can also select the Desk View camera above after allowing camera access. Remap if the view changes.</p>
           <details id="window-diagnostics" hidden><summary>Input timing diagnostics</summary><pre id="window-readout" style="white-space:pre-wrap;overflow-wrap:anywhere"></pre><p>No footage is recorded. Unchanged pixels can mean still hands or a frozen source; move your fingers to check.</p></details>
           <div id="setup-panel"></div>
+          <div id="decision-inspector"></div>
           <p id="tracking-readout">Camera frames stay in this browser.</p>
         </aside>
       </div>
@@ -176,6 +178,19 @@ $('#app').innerHTML = `
 const video = $<HTMLVideoElement>('#camera');
 const canvas = $<HTMLCanvasElement>('#overlay');
 const camera = new Camera(video, cameraChanged, drawFrame);
+const inspector = decisionInspector($('#decision-inspector'));
+camera.evidence.clearInspection = inspector.clear;
+camera.evidence.inspectDecision = (press, calibration, decision) =>
+  inspector.capture(press, calibration, decision, {
+    build: import.meta.env.VITE_BUILD_SHA,
+    browser: navigator.userAgent,
+    profile: calibration.profile?.id,
+    kind: camera.timingSource,
+    width: video.videoWidth,
+    height: video.videoHeight,
+    crop: { ...camera.crop },
+    rotation: cameraRotation,
+  });
 const fingerPalette = readFingerPalette(getComputedStyle(document.documentElement));
 const content = $('#content');
 const settings = $<HTMLDialogElement>('#settings');
@@ -946,7 +961,8 @@ function startPractice() {
   autoStartPending = false;
   store();
   abandonProgress();
-  camera.evidence.reset();
+  // Starting practice keeps an explicitly armed inspection from the settings drawer.
+  camera.evidence.reset({ preserveInspection: true });
   message = '';
   boundaryKeys = 0;
   if (resuming && exercise.state !== 'complete') exercise.retry();
