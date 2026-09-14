@@ -160,12 +160,6 @@ export function cameraDelayControls(
       (find(id) as HTMLInputElement | HTMLButtonElement).disabled =
         !state().ready || !state().adjustable || recording || finishing;
     (find('record-delay-clip') as HTMLButtonElement).disabled = !state().ready;
-    if (clip.state === 'ready' && !reviewed) {
-      reviewed = true;
-      selectedKey = clip.keys.length ? 0 : -1;
-      current = 0;
-      align();
-    }
     if (clip.state === 'ready' && markerCount !== clip.keys.length) {
       markerCount = clip.keys.length;
       find('clip-markers').replaceChildren(
@@ -181,7 +175,12 @@ export function cameraDelayControls(
           return button;
         }),
       );
-      draw();
+    }
+    if (clip.state === 'ready' && !reviewed) {
+      reviewed = true;
+      selectedKey = clip.keys.length ? 0 : -1;
+      current = 0;
+      align();
     }
   }
   function discard() {

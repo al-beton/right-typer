@@ -231,3 +231,37 @@ test('retake, cancel, duration and geometry invalidation discard local clip data
   await expect(page.locator('#stop-delay-clip')).toBeHidden();
   await expect(page.locator('#clip-markers button')).toHaveCount(0);
 });
+
+test('initial unmatched key keeps its warning and never paints frame zero as a match', async ({
+  page,
+}) => {
+  await syntheticCamera(page, undefined, true);
+  await page.addInitScript(() => {
+    const callback = HTMLVideoElement.prototype.requestVideoFrameCallback;
+    HTMLVideoElement.prototype.requestVideoFrameCallback = function (fn) {
+      return callback.call(this, (now, meta) =>
+        fn(now, { ...meta, captureTime: performance.now() - 1000 }),
+      );
+    };
+  });
+  await setup(page, false, '/', test.info().project.name === 'webkit');
+  await openSettings(page);
+  await apply(page, '500');
+  await page.locator('#record-delay-clip').click();
+  await page.waitForTimeout(200);
+  await page.locator('#delay-clip-keys').press('r');
+  await page.locator('#stop-delay-clip').click();
+  await expect(page.locator('#delay-clip-review')).toBeVisible();
+  await expect(page.locator('#clip-markers button')).toHaveCount(1);
+  await expect(page.locator('#delay-clip-position')).toContainText(
+    'no recorded frame within 500 ms',
+  );
+  await expect(page.locator('#clip-markers button')).toHaveAttribute('aria-pressed', 'true');
+  expect(await page.locator('#delay-clip-view').getAttribute('data-frame-id')).toBeNull();
+  await page.locator('#clip-markers button').click();
+  await page.locator('#camera-delay').fill('0');
+  await expect(page.locator('#delay-clip-position')).toContainText(
+    'no recorded frame within 500 ms',
+  );
+  expect(await page.locator('#delay-clip-view').getAttribute('data-frame-id')).toBeNull();
+});
