@@ -17,6 +17,8 @@ import { orderedFingers, fingerBackground, readFingerPalette } from './view/fing
 import { drawCalibrationDot } from './view/calibration-dot';
 import { SampleRecorder } from './recording/recorder';
 import { unrotatePoint, isCameraRotation } from './view/rotation';
+import { fullCrop, hasCrop, insideCrop, cropSourceKey, type Crop } from './view/crop';
+import { cropControls } from './view/crop-controls';
 import { Camera } from './tracking/camera';
 import { keyTime } from './tracking/timing';
 import {
@@ -140,13 +142,13 @@ $('#app').innerHTML = `
         '',
       )}</select><button id="key-details-open" class="text-button">Key details</button></div><p id="heatmap-legend"></p>
     <section id="camera-section" aria-label="Live camera and finger tracking">
-      <div id="camera-preview"></div><div class="camera-strip-info"><span id="camera-badge">Camera off</span><p>Frames stay in this browser.</p><button id="camera-settings" class="text-button">Camera settings</button><button id="sample-indicator" class="text-button" hidden></button></div>
+      <div id="camera-preview"></div><div class="camera-strip-info"><span id="camera-badge">Camera off</span><p>Frames stay in this browser.</p><button id="camera-settings" class="text-button">Camera settings</button><button id="crop-view" class="text-button">Crop view</button><button id="sample-indicator" class="text-button" hidden></button></div>
     </section>
     <div id="storage-warning" class="storage-alert" role="status" hidden></div>
   </main>
   <dialog id="settings" aria-labelledby="settings-title"><div class="drawer-header"><h2 id="settings-title" tabindex="-1">Settings & progress</h2><button id="settings-close">Close</button></div><p id="settings-state">Changes stay in this browser.</p>
     <details id="camera-group"><summary>Camera & key positions</summary>
-      <div class="camera-layout"><div id="mapping-host">
+      <div class="camera-layout"><div id="mapping-host"><div id="crop-host"></div>
         <div class="view-wrap" id="view-wrap"><div id="camera-image"><video id="camera" autoplay playsinline muted aria-label="Live view of your keyboard"></video><canvas id="overlay" aria-label="Keyboard calibration. Click the center of the requested key, or use arrow keys and Enter." tabindex="0"></canvas></div><div class="camera-empty" id="camera-empty"><strong>Allow camera access</strong><span>Tilt your MacBook screen toward the keyboard.<br/>Use your external display for this page.</span></div></div>
         </div><aside>
           <div class="camera-options"><label for="camera-rotation">Rotate camera view</label><select id="camera-rotation"><option value="0">0°</option><option value="90">90° clockwise</option><option value="180">180°</option><option value="270">270° clockwise</option></select><button id="swap" aria-pressed="false">Swap left/right hand labels</button></div>
@@ -269,8 +271,11 @@ const rotationControl = $<HTMLSelectElement>('#camera-rotation');
 rotationControl.value = String(cameraRotation);
 function layoutCameraView() {
   const stage = $('#view-wrap');
+  const crop = camera.crop;
   const aspect =
-    video.videoWidth && video.videoHeight ? video.videoWidth / video.videoHeight : 4 / 3;
+    ((video.videoWidth && video.videoHeight ? video.videoWidth / video.videoHeight : 4 / 3) *
+      crop.width) /
+    crop.height;
   const sideways = cameraRotation === 90 || cameraRotation === 270;
   const width = Math.min(
     sideways ? stage.clientHeight : stage.clientWidth,
@@ -280,6 +285,61 @@ function layoutCameraView() {
   image.style.width = `${width}px`;
   image.style.height = `${width / aspect}px`;
   image.style.transform = `translate(-50%, -50%) rotate(${cameraRotation}deg)`;
+  for (const element of [video, canvas])
+    Object.assign(element.style, {
+      width: `${100 / crop.width}%`,
+      height: `${100 / crop.height}%`,
+      left: `${(-100 * crop.x) / crop.width}%`,
+      top: `${(-100 * crop.y) / crop.height}%`,
+    });
+}
+const cropUI = cropControls(
+  $('#crop-host'),
+  video,
+  () => camera.crop,
+  () => camera.status === 'ready',
+  applyCameraCrop,
+  () => {
+    $('#view-wrap').scrollIntoView({ block: 'center' });
+    canvas.focus({ preventScroll: true });
+  },
+);
+$('#crop-view').onclick = () => {
+  openSettings('camera-group');
+  cropUI.open();
+};
+function savedCropKey() {
+  return cropSourceKey(camera.settings()?.deviceId ?? '', video.videoWidth, video.videoHeight);
+}
+function restoreCameraCrop() {
+  camera.setCrop(
+    camera.source === 'camera' ? (saved.cameraCrops?.[savedCropKey()] ?? fullCrop()) : fullCrop(),
+  );
+  cropUI.refresh();
+  layoutCameraView();
+}
+function applyCameraCrop(crop: Crop) {
+  if (camera.status !== 'ready') return;
+  if (phase === 'practice') pause(false);
+  disableAutoStart();
+  void sample?.stop('camera-view-changed');
+  diagnosticsId--;
+  camera.setCrop(crop);
+  if (camera.source === 'camera') {
+    saved.cameraCrops = { ...saved.cameraCrops, [savedCropKey()]: { ...camera.crop } };
+    store();
+  }
+  // Mapping and returned landmarks remain in uncropped source coordinates.
+  phase = draftValid() ? 'verify' : 'calibrate';
+  message = cropHidesKeys()
+    ? 'The crop hides mapped keys. Widen the crop to include the whole keyboard before resuming.'
+    : 'Crop applied to tracking. Check the key positions, then resume practice.';
+  layoutCameraView();
+  drawOverlay({ id: 0, at: 0, receivedAt: 0, clock: 'unavailable', hands: [] });
+  render();
+}
+function cropHidesKeys() {
+  return Object.values(points).some((point) => !insideCrop(point, camera.crop));
 }
 new ResizeObserver(layoutCameraView).observe($('#view-wrap'));
 video.addEventListener('loadedmetadata', layoutCameraView);
@@ -758,7 +818,7 @@ function makeCalibration(): Calibration {
   };
 }
 function draftValid() {
-  return validCalibration(makeCalibration());
+  return validCalibration(makeCalibration()) && !cropHidesKeys();
 }
 function startCalibration() {
   disableAutoStart();
@@ -786,6 +846,8 @@ function flowMessage() {
     return camera.status === 'error' ? camera.error : 'Connect the camera to practise.';
   if (missingOutputs(progress.cohort, profile).length)
     return `Missing practice characters: ${missingOutputs(progress.cohort, profile).join(' ')}. Adjust your keyboard profile; saved progress is preserved.`;
+  if (cropHidesKeys())
+    return 'The crop hides mapped keys. Widen the crop in Camera settings before resuming.';
   if (!draftValid())
     return Object.keys(points).length === CALIBRATION_KEYS.length
       ? 'Adjust overlapping dots or flat rows in the camera image.'
@@ -926,6 +988,8 @@ function updateCameraChoices() {
     .catch(() => {});
 }
 function cameraChanged() {
+  cropUI.refresh();
+  layoutCameraView();
   const sharing = camera.source === 'window';
   $('#window-diagnostics').hidden = !sharing && camera.timingSource !== 'desk-view';
   $('#disconnect-camera').textContent = sharing ? 'Stop sharing' : 'Disconnect camera';
@@ -990,6 +1054,7 @@ function cameraChanged() {
   }
   if (camera.status === 'ready') {
     cameraErrorHandled = false;
+    restoreCameraCrop();
     mappingGeometry = sourceGeometry();
     if (!sharing) {
       selectedCamera = camera.settings()?.deviceId ?? selectedCamera;
@@ -1037,6 +1102,7 @@ function checkVideoDimensions() {
     current.width !== mappingGeometry.width ||
     current.height !== mappingGeometry.height
   ) {
+    restoreCameraCrop();
     mappingGeometry = current;
     if (phase === 'practice') pause(false);
     camera.evidence.reset();
@@ -1047,6 +1113,8 @@ function checkVideoDimensions() {
 }
 function drawFrame(frame: Frame) {
   checkVideoDimensions();
+  if (camera.latest !== frame) return;
+  cropUI.draw();
   $('#camera-badge').textContent =
     frame.clock === 'unavailable'
       ? 'Capture timing unavailable'
@@ -1690,12 +1758,15 @@ function updateSampleControls() {
         ? 'Stopping sample'
         : 'Sample retained';
   $<HTMLButtonElement>('#sample-start').disabled =
-    !!active || !ready() || camera.source === 'window';
+    !!active || !ready() || camera.source === 'window' || hasCrop(camera.crop);
   $<HTMLButtonElement>('#sample-stop').disabled = sample?.state !== 'recording';
   $<HTMLButtonElement>('#sample-download').disabled = sample?.state !== 'ready';
   $<HTMLButtonElement>('#sample-discard').disabled = !active || sample?.state === 'stopping';
   $('#sample-status').textContent =
-    sample?.message ?? 'Map your keys, choose a fingering mode, then start a sample.';
+    sample?.message ??
+    (hasCrop(camera.crop)
+      ? 'Use full frame before recording a debugging sample.'
+      : 'Map your keys, choose a fingering mode, then start a sample.');
   $('#sample-panel').classList.toggle('is-recording', sample?.state === 'recording');
   $('#debugging > summary').textContent =
     sample?.state === 'recording'
@@ -1714,7 +1785,13 @@ function updateSampleControls() {
     <div class="sample-actions"><button id="sample-start">Start sample (fresh passage)</button><button id="sample-stop" disabled>Stop sample</button><button id="sample-download" disabled>Download sample</button><button id="sample-discard" disabled>Discard sample</button></div>
     <p id="sample-status" role="status"></p><small>Stops at five minutes or 256 MiB, or when setup/fingering changes. Use a short pilot first.</small>`;
   $('#sample-start').onclick = () => {
-    if (camera.source === 'window' || !ready() || (sample && sample.state !== 'discarded')) return;
+    if (
+      camera.source === 'window' ||
+      hasCrop(camera.crop) ||
+      !ready() ||
+      (sample && sample.state !== 'discarded')
+    )
+      return;
     try {
       sample = new SampleRecorder(
         camera,

@@ -2,6 +2,7 @@ import { EvidenceBuffer } from '../core/observation';
 import type { Frame } from '../core/types';
 import { frameTime, sourceFrameTime } from './timing';
 import { displayOptions, displayError, DisplayDiagnostics } from './display';
+import { boundCrop, cropPixels, fullCrop, hasCrop, sourcePoint, type Crop } from '../view/crop';
 export type CameraStatus = 'off' | 'loading' | 'ready' | 'error';
 export class Camera {
   // Optional local recorder; pixels are copied before the production bitmap is transferred.
@@ -19,7 +20,16 @@ export class Camera {
   stream?: MediaStream;
   source: 'camera' | 'window' = 'camera';
   sourceId = '';
-  private inputs = new Map<number, Pick<Frame, 'at' | 'clock' | 'timing'>>();
+  private inputs = new Map<number, Pick<Frame, 'at' | 'clock' | 'timing'> & { crop: Crop }>();
+  crop = fullCrop();
+  private cropRevision = 0;
+  setCrop(crop: Crop) {
+    this.crop = boundCrop(crop);
+    this.cropRevision++;
+    this.inputs.clear();
+    this.evidence.reset();
+    this.latest = undefined;
+  }
   get timingSource(): 'camera' | 'desk-view' | 'window' {
     return this.source === 'window'
       ? 'window'
@@ -142,15 +152,19 @@ export class Camera {
         else if (message.type === 'frame') {
           this.busy = false;
           this.lastArrival = performance.now();
+          const input = this.inputs.get(message.id);
+          this.inputs.delete(message.id);
+          if (!input) return;
+          const { crop, ...timing } = input;
           const frame: Frame = {
             id: message.id,
-            at: message.at,
-            clock: message.clock,
-            hands: message.hands,
+            hands: message.hands.map((hand: Frame['hands'][number]) => ({
+              ...hand,
+              points: hand.points.map((p) => sourcePoint(p, crop)),
+            })),
             receivedAt: this.lastArrival,
-            ...this.inputs.get(message.id),
+            ...timing,
           };
-          this.inputs.delete(message.id);
           this.diagnostics.results++;
           this.latest = frame;
           this.evidence.add(frame);
@@ -232,13 +246,50 @@ export class Camera {
         );
         return;
       }
-      this.inputs.set(id, timing);
+      const revision = this.cropRevision;
+      const rect = cropPixels(this.crop, this.video.videoWidth, this.video.videoHeight);
+      const crop = hasCrop(this.crop)
+        ? {
+            x: rect.x / this.video.videoWidth,
+            y: rect.y / this.video.videoHeight,
+            width: rect.width / this.video.videoWidth,
+            height: rect.height / this.video.videoHeight,
+          }
+        : fullCrop();
+      this.inputs.set(id, { ...timing, crop });
       this.evidence.startFrame(id, at);
       createImageBitmap(frozen)
         .then((bitmap) => {
           if (generation !== this.generation) {
             bitmap.close();
             return;
+          }
+          if (revision !== this.cropRevision) {
+            bitmap.close();
+            this.busy = false;
+            return;
+          }
+          if (hasCrop(crop)) {
+            // WebKit ignores source cropping on VideoFrame, returning a resized
+            // full image. Materialize its full bitmap first, then crop those pixels.
+            const surface = new OffscreenCanvas(rect.width, rect.height);
+            const context = surface.getContext('2d')!;
+            try {
+              context.drawImage(
+                bitmap,
+                rect.x,
+                rect.y,
+                rect.width,
+                rect.height,
+                0,
+                0,
+                rect.width,
+                rect.height,
+              );
+            } finally {
+              bitmap.close();
+            }
+            bitmap = surface.transferToImageBitmap();
           }
           this.recordInput?.(bitmap, {
             id,
@@ -293,6 +344,8 @@ export class Camera {
     this.video.srcObject = null;
     this.evidence.reset();
     this.inputs.clear();
+    this.crop = fullCrop();
+    this.cropRevision++;
     this.busy = false;
     this.latest = undefined;
     this.lastFrameAt = -Infinity;

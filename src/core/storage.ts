@@ -14,6 +14,7 @@ import type { Stats } from './exercise';
 import { isCameraRotation, type CameraRotation } from '../view/rotation';
 import { isDailyGoal } from '../view/daily-goal';
 import { isKeyboardView, type KeyboardView } from '../view/heatmap';
+import { isCrop, type Crop } from '../view/crop';
 const KEY = 'right-typer.v1';
 export type SavedResult = Stats & {
   date: string;
@@ -26,6 +27,7 @@ export type Saved = {
   dailyGoalMinutes?: number;
   customProfiles?: KeyboardProfile[];
   calibrations?: Record<string, Calibration>;
+  cameraCrops?: Record<string, Crop>;
   cameraCalibrations?: Record<string, Calibration>;
   legacyCalibration?: unknown;
   calibrationHistory?: Record<string, Calibration>;
@@ -180,6 +182,11 @@ export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
       customProfiles,
       calibrations,
       cameraCalibrations,
+      cameraCrops: Object.fromEntries(
+        Object.entries(parsed.cameraCrops ?? {})
+          .slice(-28)
+          .filter(([key, value]) => key.length <= 1024 && isCrop(value)),
+      ) as Record<string, Crop>,
       legacyCalibration,
       calibrationHistory,
       migrationNotice,
@@ -213,6 +220,7 @@ export function save(data: Saved, storage: Pick<Storage, 'setItem'> = localStora
         customProfiles: data.customProfiles,
         calibrations: data.calibrations,
         cameraCalibrations: data.cameraCalibrations,
+        cameraCrops: data.cameraCrops,
         legacyCalibration: data.legacyCalibration,
         calibrationHistory: data.calibrationHistory,
         migrationNotice: data.migrationNotice,

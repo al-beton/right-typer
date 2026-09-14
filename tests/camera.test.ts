@@ -139,3 +139,75 @@ it('closes a bitmap completed after disconnect without submitting it to either w
   expect(f.WorkerMock.instances[1]!.postMessage).toHaveBeenCalledTimes(1);
   f.camera.stop();
 });
+
+it('crops the model bitmap and transforms landmarks back into source coordinates', async () => {
+  const f = fixture();
+  Object.assign(f.video, { videoWidth: 960, videoHeight: 720 });
+  let capture!: VideoFrameRequestCallback;
+  vi.mocked(f.video.requestVideoFrameCallback).mockImplementation((cb) => {
+    capture = cb;
+    return 42;
+  });
+  const bitmap = { close: vi.fn() } as unknown as ImageBitmap;
+  const create = vi.fn(async () => bitmap);
+  vi.stubGlobal('createImageBitmap', create);
+  const drawImage = vi.fn();
+  const cropped = { close: vi.fn() } as unknown as ImageBitmap;
+  vi.stubGlobal(
+    'OffscreenCanvas',
+    class {
+      getContext = () => ({ drawImage });
+      transferToImageBitmap = () => cropped;
+    },
+  );
+  const start = f.camera.start();
+  f.media.resolve(f.stream);
+  f.play.resolve();
+  await start;
+  const worker = f.WorkerMock.instances[0]!;
+  worker.onmessage!({ data: { type: 'ready' } });
+  f.camera.setCrop({ x: 0.25, y: 0.25, width: 0.5, height: 0.5 });
+  capture(performance.now(), {} as VideoFrameCallbackMetadata);
+  await Promise.resolve();
+  expect(drawImage).toHaveBeenCalledWith(bitmap, 240, 180, 480, 360, 0, 0, 480, 360);
+  expect(bitmap.close).toHaveBeenCalledOnce();
+  const sent = worker.postMessage.mock.calls.at(-1)![0];
+  expect(sent.bitmap).toBe(cropped);
+  worker.onmessage!({
+    data: {
+      type: 'frame',
+      id: sent.id,
+      at: sent.at,
+      clock: sent.clock,
+      hands: [{ side: 'left', score: 0.9, points: [{ x: 0.2, y: 0.4, z: 0.2 }] }],
+    },
+  });
+  expect(f.camera.latest?.hands[0]?.points[0]).toEqual({ x: 0.35, y: 0.45, z: 0.1 });
+  expect(f.frame).toHaveBeenCalledOnce();
+  f.camera.stop();
+});
+
+it('rejects an old inference result after a crop change clears evidence', async () => {
+  const f = fixture();
+  Object.assign(f.video, { videoWidth: 960, videoHeight: 720 });
+  let capture!: VideoFrameRequestCallback;
+  vi.mocked(f.video.requestVideoFrameCallback).mockImplementation((cb) => {
+    capture = cb;
+    return 42;
+  });
+  vi.stubGlobal('createImageBitmap', async () => ({ close: vi.fn() }));
+  const start = f.camera.start();
+  f.media.resolve(f.stream);
+  f.play.resolve();
+  await start;
+  const worker = f.WorkerMock.instances[0]!;
+  worker.onmessage!({ data: { type: 'ready' } });
+  capture(performance.now(), {} as VideoFrameCallbackMetadata);
+  await Promise.resolve();
+  const sent = worker.postMessage.mock.calls.at(-1)![0];
+  f.camera.setCrop({ x: 0.1, y: 0.1, width: 0.8, height: 0.8 });
+  worker.onmessage!({ data: { type: 'frame', id: sent.id, at: sent.at, hands: [] } });
+  expect(f.frame).not.toHaveBeenCalled();
+  expect(f.camera.latest).toBeUndefined();
+  f.camera.stop();
+});
