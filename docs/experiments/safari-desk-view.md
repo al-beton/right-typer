@@ -16,7 +16,8 @@ The experiment adds explicit device enumeration, permission probing, exact camer
 
 ![Experiment before camera permission](safari-desk-view.png)
 
-- Installed Safari 26.6.2: **not tested yet**. Device listing, exact Studio Display Desk View capture, real hands, resolution/rate, setup prerequisite and calibration/typing remain pending the manager's camera/UI slot.
+- **User-reported Safari success:** Al reported, “I tested the safari one and it worked great”. The confirmed stages are not yet specified: do not infer exact Desk View selection, tracking, completed practice or wrong-finger accuracy from this report. It supersedes the earlier assumption that Safari remained untested.
+- **Follow-up inspection:** after the manager granted the Safari slot, native Safari accessibility inspection showed only Start Page; its Window menu listed no prototype window, and the connected browser-tab inventory contained no prototype URL. The existing tested session was not accessible. No page was navigated/reloaded, permission changed, capture started or camera screenshot/recording taken. Actual selected track label/settings, browser API/worker state, hand count, runtime errors and timing values remain unavailable to this task. Recover the existing page or its metadata-only diagnostic text through the coordinator before drawing stronger conclusions.
 - An older cached Playwright WebKit runtime did not initialize with the current automation protocol and was stopped. This supplies no evidence about the installed Safari.
 
 ## Timing limitation
@@ -48,4 +49,4 @@ Initial feasibility can be assessed with repeated user-confirmed staged presses,
 
 ## Recovery
 
-Owner: Safari research spike task `01a09f2e-1296-76c1-8026-c9d2e0e1afe0`; coordinator `01a09f24-9e2b-7a02-8f22-24b4e3804c1d` (local). Branch `codex/safari-desk-view-spike`, independent from main `8b7f601377700e6dfc472996baaddfe799766950`; no stack parent or production deployment. Manager grants shared Safari/camera access. Local server uses port 5182. Exact current head and latest acceptance evidence belong in the draft PR.
+Owner: Safari research spike task `01a09f2e-1296-76c1-8026-c9d2e0e1afe0`; coordinator `01a09f24-9e2b-7a02-8f22-24b4e3804c1d` (local). Branch `codex/safari-desk-view-spike`, independent from main `8b7f601377700e6dfc472996baaddfe799766950`; no stack parent or production deployment. Manager granted the inspection slot; the tested Safari page was not accessible. Next owner is the coordinator to clarify the user-confirmed stages and locate the existing session/diagnostic text. Preserve its source, framing and calibration. Local server uses port 5182. Exact current head and latest acceptance evidence belong in the draft PR.
