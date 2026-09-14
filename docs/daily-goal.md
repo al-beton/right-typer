@@ -8,4 +8,6 @@ A one-second presentation refresh notices a new date or timezone while idle; it 
 
 Tests cover the exact completion boundary, off/edit/reset/reload, continued and abandoned practice, duplicate observations, concurrent writer notice, denied settings storage, local midnight, DST and timezone changes. These are synthetic software checks; the default duration is a reversible product choice, with no learning-efficacy claim.
 
-Rendered synthetic fixtures at source `07e5cd7`: [goal met with editable detail](images/daily-goal/met-detail-synthetic.png) and [390px practice label](images/daily-goal/met-390-synthetic.png). The activity seed and camera stream are artificial; no personal footage is included.
+Rendered synthetic fixtures at source `568e512`: [goal met with editable detail](images/daily-goal/met-detail-synthetic.png) and [390px practice label](images/daily-goal/met-390-synthetic.png). The activity seed and camera stream are artificial; no personal footage is included.
+
+The goal occupies its own reserved header row on narrow screens. A consistent action column and height preserve keyboard/camera positions through ordinary, met and off states and Start/Pause/Resume. The existing centered-geometry assertion and added320px/390px transitions remain exact.
