@@ -1,14 +1,16 @@
 # Desk View framing investigation and preserved crop candidate
 
-[ALO-289](https://linear.app/advantagegroup/issue/ALO-289) asks whether Safari can use Apple's native Desk View viewing-area control. The ordinary pixel crop below was a misunderstanding of that request and is preserved for diagnosis; PR #52 review/rollout is paused. It does not answer the native-control question.
+[ALO-289](https://linear.app/advantagegroup/issue/ALO-289) authorizes shipping the accepted full-app crop. Al tested candidate `cd1b1e4` after the WebKit pixel/overlay correction, said it works great, and requested merge/handoff. This supersedes the earlier crop rejection and rollout pause. [Acceptance and successor ownership](https://github.com/al-beton/right-typer/pull/52#issuecomment-5665871313).
+
+The separate native Apple viewing-area API question remains unverified under [ALO-290](https://linear.app/advantagegroup/issue/ALO-290). This implementation crops browser input pixels; it does not claim native slider control. That separate capability is not a delivery prerequisite for the accepted feature.
 
 Apple describes Desk View as cropping the ultra-wide feed, applying perspective correction and rotating it into an overhead view ([WWDC22](https://developer.apple.com/videos/play/wwdc2022/10018/)). Its native app has a viewing-area slider; Apple recommends sharing that app's window with third-party apps ([support](https://support.apple.com/en-us/121541)). Current [WebKit capture source](https://github.com/WebKit/WebKit/blob/main/Source/WebCore/platform/mediastream/cocoa/AVVideoCaptureSource.mm) discovers Desk View cameras but provides no zoom range on macOS in `computeMinZoom`/`computeMaxZoom`. This is source evidence, not a measurement of Al's installed Safari capabilities. Whether changing Desk View's native slider propagates into Safari's direct camera stream remains unverified.
 
-## Preserved full-app pixel crop
+## Accepted full-app crop
 
 The candidate extends the complete Desk View app from [PR #51](https://github.com/al-beton/right-typer/pull/51). The earlier standalone comparison lab has been removed.
 
-Run `pnpm dev --port 5192` and open <http://127.0.0.1:5192/> in Safari. Select your Desk View camera in **Camera settings**. Choose **Crop view**, drag around the keyboard and both hands (or use the four sliders), then map/check your key positions and **Close & resume**. The ordinary typing loop, observed-finger feedback, progress and heatmaps use the cropped input. **Use full frame** resets it.
+The preserved accepted build is available at <http://127.0.0.1:5192/> in Safari. Development and validation must use a separate checkout/output and port while that user session remains active. Select your Desk View camera in **Camera settings**. Choose **Crop view**, drag around the keyboard and both hands (or use the four sliders), then map/check your key positions and **Close & resume**. The ordinary typing loop, observed-finger feedback, progress and heatmaps use the cropped input. **Use full frame** resets it.
 
 Cropping affects actual model pixels and both the setup/practice preview. Key coordinates remain relative to the original source. Returned landmarks are transformed back into that coordinate system, preserving saved maps and view rotation. Changing a crop clears pending observations and pauses practice; hiding mapped keys prevents resume until the crop includes them again. Crops persist separately per camera identity and delivered resolution. Window shares remain transient. A changed source/resolution restores only its matching crop.
 
@@ -18,4 +20,4 @@ Al reported stationary hand outlines offset from the video in Safari on the cand
 
 Verification: `pnpm check`, `pnpm lint`, `pnpm build`, and `pnpm exec playwright test --config playwright.crop.config.ts`. The focused suite covers cropped inference pixels, source-space landmark conversion, delayed-result rejection, calibration through a rotated crop, persistence/reconnect, normal wrong-finger feedback, and a real-model synthetic-media practice flow in Chromium and WebKit. WebKit's synthetic stream needs an explicit camera-start click to satisfy autoplay; this is not a physical Desk View permission test.
 
-The original frozen Safari test on port 5184 remains untouched. The integrated crop candidate is separately served on port 5192. Native Safari/Desk View tracking benefit remains for Al's hands-on review.
+The original frozen Safari test on port 5184 remains untouched. The integrated crop candidate is separately served on port 5192. Al accepted the working Safari crop/overlay experience. This is not a general accuracy measurement or Chrome/window hardware acceptance.
