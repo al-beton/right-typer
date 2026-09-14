@@ -12,6 +12,7 @@ import { validCalibration } from './calibration';
 import type { Calibration } from './types';
 import type { Stats } from './exercise';
 import { isCameraRotation, type CameraRotation } from '../view/rotation';
+import { isDailyGoal } from '../view/daily-goal';
 import { isKeyboardView, type KeyboardView } from '../view/heatmap';
 const KEY = 'right-typer.v1';
 export type SavedResult = Stats & {
@@ -22,6 +23,7 @@ export type SavedResult = Stats & {
 export type Saved = {
   profileId?: string;
   keyboardView?: KeyboardView;
+  dailyGoalMinutes?: number;
   customProfiles?: KeyboardProfile[];
   calibrations?: Record<string, Calibration>;
   legacyCalibration?: unknown;
@@ -165,6 +167,7 @@ export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
     return {
       profileId,
       keyboardView: isKeyboardView(parsed.keyboardView) ? parsed.keyboardView : 'fingers',
+      dailyGoalMinutes: isDailyGoal(parsed.dailyGoalMinutes) ? parsed.dailyGoalMinutes : 10,
       customProfiles,
       calibrations,
       legacyCalibration,
@@ -196,6 +199,7 @@ export function save(data: Saved, storage: Pick<Storage, 'setItem'> = localStora
         calibration: data.calibration,
         profileId: data.profileId,
         keyboardView: data.keyboardView,
+        dailyGoalMinutes: data.dailyGoalMinutes,
         customProfiles: data.customProfiles,
         calibrations: data.calibrations,
         legacyCalibration: data.legacyCalibration,

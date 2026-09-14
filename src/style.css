@@ -1406,3 +1406,69 @@ label[for='diagnostic'] {
     flex-basis: 100%;
   }
 }
+
+#daily-goal {
+  color: #505b68;
+}
+#daily-goal[hidden] {
+  display: none;
+}
+#daily-goal-settings {
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 18px;
+}
+#daily-goal-minutes {
+  display: block;
+  width: 110px;
+  max-width: 100%;
+  margin-top: 8px;
+}
+#daily-goal-validation:empty {
+  display: none;
+}
+#daily-goal-validation {
+  color: #9c322c;
+}
+#daily-goal-help {
+  font-size: 12px;
+  color: #505b68;
+}
+
+/* Goal text and action labels must not move the keyboard between practice states. */
+.practice-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 112px;
+  grid-template-rows: 48px;
+  gap: 12px;
+}
+.practice-top > button {
+  width: 112px;
+  height: 48px;
+}
+.practice-metrics {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+#daily-goal {
+  grid-column: 2;
+  grid-row: 1;
+}
+.practice-top > button {
+  grid-column: 3;
+  grid-row: 1;
+}
+@media (max-width: 600px) {
+  .practice-top {
+    grid-template-columns: minmax(0, 1fr) 112px;
+    grid-template-rows: 48px 18px;
+    gap: 4px 12px;
+  }
+  .practice-top > button {
+    grid-column: 2;
+  }
+  #daily-goal {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}

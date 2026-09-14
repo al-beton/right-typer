@@ -1,6 +1,6 @@
 export type DayActivity = { date: string; ms: number };
 export type ActivityLedger = { days: DayActivity[]; clockAnomalies: number; undatedMs: number };
-const localDate = (wall: number) => {
+export const localDate = (wall: number) => {
   const date = new Date(wall);
   if (!Number.isFinite(date.getTime()) || date.getFullYear() < 0 || date.getFullYear() > 9999)
     return undefined;
@@ -8,7 +8,13 @@ const localDate = (wall: number) => {
 };
 // Duration always comes from the monotonic clock. Wall time only allocates it
 // between local dates; clock changes cannot invent practice hours.
-export function recordActivity(ledger: ActivityLedger, ms: number, start: number, end: number) {
+export function recordActivity(
+  ledger: ActivityLedger,
+  ms: number,
+  start: number,
+  end: number,
+  calendarChanged = false,
+) {
   const add = (date: string, amount: number) => {
     if (amount <= 0) return;
     const entry = ledger.days.find((day) => day.date === date);
@@ -25,7 +31,7 @@ export function recordActivity(ledger: ActivityLedger, ms: number, start: number
     else ledger.undatedMs += ms;
     return;
   }
-  if (wall <= 0 || Math.abs(wall - ms) > 1000) {
+  if (calendarChanged || wall <= 0 || Math.abs(wall - ms) > 1000) {
     ledger.clockAnomalies++;
     add(to, ms);
     return;
