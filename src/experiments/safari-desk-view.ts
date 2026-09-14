@@ -1,11 +1,14 @@
 import type { Camera } from '../tracking/camera';
 import { frameTime } from '../tracking/timing';
+import { timingTrial, type TrialContext } from './timing-trial';
 
-// Explicit experiment only: no capture at page load, no pixel/key/landmark logging.
+// Explicit experiment only: no capture at page load and no pixel recording.
+// Optional staged-key trials retain their declared test results in memory only.
 export function safariDeskView(
   camera: Camera,
   start: (deviceId: string, width: number) => void,
   stop: () => void,
+  trialContext: (event: KeyboardEvent) => TrialContext | undefined,
 ) {
   // WebKit's AVFoundation callback assigns MonotonicTime::now() to captureTime.
   // Until sensor exposure provenance is established, this source stays unknown.
@@ -16,7 +19,7 @@ export function safariDeskView(
     'margin:16px auto;padding:18px;max-width:1000px;border:1px solid #9a8771;border-radius:12px';
   panel.innerHTML = `
     <h2>Safari Desk View experiment</h2>
-    <p>Direct browser camera capture. Nothing starts until you choose a capture button. No recording or upload.</p>
+    <p>Direct browser camera capture. Nothing starts until you choose a capture button. No camera recording or upload.</p>
     <p>Refresh first. If names are hidden, briefly allow the default camera, then select the exact Studio Display Desk View device. Starting a camera also starts the bundled hand model.</p>
     <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
       <button id="desk-refresh">Refresh devices</button>
@@ -28,8 +31,9 @@ export function safariDeskView(
     </div>
     <p id="desk-message" role="status">Camera has not been requested. Refresh devices to inspect Safari's current list.</p>
     <details><summary>Local diagnostics (metadata only)</summary><pre id="desk-report" style="white-space:pre-wrap;overflow-wrap:anywhere;font-size:12px;max-height:320px;overflow:auto"></pre></details>
-    <p>Use keyboard mapping and Go below. Finger evidence stays unknown in this experiment: Safari's captureTime has not been established as sensor exposure time. Hands can be visible without verified finger grading. No automatic Desk View setup is invoked.</p>`;
+    <p>Use keyboard mapping and Go below. Ordinary practice keeps finger evidence unknown: Safari's captureTime has not been established as sensor exposure time. The optional staged trial below estimates finger identity separately, with explicit timing assumptions. No automatic Desk View setup is invoked.</p>`;
   document.body.prepend(panel);
+  timingTrial(panel, camera, trialContext);
   const get = <T extends HTMLElement>(id: string) => panel.querySelector<T>(`#${id}`)!;
   const select = get<HTMLSelectElement>('desk-device');
   const startButton = get<HTMLButtonElement>('desk-start');
@@ -105,7 +109,7 @@ export function safariDeskView(
           arrivalMinusFrameMs: (camera.latest.receivedAt ?? 0) - camera.latest.at,
         },
         timing:
-          'Exposure timing is unverified: all experimental frames are unavailable for finger grading, including when Safari supplies captureTime. Raw browser timestamps below are diagnostic only.',
+          'Exposure timing is unverified: ordinary practice keeps experimental frames unavailable for finger grading, including when Safari supplies captureTime; the staged trial reports separate estimates. Raw browser timestamps below are diagnostic only.',
       },
       null,
       2,

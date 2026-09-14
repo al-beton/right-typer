@@ -1663,6 +1663,16 @@ if (safariExperiment) {
       restartCamera();
     },
     disconnectCamera,
+    (event) => {
+      const resolved = resolveEvent(profile, event);
+      if (!calibration || 'error' in resolved) return undefined;
+      return {
+        calibration,
+        key: event.key,
+        code: resolved.code,
+        intended: profileFingers(profile, resolved.code, fingeringMode),
+      };
+    },
   );
 } else if (saved.cameraDisconnected) cameraChanged();
 else restartCamera();

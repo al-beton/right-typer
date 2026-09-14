@@ -90,6 +90,25 @@ test('permission probe releases tracks; missing capture time stays unavailable t
     await canvas.click({ position: { x: point.x * box!.width, y: point.y * box!.height } });
   }
   await resumePractice(page);
+  await page.locator('#timing-trial > summary').click();
+  await page.locator('#trial-finger').selectOption('left-index');
+  await page.locator('#trial-phase').selectOption('heldout');
+  await page.locator('#trial-pad').press('f');
+  await expect(page.locator('#trial-status')).toContainText('Estimated finger matches declaration');
+  await expect(page.locator('#trial-results')).toContainText('"sourceClock": "unavailable"');
+  await expect(page.locator('#trial-results')).toContainText('"estimatedIntended": true');
+  await expect(page.locator('#trial-results')).toContainText('"phase": "heldout"');
+  await expect(page.locator('#typing')).toHaveValue('');
+  await page.locator('#trial-finger').selectOption('left-middle');
+  await page.locator('#trial-pad').press('f');
+  await expect(page.locator('#trial-status')).toContainText(
+    'Estimated finger differs from declaration',
+  );
+  await page.locator('#trial-pad').press('f');
+  await page.locator('#trial-clear').click();
+  await expect(page.locator('#trial-results')).toHaveText('');
+  await page.waitForTimeout(1700);
+  await expect(page.locator('#trial-results')).toHaveText('');
   const first = await page.locator('.passage > span').first().textContent();
   await page.locator('#typing').pressSequentially(first! + ' ');
   await expect(page.locator('#feedback')).toContainText('Word accepted. I could not verify');
