@@ -372,6 +372,7 @@ rotationControl.onchange = () => {
   const angle = Number(rotationControl.value);
   if (!isCameraRotation(angle)) return;
   void sample?.stop('camera-view-changed');
+  inspector.reset();
   cameraRotation = angle;
   saved.cameraRotation = angle;
   store();

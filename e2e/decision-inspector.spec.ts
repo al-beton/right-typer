@@ -38,6 +38,8 @@ test('explicit one-press inspection survives resume, preserves metadata, and cle
     animations: 'disabled',
   });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  await page.locator('#camera-rotation').selectOption('90');
+  await expect(readout).toHaveText('No decision captured.');
   await page.getByRole('button', { name: 'Clear decision', exact: true }).click();
   await expect(readout).toHaveText('No decision captured.');
   await page.getByRole('button', { name: 'Inspect next press', exact: true }).click();
@@ -68,4 +70,24 @@ test('arming ignores an older pending press and captures the first new request',
   await expect(readout).toContainText('"key": "s"');
   await page.waitForTimeout(1500);
   expect(JSON.parse((await readout.textContent())!).press.key).toBe('s');
+});
+
+test('clear and rearm cannot capture the earlier selected request', async ({ page }) => {
+  await syntheticCamera(page);
+  await setup(page);
+  await openSettings(page);
+  await page.locator('#decision-inspector summary').click();
+  await page.evaluate(() => {
+    window.__inferenceDelay = 1400;
+  });
+  await page.waitForTimeout(120);
+  await page.getByRole('button', { name: 'Inspect next press', exact: true }).click();
+  await page.locator('#diagnostic').press('a');
+  await page.getByRole('button', { name: 'Clear decision', exact: true }).click();
+  await page.getByRole('button', { name: 'Inspect next press', exact: true }).click();
+  const readout = page.locator('[data-decision]');
+  await page.waitForTimeout(1200);
+  await expect(readout).toContainText('Waiting for the next');
+  await page.locator('#diagnostic').press('s');
+  await expect(readout).toContainText('"key": "s"');
 });
