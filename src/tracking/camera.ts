@@ -1,5 +1,6 @@
+import { isCameraDelay } from '../core/camera-delay';
 import { EvidenceBuffer } from '../core/observation';
-import type { Frame } from '../core/types';
+import type { Frame, FrameTiming } from '../core/types';
 import { frameTime, sourceFrameTime } from './timing';
 import { displayOptions, displayError, DisplayDiagnostics } from './display';
 import { boundCrop, cropPixels, fullCrop, hasCrop, sourcePoint, type Crop } from '../view/crop';
@@ -23,6 +24,20 @@ export class Camera {
   private inputs = new Map<number, Pick<Frame, 'at' | 'clock' | 'timing'> & { crop: Crop }>();
   crop = fullCrop();
   private cropRevision = 0;
+  delayMs = 0;
+  timingBasis?: FrameTiming['basis'];
+  timingChanged?: (changedBasis: boolean) => void;
+  setDelay(delayMs: number) {
+    if (!isCameraDelay(delayMs)) return;
+    this.delayMs = this.timingSource === 'camera' ? 0 : delayMs;
+    // Share the input revision barrier with cropping: queued bitmap/results belong
+    // to their original timeline and must not enter the new evidence epoch.
+    this.cropRevision++;
+    this.inputs.clear();
+    this.evidence.reset();
+    this.latest = undefined;
+    this.lastFrameAt = -Infinity;
+  }
   setCrop(crop: Crop) {
     this.crop = boundCrop(crop);
     this.cropRevision++;
@@ -220,6 +235,14 @@ export class Camera {
       this.capture();
       const callbackTime = performance.now();
       const nativeCaptureTime = frameTime(metadata, callbackTime);
+      const basis = nativeCaptureTime === null ? 'callback' : 'browser-capture';
+      if (this.timingSource === 'camera') this.timingBasis = basis;
+      else if (this.timingBasis !== basis) {
+        const changedBasis = this.timingBasis !== undefined;
+        this.timingBasis = basis;
+        this.setDelay(0);
+        this.timingChanged?.(changedBasis);
+      }
       if (this.timingSource !== 'camera')
         this.diagnostics.observe(this.video, metadata, callbackTime, nativeCaptureTime);
       if (this.busy || document.hidden) {
@@ -228,7 +251,7 @@ export class Camera {
       }
       // rVFC's `now` can be the earlier render-tick timestamp, even before captureTime.
       // Validate against the clock sampled here, not that scheduling timestamp.
-      const timing = sourceFrameTime(metadata, callbackTime, this.timingSource);
+      const timing = sourceFrameTime(metadata, callbackTime, this.timingSource, this.delayMs);
       const { at, clock } = timing;
       if (at <= this.lastFrameAt) return;
       this.lastFrameAt = at;
@@ -304,6 +327,7 @@ export class Camera {
               bitmap,
               id,
               at,
+              modelAt: this.timingSource === 'camera' ? at : callbackTime,
               clock,
             },
             [bitmap],
@@ -320,7 +344,11 @@ export class Camera {
     return this.stream?.getVideoTracks()[0]?.getSettings();
   }
   fresh() {
-    return this.status === 'ready' && !!this.latest && performance.now() - this.latest.at < 500;
+    return (
+      this.status === 'ready' &&
+      !!this.latest &&
+      performance.now() - this.latest.at - this.delayMs < 500
+    );
   }
   private fail(message: string) {
     this.stop();
@@ -345,6 +373,8 @@ export class Camera {
     this.evidence.reset();
     this.inputs.clear();
     this.crop = fullCrop();
+    this.delayMs = 0;
+    this.timingBasis = undefined;
     this.cropRevision++;
     this.busy = false;
     this.latest = undefined;

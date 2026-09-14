@@ -1539,3 +1539,25 @@ label[for='diagnostic'] {
 #crop-view {
   margin-left: 12px;
 }
+
+.delay-settings {
+  margin: 1rem 0;
+  min-width: 0;
+}
+.delay-settings label {
+  display: block;
+  margin-top: 0.75rem;
+}
+.delay-settings input[type='number'] {
+  width: 6rem;
+  margin: 0.35rem 0;
+}
+.delay-settings input[readonly] {
+  width: 100%;
+}
+.delay-settings select {
+  max-width: 100%;
+}
+.delay-settings li {
+  margin-block: 0.5rem;
+}

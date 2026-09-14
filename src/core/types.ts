@@ -10,7 +10,9 @@ export type FrameTiming = {
   callbackAt: number;
   mediaTime: number;
   presentedFrames: number;
+  // Signed additive shift applied to the selected basis (negative for camera delay).
   offsetMs: number;
+  residualDelayMs?: number;
   // null means no measured exposure-error bound is available. Never infer one
   // from model turnaround or the width of the attribution search window.
   uncertaintyMs: number | null;

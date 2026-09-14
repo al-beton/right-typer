@@ -1,3 +1,4 @@
+import { isCameraDelay } from './camera-delay';
 import type {
   Calibration,
   Finger,
@@ -132,7 +133,7 @@ export function attribute(
 export type EvidenceEvent =
   | { type: 'frame-start'; id: number; at: number }
   | { type: 'frame-result'; frame: Frame }
-  | { type: 'request'; press: Press }
+  | { type: 'request'; press: Press; delayMs?: number }
   | { type: 'tick'; at: number }
   | { type: 'reset' };
 export class EvidenceBuffer {
@@ -143,7 +144,7 @@ export class EvidenceBuffer {
   frames: Frame[] = [];
   private pending = new Map<
     number,
-    { press: Press; calibration: Calibration; resolve: (o: Observation) => void }
+    { press: Press; calibration: Calibration; deadline: number; resolve: (o: Observation) => void }
   >();
   private inFlight = new Map<number, number>();
   private watermark = -Infinity;
@@ -159,10 +160,18 @@ export class EvidenceBuffer {
     // Keep observations for long words by settling presses as they arrive, not at the boundary.
     this.frames = this.frames.filter((f) => f.at >= this.watermark - 4000);
   }
-  request(press: Press, calibration: Calibration): Promise<Observation> {
-    this.trace?.({ type: 'request', press });
+  request(press: Press, calibration: Calibration, delayMs = 0): Promise<Observation> {
+    const delay = isCameraDelay(delayMs) ? delayMs : 0;
+    this.trace?.({ type: 'request', press, ...(delay ? { delayMs: delay } : {}) });
     this.inspectRequest?.(press);
-    return new Promise((resolve) => this.pending.set(press.id, { press, calibration, resolve }));
+    return new Promise((resolve) =>
+      this.pending.set(press.id, {
+        press,
+        calibration,
+        deadline: press.at + delay + DEADLINE_MS,
+        resolve,
+      }),
+    );
   }
   // Settle once a frame after the press has landed and no in-flight frame could be nearer,
   // or at the deadline with whatever evidence exists. Either way the press gets an answer.
@@ -172,7 +181,7 @@ export class EvidenceBuffer {
       const best = nearestFrame(p.press.at, this.frames);
       const gap = best ? Math.abs(best.at - p.press.at) : SEARCH_MS;
       const waiting = [...this.inFlight.values()].some((at) => Math.abs(at - p.press.at) < gap);
-      if (now >= p.press.at + DEADLINE_MS || (this.watermark > p.press.at && !waiting)) {
+      if (now >= p.deadline || (this.watermark > p.press.at && !waiting)) {
         const decision = inspectAttribution(p.press, this.frames, p.calibration);
         p.resolve(decision.observation);
         this.pending.delete(id);
