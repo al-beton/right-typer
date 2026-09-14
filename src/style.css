@@ -1434,3 +1434,41 @@ label[for='diagnostic'] {
   font-size: 12px;
   color: #505b68;
 }
+
+/* Goal text and action labels must not move the keyboard between practice states. */
+.practice-top {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 112px;
+  grid-template-rows: 48px;
+  gap: 12px;
+}
+.practice-top > button {
+  width: 112px;
+  height: 48px;
+}
+.practice-metrics {
+  min-width: 0;
+  flex-wrap: wrap;
+}
+#daily-goal {
+  grid-column: 2;
+  grid-row: 1;
+}
+.practice-top > button {
+  grid-column: 3;
+  grid-row: 1;
+}
+@media (max-width: 600px) {
+  .practice-top {
+    grid-template-columns: minmax(0, 1fr) 112px;
+    grid-template-rows: 48px 18px;
+    gap: 4px 12px;
+  }
+  .practice-top > button {
+    grid-column: 2;
+  }
+  #daily-goal {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+}

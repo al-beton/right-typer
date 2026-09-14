@@ -130,3 +130,35 @@ test('local day changes only presentation; second tab and denied goal storage re
   await expect(page.locator('#storage-warning')).toContainText('storage is unavailable');
   expect(await milliseconds(page)).toBe(before);
 });
+
+for (const width of [320, 390]) {
+  test(`goal on/met/off and pause/resume preserve physical positions at ${width}px`, async ({
+    page,
+  }) => {
+    await seed(page, 600000);
+    await syntheticCamera(page);
+    await page.setViewportSize({ width, height: 1000 });
+    await setup(page);
+    const positions = () =>
+      page.evaluate(() =>
+        ['#finger-map', '#camera-preview'].map((s) => {
+          const r = document.querySelector(s)!.getBoundingClientRect();
+          return { top: r.top + scrollY, left: r.left, width: r.width, height: r.height };
+        }),
+      );
+    const initial = await positions();
+    for (const goal of ['0', '120', '10']) {
+      await openSettings(page, 'history-group');
+      await page.locator('#daily-goal-minutes').fill(goal);
+      await page.locator('#settings-close').click();
+      expect(await positions()).toEqual(initial);
+      await page.locator('#practice').click();
+      expect(await positions()).toEqual(initial);
+      await page.locator('#pause').click();
+      expect(await positions()).toEqual(initial);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+  });
+}

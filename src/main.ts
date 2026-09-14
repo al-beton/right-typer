@@ -524,7 +524,7 @@ function render() {
           ? message || 'Type the whole word, then Space.'
           : flowMessage();
   content.innerHTML = `<section class="practice${complete ? ' results' : ''}">
-    <div class="practice-top"><span class="practice-metrics">Practice · <span>${exercise.index} / ${exercise.words.length} words</span><span>${stats.retries} retries</span><span id="daily-goal"></span></span>${action}</div>
+    <div class="practice-top"><span class="practice-metrics">Practice · <span>${exercise.index} / ${exercise.words.length} words</span><span>${stats.retries} retries</span></span><span id="daily-goal"></span>${action}</div>
     <p id="round-focus" class="recent">${escapeHtml(focusText)}${displayedRound.diagnostic ? ` ${escapeHtml(displayedRound.diagnostic)}` : ''}</p>
     ${passageMarkup()}
     <div class="entry-heading"><label for="typing">${complete ? 'Completed' : retry ? 'Try again' : 'Your word'}</label><span id="word-hint">Space finishes each word.</span></div>
