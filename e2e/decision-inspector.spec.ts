@@ -16,6 +16,8 @@ test('explicit one-press inspection survives resume, preserves metadata, and cle
   await expect(readout).toContainText('left-ring');
   const first = JSON.parse((await readout.textContent())!);
   expect(first.press.key).toBe('a');
+  expect(first.calibration.keyPoint).toBeDefined();
+  expect(first.source.build).toMatch(/^[0-9a-f]{40}$/);
   expect(first.observation.finger).toBe('left-ring');
   expect(first.candidates[0].landmarkIndex).toBe(16);
   expect(first.selectedFrame.id).toBe(first.observation.frameIds[0]);
@@ -27,7 +29,14 @@ test('explicit one-press inspection survives resume, preserves metadata, and cle
   expect(JSON.parse((await readout.textContent())!)).toEqual(first);
   await page.setViewportSize({ width: 375, height: 900 });
   await page.locator('#decision-inspector').scrollIntoViewIfNeeded();
-  await page.screenshot({ path: 'test-results/alo292-inspector-synthetic.png' });
+  await readout.evaluate((el) => {
+    el.scrollTop = 0;
+  });
+  await page.waitForTimeout(250);
+  await page.screenshot({
+    path: 'test-results/alo292-inspector-synthetic.png',
+    animations: 'disabled',
+  });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.getByRole('button', { name: 'Clear decision', exact: true }).click();
   await expect(readout).toHaveText('No decision captured.');
