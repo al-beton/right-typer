@@ -11,15 +11,18 @@ test.describe('camera view rotation', () => {
       await expect(page.locator('#camera-badge')).toContainText('hands detected');
       const rotation = page.getByLabel('Rotate camera view');
       const stage = page.locator('#view-wrap');
-      const documentBox = () =>
+      const drawerBox = () =>
         stage.evaluate((el) => {
           const r = el.getBoundingClientRect();
-          return { x: r.x, y: r.y + scrollY, width: r.width, height: r.height };
+          // The view is inside a fixed, independently scrolling drawer. Selecting
+          // lower controls may scroll that drawer without moving its content.
+          const drawer = el.closest('dialog')!;
+          return { x: r.x, y: r.y + drawer.scrollTop, width: r.width, height: r.height };
         });
       await openSettings(page);
-      const initial = await documentBox();
+      const initial = await drawerBox();
       await rotation.selectOption(String(angle));
-      expect(await documentBox()).toEqual(initial);
+      expect(await drawerBox()).toEqual(initial);
       for (const point of Object.values(calibration().points)) {
         const [x, y] =
           angle === 90
@@ -67,7 +70,7 @@ test.describe('camera view rotation', () => {
       await rotation.selectOption(String((angle + 90) % 360));
       await expect(page.locator('#typing')).toHaveValue('q');
       expect(await page.evaluate(() => window.__terminated)).toBe(0);
-      expect(await documentBox()).toEqual(initial);
+      expect(await drawerBox()).toEqual(initial);
       await resumePractice(page);
       await expect(page.locator('#typing')).toHaveValue('');
       await page.reload();
