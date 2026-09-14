@@ -125,8 +125,15 @@ export function cameraDelayControls(
         canvas.width = 0;
         canvas.height = 0;
         delete canvas.dataset.frameId;
+        delete canvas.dataset.basisAt;
+        delete canvas.dataset.effectiveAt;
+        for (const button of find('clip-markers').querySelectorAll<HTMLButtonElement>('button'))
+          button.setAttribute(
+            'aria-pressed',
+            String(Number(button.dataset.keyIndex) === selectedKey),
+          );
         find('delay-clip-position').textContent =
-          'No recorded frame within 500 ms of this press at this delay. Retake with keys away from the clip edges.';
+          `Selected ${event.key === ' ' ? 'Space' : event.key.toUpperCase()}: no recorded frame within 500 ms at this delay. Retake with keys away from the clip edges.`;
         return;
       }
       current = found;
