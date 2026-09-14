@@ -107,6 +107,11 @@ export class SampleRecorder {
       if (copy.type === 'frame-result') {
         copy.frame.at -= this.origin;
         copy.frame.receivedAt -= this.origin;
+        if (copy.frame.timing) {
+          copy.frame.timing.callbackAt -= this.origin;
+          if (copy.frame.timing.nativeCaptureTime !== null)
+            copy.frame.timing.nativeCaptureTime -= this.origin;
+        }
       }
       if (copy.type === 'request') copy.press.at -= this.origin;
       this.event({ type: 'evidence', event: copy });
@@ -170,8 +175,22 @@ export class SampleRecorder {
   }
   event(payload: Payload) {
     if (this.state !== 'recording') return;
+    const copy = structuredClone(payload);
+    const observations =
+      copy.type === 'observation'
+        ? [copy.observation]
+        : copy.type === 'verdict'
+          ? copy.attempt.presses.map((p) => p.observation)
+          : [];
+    for (const observation of observations) {
+      if (observation?.kind === 'finger' && observation.timing) {
+        observation.timing.callbackAt -= this.origin;
+        if (observation.timing.nativeCaptureTime !== null)
+          observation.timing.nativeCaptureTime -= this.origin;
+      }
+    }
     this.events.push({
-      ...structuredClone(payload),
+      ...copy,
       seq: ++this.sequence,
       at: performance.now() - this.origin,
     } as SampleEvent);

@@ -26,6 +26,7 @@ export type Saved = {
   dailyGoalMinutes?: number;
   customProfiles?: KeyboardProfile[];
   calibrations?: Record<string, Calibration>;
+  cameraCalibrations?: Record<string, Calibration>;
   legacyCalibration?: unknown;
   calibrationHistory?: Record<string, Calibration>;
   migrationNotice?: string;
@@ -104,6 +105,10 @@ export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
     const calibrations: Record<string, Calibration> = Object.create(null);
     for (const [id, c] of Object.entries(parsed.calibrations ?? {}).slice(0, 28))
       if (validCalibration(c)) calibrations[id] = c;
+    const cameraCalibrations: Record<string, Calibration> = Object.create(null);
+    for (const [id, c] of Object.entries(parsed.cameraCalibrations ?? {}).slice(-112))
+      if (validCalibration(c) && c.profile && id === cameraMapKey(c.deviceId, c.profile.id))
+        cameraCalibrations[id] = c;
     let legacyCalibration = parsed.legacyCalibration;
     let migrationNotice =
       typeof parsed.migrationNotice === 'string' ? parsed.migrationNotice.slice(0, 300) : undefined;
@@ -163,6 +168,10 @@ export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
     };
     for (const id of Object.keys(calibrations)) calibrations[id] = upgrade(calibrations[id], id)!;
     activeCalibration = upgrade(activeCalibration, profileId);
+    for (const [key, c] of Object.entries(cameraCalibrations))
+      cameraCalibrations[key] = upgrade(c, c.profile!.id)!;
+    for (const c of [activeCalibration, ...Object.values(calibrations)])
+      if (c?.profile) cameraCalibrations[cameraMapKey(c.deviceId, c.profile.id)] ??= c;
     if (migrationNotice?.includes('corrected spacebar')) migrationNotice = undefined;
     return {
       profileId,
@@ -170,6 +179,7 @@ export function load(storage: Pick<Storage, 'getItem'> = localStorage): Saved {
       dailyGoalMinutes: isDailyGoal(parsed.dailyGoalMinutes) ? parsed.dailyGoalMinutes : 10,
       customProfiles,
       calibrations,
+      cameraCalibrations,
       legacyCalibration,
       calibrationHistory,
       migrationNotice,
@@ -202,6 +212,7 @@ export function save(data: Saved, storage: Pick<Storage, 'setItem'> = localStora
         dailyGoalMinutes: data.dailyGoalMinutes,
         customProfiles: data.customProfiles,
         calibrations: data.calibrations,
+        cameraCalibrations: data.cameraCalibrations,
         legacyCalibration: data.legacyCalibration,
         calibrationHistory: data.calibrationHistory,
         migrationNotice: data.migrationNotice,
@@ -225,4 +236,8 @@ export function reset(storage: Pick<Storage, 'removeItem'> = localStorage): bool
   } catch {
     return false;
   }
+}
+
+export function cameraMapKey(deviceId: string, profileId: string): string {
+  return JSON.stringify([deviceId, profileId]);
 }

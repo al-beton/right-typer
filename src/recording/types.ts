@@ -30,7 +30,7 @@ export type SampleEvent = { seq: number; at: number } & (
 export type InputFrame = {
   id: number;
   at: number;
-  clock: 'capture' | 'unavailable';
+  clock: import('../core/types').Frame['clock'];
   mediaTime: number;
   presentedFrames: number;
   dispatchedAt: number;
