@@ -103,18 +103,17 @@ test('two previews preserve separate storage across updates and resets', async (
     second = await context.newPage();
   await first.goto(origin + '/previews/pr-23/');
   await second.goto(origin + '/previews/pr-24/');
-  await first.evaluate(() =>
-    localStorage.setItem(
-      'right-typer.v1',
-      JSON.stringify({ results: [], cameraDisconnected: true, cameraRotation: 90 }),
-    ),
-  );
-  await second.evaluate(() =>
-    localStorage.setItem(
-      'right-typer.v1',
-      JSON.stringify({ results: [], cameraDisconnected: true, cameraRotation: 180 }),
-    ),
-  );
+  // Establish state through the running app. Out-of-band storage seeding races
+  // asynchronous camera startup, whose in-memory preferences are still old.
+  for (const [page, rotation] of [
+    [first, '90'],
+    [second, '180'],
+  ] as const) {
+    await openSettings(page, 'camera-group');
+    await page.getByRole('button', { name: 'Disconnect camera', exact: true }).click();
+    await expect(page.locator('#camera-badge')).toHaveText('Camera disconnected');
+    await page.getByLabel('Rotate camera view').selectOption(rotation);
+  }
   await first.reload();
   expect(
     await first.evaluate(() => JSON.parse(localStorage.getItem('right-typer.v1')!).cameraRotation),
