@@ -11,6 +11,7 @@ declare global {
     __deviceId: string;
     __cameraRequests: number;
     __denyCamera: boolean;
+    __clipPixel?: string;
   }
 }
 // Test-only replacement at the worker boundary. Production code exposes no simulation mode.
@@ -28,7 +29,7 @@ export async function syntheticCamera(
         canvas.height = 720;
         const ctx = canvas.getContext('2d')!;
         const draw = () => {
-          ctx.fillStyle = '#315944';
+          ctx.fillStyle = window.__clipPixel ?? '#315944';
           ctx.fillRect(0, 0, 960, 720);
           ctx.fillStyle = 'white';
           ctx.font = '24px system-ui';

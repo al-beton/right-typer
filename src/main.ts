@@ -184,7 +184,6 @@ const camera = new Camera(video, cameraChanged, drawFrame);
 const inspector = decisionInspector($('#decision-inspector'));
 camera.evidence.clearInspection = (preserve) => {
   inspector.reset(preserve);
-  if (!preserve) delayUI.clearCheck();
 };
 camera.evidence.inspectRequest = inspector.request;
 camera.evidence.inspectDecision = (press, calibration, decision) =>
@@ -245,7 +244,7 @@ function openSettings(
   summary.scrollIntoView({ block: 'nearest' });
 }
 function closeSettings(resume = false) {
-  delayUI.clearCheck();
+  delayUI.discard();
   for (const key of heldActivations) blockedActivations.add(key);
   settings.close();
   document.body.classList.remove('settings-open');
@@ -358,30 +357,15 @@ const delayUI = cameraDelayControls(
     reusable: camera.source === 'window' ? saved.lastWindowDelayMs : undefined,
   }),
   applyCameraDelay,
-  (event) => {
-    if (!settings.open || phase === 'practice' || !ready())
-      return 'Map the keyboard and keep the camera running before checking.';
-    const resolved = resolveEvent(profile, event);
-    if ('error' in resolved) return resolved.error;
-    const intendedFingers = profileFingers(profile, resolved.code, fingeringMode);
-    const press: Press = {
-      id: diagnosticsId--,
-      attemptId: -2,
-      key: event.key.toLowerCase(),
-      code: resolved.code,
-      at: keyTime(event, performance.now(), performance.timeOrigin),
-    };
-    return camera.evidence
-      .request(press, makeCalibration(), camera.delayMs)
-      .then((observation) => ({ press, observation, intended: intendedFingers }));
-  },
 );
 function restoreCameraDelay(changedBasis = false) {
+  delayUI.discard();
   delayBasisNotice = changedBasis;
   const key = currentDelayKey();
   camera.setDelay(key && !changedBasis ? (saved.cameraDelays?.[key] ?? 0) : 0);
   delayUI.refresh();
 }
+camera.setupFrame = (video, timing) => delayUI.capture(video, timing, camera.crop, cameraRotation);
 camera.timingChanged = (changedBasis) => {
   if (changedBasis && phase === 'practice') pause(false);
   diagnosticsId--;
@@ -417,6 +401,7 @@ function restoreCameraCrop() {
   layoutCameraView();
 }
 function applyCameraCrop(crop: Crop) {
+  delayUI.discard();
   if (camera.status !== 'ready') return;
   if (phase === 'practice') pause(false);
   disableAutoStart();
@@ -450,6 +435,7 @@ rotationControl.onchange = () => {
   if (!isCameraRotation(angle)) return;
   void sample?.stop('camera-view-changed');
   inspector.reset();
+  delayUI.discard();
   cameraRotation = angle;
   saved.cameraRotation = angle;
   store();
@@ -920,6 +906,7 @@ function draftValid() {
   return validCalibration(makeCalibration()) && !cropHidesKeys();
 }
 function startCalibration() {
+  delayUI.discard();
   disableAutoStart();
   setupOpen = true;
   void sample?.stop('calibration-changed');
@@ -956,6 +943,7 @@ function flowMessage() {
     : 'Key positions ready. Start when you’re ready to type.';
 }
 function editSetup() {
+  delayUI.discard();
   openSettings('camera-group');
   void sample?.stop('edit-setup');
   disableAutoStart();
@@ -1002,6 +990,7 @@ function renderSetup() {
     .forEach((el) => {
       el.onclick = () => {
         void sample?.stop('calibration-changed');
+        delayUI.discard();
         selectedKey = Number(el.dataset.cal);
         phase = 'calibrate';
         render();
@@ -1088,6 +1077,7 @@ function updateCameraChoices() {
     .catch(() => {});
 }
 function cameraChanged() {
+  delayUI.discard();
   cropUI.refresh();
   layoutCameraView();
   const sharing = camera.source === 'window';

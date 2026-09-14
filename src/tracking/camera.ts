@@ -17,6 +17,7 @@ export class Camera {
       presentedFrames: number;
     },
   ) => void;
+  setupFrame?: (video: HTMLVideoElement, timing: Pick<Frame, 'at' | 'clock' | 'timing'>) => void;
   recordSkip?: (reason: string, metadata: { mediaTime: number; presentedFrames: number }) => void;
   stream?: MediaStream;
   source: 'camera' | 'window' = 'camera';
@@ -245,13 +246,14 @@ export class Camera {
       }
       if (this.timingSource !== 'camera')
         this.diagnostics.observe(this.video, metadata, callbackTime, nativeCaptureTime);
+      const timing = sourceFrameTime(metadata, callbackTime, this.timingSource, this.delayMs);
+      if (!document.hidden) this.setupFrame?.(this.video, timing);
       if (this.busy || document.hidden) {
         this.recordSkip?.(document.hidden ? 'hidden' : 'worker-busy', metadata);
         return;
       }
       // rVFC's `now` can be the earlier render-tick timestamp, even before captureTime.
       // Validate against the clock sampled here, not that scheduling timestamp.
-      const timing = sourceFrameTime(metadata, callbackTime, this.timingSource, this.delayMs);
       const { at, clock } = timing;
       if (at <= this.lastFrameAt) return;
       this.lastFrameAt = at;
