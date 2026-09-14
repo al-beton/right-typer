@@ -143,9 +143,7 @@ test('same clip aligns actual red/green pixels at 0/50 ms and supports replay an
   expect(after).toEqual(before);
   await page.setViewportSize({ width: 375, height: 1600 });
   await page.locator('#camera-delay-controls').scrollIntoViewIfNeeded();
-  await page
-    .locator('#camera-delay-controls')
-    .screenshot({ path: `test-results/clip-${test.info().project.name}.png` });
+  await page.screenshot({ path: `test-results/clip-${test.info().project.name}.png` });
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await page.locator('#discard-delay-clip').click();
   await expect(page.locator('#delay-clip-review')).toBeHidden();
