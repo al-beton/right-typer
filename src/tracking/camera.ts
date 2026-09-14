@@ -3,6 +3,11 @@ import type { Frame } from '../core/types';
 import { frameTime } from './timing';
 export type CameraStatus = 'off' | 'loading' | 'ready' | 'error';
 export class Camera {
+  // Opt-in, metadata-only experiment observer. Never retains camera pixels.
+  inspectFrame?: (metadata: VideoFrameCallbackMetadata, callbackTime: number) => void;
+  // An experimental source may expose a delivery clock under captureTime.
+  // Never promote it to exposure evidence just because the field is present.
+  captureClockTrusted = true;
   // Optional local recorder; pixels are copied before the production bitmap is transferred.
   recordInput?: (
     bitmap: ImageBitmap,
@@ -34,23 +39,28 @@ export class Camera {
     private changed: () => void,
     private onFrame: (frame: Frame) => void,
   ) {}
-  async start(deviceId = '') {
+  async start(deviceId = '', width = 960) {
     this.stop();
     const generation = this.generation;
     this.status = 'loading';
     this.error = '';
     this.changed();
     try {
-      if (!navigator.mediaDevices?.getUserMedia || !this.video.requestVideoFrameCallback)
+      if (
+        !navigator.mediaDevices?.getUserMedia ||
+        !this.video.requestVideoFrameCallback ||
+        typeof VideoFrame === 'undefined' ||
+        typeof createImageBitmap === 'undefined'
+      )
         throw new Error(
-          'Open this page in current Chrome on HTTPS or localhost to use the camera.',
+          'This browser needs getUserMedia, requestVideoFrameCallback, VideoFrame and createImageBitmap on HTTPS or localhost.',
         );
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: false,
         video: {
           deviceId: deviceId ? { exact: deviceId } : undefined,
-          width: { ideal: 960 },
-          height: { ideal: 720 },
+          width: { ideal: width },
+          height: { ideal: (width * 3) / 4 },
           frameRate: { ideal: 30 },
         },
       });
@@ -125,13 +135,13 @@ export class Camera {
       const e = error as DOMException;
       this.fail(
         e.name === 'NotAllowedError'
-          ? 'Camera permission is blocked. In Chrome, open the site controls beside the address, allow Camera, then try again.'
+          ? 'Camera permission is blocked. Allow Camera for this site in your browser’s website settings, then try again.'
           : e.name === 'OverconstrainedError'
             ? 'The saved camera is unavailable. Reconnect it or choose another camera below.'
             : e.name === 'NotFoundError'
               ? 'No camera was found. Connect or enable the MacBook camera, then try again.'
               : e.name === 'NotReadableError'
-                ? 'Chrome could not open the camera. Close another app using it, then try again.'
+                ? 'The browser could not open the camera. Wait until the other camera session is finished, then try again.'
                 : e.message,
       );
     }
@@ -141,21 +151,28 @@ export class Camera {
     this.callbackId = this.video.requestVideoFrameCallback((_now, metadata) => {
       if (generation !== this.generation || this.status !== 'ready') return;
       this.capture();
+      const callbackTime = performance.now();
+      this.inspectFrame?.(metadata, callbackTime);
       if (this.busy || document.hidden) {
         this.recordSkip?.(document.hidden ? 'hidden' : 'worker-busy', metadata);
         return;
       }
       // rVFC's `now` can be the earlier render-tick timestamp, even before captureTime.
       // Validate against the clock sampled here, not that scheduling timestamp.
-      const callbackTime = performance.now();
-      const captureTime = frameTime(metadata, callbackTime);
+      const captureTime = this.captureClockTrusted ? frameTime(metadata, callbackTime) : null;
       const at = captureTime ?? callbackTime;
       if (at <= this.lastFrameAt) return;
       this.lastFrameAt = at;
       this.busy = true;
       const id = ++this.sequence;
       // Snapshot pixels synchronously inside rVFC so the metadata belongs to these pixels.
-      const frozen = new VideoFrame(this.video, { timestamp: Math.round(at * 1000) });
+      let frozen: VideoFrame;
+      try {
+        frozen = new VideoFrame(this.video, { timestamp: Math.round(at * 1000) });
+      } catch {
+        this.fail('This browser could not snapshot a camera frame with VideoFrame.');
+        return;
+      }
       this.evidence.startFrame(id, at);
       createImageBitmap(frozen)
         .then((bitmap) => {

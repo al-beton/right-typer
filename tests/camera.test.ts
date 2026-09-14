@@ -38,6 +38,8 @@ function fixture() {
   vi.stubGlobal('window', globalThis);
   vi.stubGlobal('document', { baseURI: 'http://localhost/', hidden: false });
   vi.stubGlobal('Worker', WorkerMock);
+  vi.stubGlobal('VideoFrame', class {});
+  vi.stubGlobal('createImageBitmap', vi.fn());
   const frame = vi.fn();
   const camera = new Camera(video, vi.fn(), frame);
   return { camera, media, play, stream, track, video, WorkerMock, frame };

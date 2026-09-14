@@ -18,6 +18,7 @@ import { drawCalibrationDot } from './view/calibration-dot';
 import { SampleRecorder } from './recording/recorder';
 import { unrotatePoint, isCameraRotation } from './view/rotation';
 import { Camera } from './tracking/camera';
+import { safariDeskView } from './experiments/safari-desk-view';
 import { keyTime } from './tracking/timing';
 import {
   DIGITS,
@@ -125,6 +126,8 @@ let selectedProgress = '';
 let progressResetTimer: ReturnType<typeof setTimeout> | undefined;
 let sample: SampleRecorder | undefined;
 const openDebugging = new URLSearchParams(location.search).get('record') === '1';
+const safariExperiment = new URLSearchParams(location.search).get('safariDeskView') === '1';
+let experimentWidth = 960;
 
 $('#app').innerHTML = `
   <header class="topbar"><h1 class="brand" aria-label="Right Typer"><span aria-hidden="true">${brandWordmark()}</span></h1><nav aria-label="App"><a href="https://github.com/al-beton/right-typer" target="_blank" rel="noreferrer">Source</a><button id="settings-open" class="text-button">Settings & progress</button></nav></header>
@@ -1153,7 +1156,7 @@ function restartCamera() {
   calibration = undefined;
   points = {};
   phase = 'setup';
-  void camera.start(selectedCamera);
+  void camera.start(selectedCamera, experimentWidth);
 }
 $('#start-camera').onclick = restartCamera;
 $('#device').onchange = () => {
@@ -1649,7 +1652,19 @@ render();
 showStorageWarning();
 updateCameraChoices();
 
-if (saved.cameraDisconnected) cameraChanged();
+if (safariExperiment) {
+  saved.cameraDisconnected = true;
+  cameraChanged();
+  safariDeskView(
+    camera,
+    (deviceId, width) => {
+      selectedCamera = deviceId;
+      experimentWidth = width;
+      restartCamera();
+    },
+    disconnectCamera,
+  );
+} else if (saved.cameraDisconnected) cameraChanged();
 else restartCamera();
 moveCamera();
 if (openDebugging) openSettings('debugging');
