@@ -277,6 +277,11 @@ function layoutCameraView() {
       crop.width) /
     crop.height;
   const sideways = cameraRotation === 90 || cameraRotation === 270;
+  // The practice view follows the selected crop rather than a fixed thumbnail.
+  // Keep the settings mapping stage stable while rotating its contents.
+  const viewAspect = String(sideways ? 1 / aspect : aspect);
+  $('#camera-preview').style.aspectRatio = viewAspect;
+  stage.style.aspectRatio = settings.open ? '4 / 3' : viewAspect;
   const width = Math.min(
     sideways ? stage.clientHeight : stage.clientWidth,
     (sideways ? stage.clientWidth : stage.clientHeight) * aspect,

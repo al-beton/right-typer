@@ -238,10 +238,57 @@ test('real model and cropped full app run on synthetic media with no external re
   await page.locator('#typing').pressSequentially(word, { delay: 80 });
   await page.locator('#typing').press('Space');
   await expect(page.locator('#current-target')).not.toHaveText(word);
+  // The normal practice camera fills the keyboard/content width and preserves
+  // the complete crop, including after a settings round trip and view rotation.
+  for (const width of [1440, 640, 375]) {
+    await page.setViewportSize({ width, height: 1000 });
+    await expect
+      .poll(async () => {
+        const view = (await page.locator('#view-wrap').boundingBox())!;
+        const keyboard = (await page.locator('#finger-map').boundingBox())!;
+        return Math.abs(view.width - keyboard.width);
+      })
+      .toBeLessThan(1);
+    const view = (await page.locator('#view-wrap').boundingBox())!;
+    expect(view.width / view.height).toBeCloseTo(((640 / 480) * 0.9) / 0.7, 2);
+    const image = (await page.locator('#camera-image').boundingBox())!;
+    expect(Math.abs(image.width - view.width)).toBeLessThan(1);
+    expect(Math.abs(image.height - view.height)).toBeLessThan(1);
+    expect(await page.locator('#camera').boundingBox()).toEqual(
+      await page.locator('#overlay').boundingBox(),
+    );
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+      true,
+    );
+    await page.screenshot({
+      path: `test-results/live-view-${browserName}-${width}.png`,
+      fullPage: true,
+    });
+  }
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await openSettings(page);
+  await page.getByLabel('Rotate camera view').selectOption('90');
+  await resumePractice(page);
+  await expect(page.locator('#typing')).toBeEnabled();
+  await expect
+    .poll(async () => {
+      const box = (await page.locator('#view-wrap').boundingBox())!;
+      return box.width / box.height;
+    })
+    .toBeCloseTo(1 / (((640 / 480) * 0.9) / 0.7), 2);
+  expect(await page.locator('#camera').boundingBox()).toEqual(
+    await page.locator('#overlay').boundingBox(),
+  );
+  await page.screenshot({
+    path: `test-results/live-view-${browserName}-rotated.png`,
+    fullPage: true,
+  });
+  await page.locator('#crop-view').click();
+  await page.screenshot({
+    path: `test-results/live-view-${browserName}-settings.png`,
+    fullPage: true,
+  });
   expect(errors).toEqual([]);
   expect(requests.filter((url) => new URL(url).origin !== new URL(page.url()).origin)).toEqual([]);
-  await page.screenshot({ path: 'test-results/crop-full-practice-synthetic.png', fullPage: true });
-  await page.locator('#crop-view').click();
-  await page.screenshot({ path: 'test-results/crop-full-settings-synthetic.png', fullPage: true });
   await page.locator('#disconnect-camera').click();
 });
