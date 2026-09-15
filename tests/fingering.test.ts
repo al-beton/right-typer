@@ -35,8 +35,17 @@ for (const mode of Object.keys(MODES) as FingeringMode[]) {
     it(`${mode}: complete allowlist, grading and feedback for ${key}`, () => {
       const standard = key === ' ' ? ['left-thumb', 'right-thumb'] : [EXPECTED[key]];
       const alternate = key === ' ' ? standard : [changed[key] ?? EXPECTED[key]];
-      const expected =
-        mode === 'standard'
+      const symmetric: Record<string, Finger> = {
+        z: 'left-ring',
+        x: 'left-middle',
+        c: 'left-index',
+        b: mode === 'symmetric-right' ? 'right-index' : 'left-index',
+      };
+      const expected = mode.startsWith('symmetric-')
+        ? key === ' '
+          ? standard
+          : [symmetric[key] ?? EXPECTED[key]]
+        : mode === 'standard'
           ? standard
           : mode === 'alternate'
             ? alternate

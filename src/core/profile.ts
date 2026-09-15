@@ -1,4 +1,4 @@
-import { allowedFingers, type FingeringMode } from './keyboard';
+import { allowedFingers, symmetricFingers, isSymmetric, type FingeringMode } from './keyboard';
 import type { Finger } from './types';
 export type Output = { text: string; shift: boolean; altGr: boolean };
 export type PhysicalKey = {
@@ -147,6 +147,8 @@ frenchPeriod.label = '; / .';
 export const profileFingers = (p: KeyboardProfile, code: string, mode: FingeringMode): Finger[] => {
   const key = p.keys.find((k) => k.code === code);
   if (!key) return [];
+  // Fixed new policies need no migration or mutation of legacy/custom policy arrays.
+  if (isSymmetric(mode)) return symmetricFingers(code, mode) ?? [...key.standard];
   return mode === 'either' ? [...new Set([...key.standard, ...key.alternate])] : [...key[mode]];
 };
 export const characterKey = (p: KeyboardProfile, text: string) =>
