@@ -58,7 +58,9 @@ test('product: explicit fingers, retries, correction and honest unknown coverage
     input: '',
     focus: 'typing',
   });
-  await expect(page.locator('.press-result.unseen')).toHaveCount(first!.length + 1);
+  await expect(page.locator('#feedback')).toContainText(
+    `could not verify ${first!.length + 1} presses`,
+  );
   await p.type(next!, observations(next!));
   await p.submit('unknown');
   await expect(page.locator('#feedback')).toContainText('could not verify 1 press');
