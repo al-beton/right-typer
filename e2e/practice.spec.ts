@@ -79,10 +79,8 @@ test('wrong and erased fingers still retry alongside unknowns; text errors retry
   await page.locator('#typing').press('Backspace');
   for (const key of WORDS[0]!) await press(page, key, undefined, true);
   await press(page, ' ', undefined, true);
-  await expect(page.locator('#feedback')).toContainText('saw left index');
-  await expect(page.locator('#feedback')).toContainText(
-    `could not verify ${WORDS[0]!.length + 1} presses`,
-  );
+  await expect(page.locator('#attempt-evidence')).toContainText('Detected: left index');
+  await expect(page.locator('.press-result.unseen')).toHaveCount(WORDS[0]!.length + 1);
   await expect(page.locator('.passage .active')).toHaveText(WORDS[0]!);
   await expect(page.locator('.press-result.unseen')).toHaveCount(WORDS[0]!.length + 1);
   await page.screenshot({ path: 'test-results/wrong-finger-synthetic.png', fullPage: true });
@@ -96,12 +94,12 @@ test('wrong and erased fingers still retry alongside unknowns; text errors retry
   await expect(page.locator('#typing')).toHaveValue('');
   await press(page, 'b', undefined, true);
   await press(page, ' ', undefined, true);
-  await expect(page.locator('#feedback')).toContainText('text did not match');
+  await expect(page.locator('#feedback')).toContainText('Wrong text');
   await expect(page.locator('.passage .active')).toHaveText(WORDS[0]!);
   await page.getByRole('button', { name: 'Retry word' }).click();
   for (const key of WORDS[0]!) await press(page, key, undefined, true);
   await press(page, ' ', 'right-index');
-  await expect(page.locator('#feedback')).toContainText('For space, I saw right index');
+  await expect(page.locator('#feedback')).toContainText('Space: Wrong finger');
   await page.locator('#typing').press('Space');
   for (const key of WORDS[0]!) await press(page, key, undefined, true);
   await press(page, ' ', undefined, true);
@@ -142,7 +140,7 @@ test('a passage with unknown words reports accurate unverified counts, saves and
   // Include a failed text attempt so results count unknowns from retries too.
   await press(page, 'b', undefined, true);
   await press(page, ' ', undefined, true);
-  await expect(page.locator('#feedback')).toContainText('text did not match');
+  await expect(page.locator('#feedback')).toContainText('Wrong text');
   await page.locator('#typing').press('Space');
   const unknownWords = 2;
   let WORDS = await page.locator('.passage > span').allTextContents();

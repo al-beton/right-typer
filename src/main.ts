@@ -32,11 +32,10 @@ import {
   policyLabel,
   LANDMARK_TIPS,
   fingerName,
-  intended,
   keyName,
 } from './core/keyboard';
 import { validCalibration } from './core/calibration';
-import { Exercise, feedback } from './core/exercise';
+import { Exercise, feedback, retryCorrections, feedbackKey, correction } from './core/exercise';
 import { cameraMapKey, load, reset, save } from './core/storage';
 import type { Calibration, Frame, Point, Press } from './core/types';
 import { Progress, getCohort, signature, type Cohort } from './curriculum/progress';
@@ -199,6 +198,13 @@ camera.evidence.inspectDecision = (press, calibration, decision) =>
   });
 const fingerPalette = readFingerPalette(getComputedStyle(document.documentElement));
 const content = $('#content');
+// The live region stays mounted while the practice markup changes.
+const practiceStatus = document.createElement('span');
+practiceStatus.id = 'practice-status';
+practiceStatus.className = 'visually-hidden';
+practiceStatus.setAttribute('role', 'status');
+practiceStatus.setAttribute('aria-atomic', 'true');
+content.before(practiceStatus);
 const settings = $<HTMLDialogElement>('#settings');
 let settingsOpener: HTMLElement | null = null;
 const heldActivations = new Set<string>();
@@ -680,13 +686,14 @@ function render() {
     <div class="practice-top"><span class="practice-metrics">Practice · <span>${exercise.index} / ${exercise.words.length} words</span><span>${stats.retries} retries</span></span><span id="daily-goal"></span>${action}</div>
     <p id="round-focus" class="recent">${escapeHtml(focusText)}${displayedRound.diagnostic ? ` ${escapeHtml(displayedRound.diagnostic)}` : ''}</p>
     ${passageMarkup()}
-    <div class="entry-heading"><label for="typing">${complete ? 'Completed' : retry ? 'Try again' : 'Your word'}</label><span id="word-hint">Space finishes each word.</span></div>
+    <div class="entry-heading"><label for="typing">${complete ? 'Completed' : retry ? 'Try again' : 'Your word'}</label><span id="word-hint">${retry ? '' : 'Space finishes each word.'}</span></div>
     <div class="word-entry ${retry ? 'needs-retry' : ''}"><input id="typing" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="Type the current word" aria-describedby="word-hint${complete ? '' : ' current-target'}" placeholder="${complete ? 'Passage complete' : practicing ? 'type here' : resuming ? 'Paused' : 'Ready when you are'}" /></div>
-    <div id="feedback" class="feedback ${retry ? 'mistake' : ''}"><span id="ready-message" role="status">${escapeHtml(feedbackText)}</span>${retry ? '<button class="primary" id="retry">Retry word <span>Space</span></button>' : !practicing && !complete && !ready() && camera.status !== 'loading' ? `<button class="text-button" id="setup-next">${camera.status === 'ready' ? 'Map keys' : 'Camera settings'}</button>` : ''}</div>
+    <div id="feedback" class="feedback ${retry ? 'mistake' : ''}"><span id="ready-message" aria-hidden="true" class="${retry ? 'visually-hidden' : ''}">${escapeHtml(feedbackText)}</span>${retry ? retrySummary() : ''}${retry ? '<button class="primary" id="retry">Retry word <span>Space</span></button>' : !practicing && !complete && !ready() && camera.status !== 'loading' ? `<button class="text-button" id="setup-next">${camera.status === 'ready' ? 'Map keys' : 'Camera settings'}</button>` : ''}</div>
     <p id="input-message" class="input-message" role="status"></p>
     ${retry ? `<details id="attempt-evidence"><summary>Attempt details</summary>${attemptDetails()}</details>` : ''}
     ${last && !practicing ? `<p class="recent">Last practice: ${policyLabel(last.fingeringModes ?? ['standard'])} · ${last.wpm.toFixed(1)} WPM · ${last.retries} retries${last.gradingPolicy !== 'wrong-finger-veto' ? ' · Earlier rule: unknown presses required retries' : ''}</p>` : ''}
   </section>`;
+  if (practiceStatus.textContent !== feedbackText) practiceStatus.textContent = feedbackText;
   const placeholder = $<HTMLInputElement>('#typing');
   const input = previousInput ?? placeholder;
   if (previousInput) {
@@ -1647,11 +1654,16 @@ function updateTyped() {
     .filter(Boolean)
     .join('+');
   $('#word-hint').textContent =
-    `Next: ${keyName(next)}${modifiers ? ` (${modifiers})` : ''} · ${hintForText(next)}`;
+    exercise.state === 'retry'
+      ? ''
+      : `Next: ${keyName(next)}${modifiers ? ` (${modifiers})` : ''} · ${hintForText(next)}`;
   document
     .querySelectorAll<HTMLElement>('[data-key]')
     .forEach((el) =>
-      el.classList.toggle('next-key', el.dataset.key === characterKey(profile, next)?.code),
+      el.classList.toggle(
+        'next-key',
+        exercise.state === 'typing' && el.dataset.key === characterKey(profile, next)?.code,
+      ),
     );
 }
 function retryWord() {
@@ -1673,21 +1685,32 @@ function pause(remember = true) {
   setPhase('verify');
   if (remember && !settings.open) $('#practice').focus({ preventScroll: true });
 }
+function retrySummary() {
+  const verdict = exercise.lastVerdict!;
+  const corrections = retryCorrections(verdict, exercise.attempt.mode);
+  return `<div class="retry-summary" aria-hidden="true">${corrections
+    .map(
+      (entry) =>
+        `<div class="retry-correction"><kbd class="error-key">${escapeHtml(entry.key)}</kbd><div><strong>Wrong finger</strong><div class="finger-comparison"><span>Detected: <b>${escapeHtml(entry.detected)}</b></span><span>→ Use: <b>${escapeHtml(entry.use)}</b></span></div></div></div>`,
+    )
+    .join(
+      '',
+    )}${verdict.textWrong ? `<div class="retry-text"><strong>Wrong text</strong><span>Type <b>${escapeHtml(exercise.words[exercise.index]!)}</b></span></div>` : ''}</div>`;
+}
 function attemptDetails() {
   const a = exercise.attempt;
-  return `<div class="attempt-details">${a.presses
+  return `<p>Presses in order, including erased keys. Camera detection can be wrong.</p><ol class="attempt-details">${a.presses
     .map((p) => {
       const o = p.observation;
       const cls =
         !o || o.kind === 'uncertain'
           ? 'unseen'
-          : o?.kind === 'finger' &&
-              (p.allowedFingers ?? allowedFingers(p.key, a.mode)).includes(o.finger)
+          : (p.allowedFingers ?? allowedFingers(p.key, a.mode)).includes(o.finger)
             ? 'ok'
             : 'wrong';
-      return `<span class="press-result ${cls}" title="${escapeHtml(o?.kind === 'finger' ? `Saw ${fingerName(o.finger)}; use ${p.allowedFingers?.map(fingerName).join(' or ') ?? intended(p.key, a.mode)}` : (o?.reason ?? 'No evidence'))}">${p.key === ' ' ? 'space' : p.key} <small>${cls === 'ok' ? '✓' : cls === 'wrong' ? '×' : '?'}</small></span>`;
+      return `<li class="press-result ${cls}"><b>${escapeHtml(feedbackKey(p.key))}</b><span>${o?.kind === 'finger' ? `Detected: ${escapeHtml(fingerName(o.finger))}` : 'Unknown'}<small>${cls === 'unseen' ? escapeHtml(o?.kind === 'uncertain' ? o.reason : 'No evidence') : `${cls === 'wrong' ? 'Wrong finger' : 'Allowed finger observed'} · Use ${escapeHtml(correction(p, a.mode))}`}</small></span></li>`;
     })
-    .join('')}</div>`;
+    .join('')}</ol>`;
 }
 function diagnostic(event: KeyboardEvent) {
   if (

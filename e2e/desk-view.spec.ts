@@ -46,7 +46,7 @@ test('ordinary camera controls discover Desk View, attribute fingers, and retain
   await resumePractice(page);
   await press(page, 'c', 'right-index');
   await press(page, ' ', 'left-thumb');
-  await expect(page.locator('#feedback')).toContainText('For c, I saw right index');
+  await expect(page.locator('#feedback')).toContainText('C: Wrong finger');
   await page.reload();
   await expect(page.locator('#camera-badge')).toContainText('timing estimated');
   await expect(page.locator('#typing')).toBeEnabled();

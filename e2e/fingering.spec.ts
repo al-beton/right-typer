@@ -50,13 +50,10 @@ test('policies update labels, hints, errors and preserve camera geometry; refres
   await expect(page.locator('#word-hint')).toContainText('Next:');
   await press(page, ' ', 'right-thumb');
   await expect(page.locator('#feedback')).toContainText(
-    'For c, I saw left middle. Use left index.',
+    'C: Wrong finger. Detected: left middle. Use left index.',
   );
   await expect(page.locator('.press-result').first()).toHaveClass(/wrong/);
-  await expect(page.locator('.press-result').first()).toHaveAttribute(
-    'title',
-    'Saw left middle; use left index',
-  );
+  await expect(page.locator('.press-result').first()).toContainText('Detected: left middle');
   await page.screenshot({
     path: 'test-results/fingering-alternate-retry-synthetic.png',
     fullPage: true,

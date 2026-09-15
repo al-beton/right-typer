@@ -54,7 +54,7 @@ test('one stable page from camera off through mapping, optional test, retry and 
   expect(await positions()).toEqual(initial);
   await press(page, 'a', 'left-index');
   await press(page, ' ');
-  await expect(page.locator('#feedback')).toContainText('saw left index');
+  await expect(page.locator('#attempt-evidence')).toContainText('Detected: left index');
   expect(await positions()).toEqual(initial);
   await page.locator('#typing').press('Space');
   await expect(page.locator('.next-key')).toHaveAttribute(

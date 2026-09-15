@@ -25,7 +25,7 @@ test('product: explicit fingers, retries, correction and honest unknown coverage
   const typo = 'b' + first!.slice(1);
   await p.type(typo, observations(typo));
   await p.submit('left-thumb');
-  await expect(page.locator('#feedback')).toContainText('text did not match');
+  await expect(page.locator('#feedback')).toContainText('Wrong text');
   await p.check('typo remains available to retry', { target: first, input: typo, focus: 'typing' });
   await p.retry();
   await p.press(first![0]!, wrong.same, { code: `Key${first![0]!.toUpperCase()}` });
@@ -35,16 +35,18 @@ test('product: explicit fingers, retries, correction and honest unknown coverage
     [...first!].map(() => 'unknown'),
   );
   await p.submit('unknown');
-  await expect(page.locator('#feedback')).toContainText(`saw ${wrong.same.replace('-', ' ')}`);
-  await expect(page.locator('#feedback')).toContainText(
-    `could not verify ${first!.length + 1} presses`,
+  await expect(page.locator('#attempt-evidence')).toContainText(
+    `Detected: ${wrong.same.replace('-', ' ')}`,
   );
+  await expect(page.locator('.press-result.unseen')).toHaveCount(first!.length + 1);
   await p.check('backspace retains wrong-finger evidence', { target: first, input: first });
   await p.checkpoint('erased-wrong-finger-retry');
   await p.retry();
   await p.type(first!, [wrong.opposite, ...observations(first!.slice(1))]);
   await p.submit('right-thumb');
-  await expect(page.locator('#feedback')).toContainText(`saw ${wrong.opposite.replace('-', ' ')}`);
+  await expect(page.locator('#attempt-evidence')).toContainText(
+    `Detected: ${wrong.opposite.replace('-', ' ')}`,
+  );
   await p.retry();
   await p.type(
     first!,
