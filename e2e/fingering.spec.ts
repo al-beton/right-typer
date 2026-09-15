@@ -37,6 +37,9 @@ test('policies update labels, hints, errors and preserve camera geometry; refres
     }
     expect(await geometry()).toEqual(initial);
   }
+  await openSettings(page, 'keyboard-group');
+  await mode.selectOption('either');
+  await resumePractice(page);
   // W must continue Q's pink band into E's orange band, rather than reversing them.
   await expect(page.locator('[data-key="KeyW"]')).toHaveCSS(
     'background-image',

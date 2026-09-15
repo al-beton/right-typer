@@ -33,6 +33,8 @@ import {
   LANDMARK_TIPS,
   fingerName,
   keyName,
+  symmetricFingers,
+  modeHelp,
 } from './core/keyboard';
 import { validCalibration } from './core/calibration';
 import { Exercise, feedback, retryCorrections, feedbackKey, correction } from './core/exercise';
@@ -164,11 +166,13 @@ $('#app').innerHTML = `
         </aside>
       </div>
     </details>
-    <details id="keyboard-group"><summary>Keyboard & fingering</summary>    <div class="fingering-control"><label for="fingering-mode">Fingering</label><select id="fingering-mode">${Object.entries(
+    <details id="keyboard-group"><summary>Keyboard & fingering</summary>    <div class="fingering-control"><label for="fingering-mode">Fingering</label><select id="fingering-mode" aria-describedby="fingering-help">${Object.entries(
       MODES,
     )
       .map(([value, name]) => `<option value="${value}">${name}</option>`)
-      .join('')}</select><span id="policy-status" role="status"></span></div>
+      .join(
+        '',
+      )}</select><span id="policy-status" role="status"></span></div><p id="fingering-help">${escapeHtml(modeHelp(fingeringMode))}</p>
     <section id="profile-settings" aria-label="Keyboard settings"></section>
 </details>
     <details id="history-group"><summary>Practice & history</summary><section id="daily-goal-settings" aria-labelledby="daily-goal-title"><h3 id="daily-goal-title">Daily practice goal</h3><label for="daily-goal-minutes">Minutes per local day (0 turns the goal off)</label><input id="daily-goal-minutes" type="number" min="0" max="120" step="1" inputmode="numeric" aria-describedby="daily-goal-help daily-goal-validation"><p id="daily-goal-validation" role="status"></p><p id="daily-goal-detail"></p><p id="daily-goal-help">Whole minutes, 0–120. Active time counts focused actions up to 5 seconds apart, including meaningful Backspace. Idle, setup, checking and pauses do not count. You can keep practising after the goal. Progress reset clears time but keeps this goal; full local reset restores 10 minutes.</p></section><section id="key-inspector" aria-labelledby="key-inspector-title"><h3 id="key-inspector-title">Keyboard key details</h3><label for="heatmap-key">Physical key</label><select id="heatmap-key"></select><div id="heatmap-detail" aria-live="polite"></div></section><section id="progress-view" aria-labelledby="progress-title"></section><div id="history-list"></div></details>
@@ -465,11 +469,12 @@ function keyboard() {
   const key = (draw: HardwareKey) => {
     const k = draw.code;
     const contextual = !profile.keys.some((key) => key.code === k);
-    const fingers = orderedFingers(profileFingers(profile, k, fingeringMode));
-    const label =
-      k === 'Space'
-        ? 'either thumb'
-        : profileFingers(profile, k, fingeringMode).map(fingerName).join(' or ');
+    const resolved = contextual
+      ? (symmetricFingers(k, fingeringMode) ?? [])
+      : profileFingers(profile, k, fingeringMode);
+    const zoned = resolved.length > 0;
+    const fingers = orderedFingers(resolved);
+    const label = k === 'Space' ? 'either thumb' : resolved.map(fingerName).join(' or ');
     const names = fingers.map(fingerName);
     const [first, second] = fingers;
     const compactLabel =
@@ -485,7 +490,7 @@ function keyboard() {
     const legend = draw.legends
       .map((text, i) => `<span class="legend-${i}">${escapeHtml(text)}</span>`)
       .join('');
-    return `<span class="key ${contextual ? 'context-key' : k === 'Space' ? 'space-key' : `finger-${fingers[0]}`} ${draw.isoReturn ? 'iso-return' : ''}" style="${contextual ? '' : background};--notch:${25 / draw.width}%" title="${escapeHtml(contextual ? draw.legends.join(' / ') : label)}" aria-label="${escapeHtml(k === 'Space' ? 'Space' : draw.legends.join(' / '))}${contextual ? '' : ': ' + label}" data-key="${k}"><b aria-hidden="true">${legend}</b>${contextual ? '' : `<small${fingers.length > 1 && k !== 'Space' ? ' data-multiple' : ''}>${compactLabel}</small>`}</span>`;
+    return `<span class="key ${contextual ? 'context-key' : k === 'Space' ? 'space-key' : `finger-${fingers[0]}`} ${draw.isoReturn ? 'iso-return' : ''}" style="${zoned ? background : ''};--notch:${25 / draw.width}%" title="${escapeHtml(zoned ? label : draw.legends.join(' / '))}" aria-label="${escapeHtml(k === 'Space' ? 'Space' : draw.legends.join(' / '))}${zoned ? ': ' + label : ''}" data-key="${k}"><b aria-hidden="true">${legend}</b>${contextual ? '' : `<small${fingers.length > 1 && k !== 'Space' ? ' data-multiple' : ''}>${compactLabel}</small>`}</span>`;
   };
   const visibleKeys = hardwareKeys(profile);
   const minX = Math.min(...visibleKeys.map((k) => k.x)),
@@ -620,6 +625,7 @@ modeControl.onchange = () => {
   if (!isFingeringMode(modeControl.value)) return;
   void sample?.stop('fingering-mode-changed');
   fingeringMode = modeControl.value;
+  $('#fingering-help').textContent = modeHelp(fingeringMode);
   saved.fingeringMode = fingeringMode;
   selectCourse();
   abandonProgress();
@@ -1458,6 +1464,7 @@ $('#reset').onclick = () => {
   );
   round = currentRound(progress.cohort, profile);
   $('#policy-status').textContent = '';
+  $('#fingering-help').textContent = modeHelp(fingeringMode);
   $('#finger-map').innerHTML = keyboard();
   exercise = new Exercise(
     roundWords((round = currentRound(progress.cohort, profile))),

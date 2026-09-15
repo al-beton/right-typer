@@ -58,3 +58,13 @@ The document-level prepractice diagnostic from PR #21 uses `resolveEvent(profile
 PR #20's shared color/dot helpers receive resolved profile fingers for physical codes, normalizing the two space endpoints to `Space`. Diagram and camera dots share the same policy colors; automated checks cover policy changes, dot sizes and rotations.
 
 PR #19's concise setup/practice feedback and removal of the diagram heading are retained. Physical labels, the selected profile footer and calibration target counts remain dynamic.
+
+## Symmetric physical zones
+
+`Symmetric · B left` (`symmetric-left`) and `Symmetric · B right` (`symmetric-right`) add fixed physical-position policies. Their top/home rows use Standard zones; on the bottom left, KeyZ uses left ring, KeyX left middle and KeyC/KeyV left index. KeyM stays right index, Comma right middle and Period right ring. Only KeyB differs between variants. Space permits either thumb. Number-row display zones are 1 little, 2 ring, 3/4 middle, 5/6 index on the left; 7 index, 8/9 middle, 0 ring on the right. Outer typing-block positions use little fingers. Numbers/modifiers remain outside the current grading curriculum.
+
+Version 1 profile JSON is unchanged: no new fields are required or injected. Known physical codes resolve the fixed Symmetric zones regardless of their output characters (including QWERTZ, AZERTY and custom remappings). Extra codes without a defined zone, such as numpad keys, retain that key's explicit Standard allowlist. Custom Standard/Alternate arrays remain editable, exported and preserved exactly; they are not rewritten when switching modes. Symmetric is a fixed policy, not a third editable custom array. Either remains only the union of Standard and Alternate.
+
+The same resolver supplies diagram guidance, captured press allowlists, recording manifests/validation and curriculum signatures. Existing signatures and historical recordings keep their original policy semantics. New recordings store the selected mode and full unchanged profile snapshot; replay resolves the matching zones. Legacy profile-less samples use their existing QWERTY character-position interpretation. Mode switches keep calibration/camera geometry while selecting the corresponding progress cohort.
+
+The matrix follows [Keybr's Symmetric zones](https://github.com/aradzie/keybr.com/blob/master/packages/keybr-keyboard/lib/geometry/mod.ts) and ALO-296's approved screenshot interpretation (Digit6 is left index). No third-party code was copied.

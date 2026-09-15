@@ -5,25 +5,49 @@ import { replaySample } from '../src/recording/replay';
 import { scoreSample, replaceLandmarks } from '../scripts/benchmark/score';
 import { attribute } from '../src/core/observation';
 import { grade } from '../src/core/exercise';
-import { allowedFingers } from '../src/core/keyboard';
+import { allowedFingers, type FingeringMode } from '../src/core/keyboard';
 import { calibration, frame } from './fixtures';
+import { PRESETS, LEGACY_CODES, profileFingers } from '../src/core/profile';
+import type { Finger, Press } from '../src/core/types';
 import type { Sample } from '../src/recording/types';
 
-function fixture(): Sample {
+function fixture(
+  mode: FingeringMode = 'standard',
+  key = 'f',
+  seen: Finger = 'left-index',
+  withProfile = false,
+): Sample {
   const c = { ...calibration(), deviceId: 'sample-camera' };
-  const f = frame(1, 11, 'f', 'left-index', 20);
-  const p = { id: 1, attemptId: 1, key: 'f', at: 10 };
+  if (withProfile) {
+    c.profile = structuredClone(PRESETS[0]!);
+    c.points = Object.fromEntries(
+      Object.entries(c.points).map(([key, point]) => [LEGACY_CODES[key] ?? key, point]),
+    );
+  }
+  const f = frame(1, 11, key, seen, 20);
+  const p: Press = {
+    id: 1,
+    attemptId: 1,
+    key,
+    at: 10,
+    ...(withProfile
+      ? {
+          code: LEGACY_CODES[key],
+          allowedFingers: profileFingers(c.profile!, LEGACY_CODES[key]!, mode),
+        }
+      : {}),
+  };
   const o = attribute(p, [f], c);
   const attempt = {
     id: 1,
     wordIndex: 0,
-    text: 'f',
-    mode: 'standard' as const,
+    text: key,
+    mode,
     presses: [{ ...p, observation: o }],
   };
   return {
     manifest: {
-      schemaVersion: 1,
+      schemaVersion: withProfile ? 2 : 1,
       sessionId: 'synthetic',
       participantId: 'p01',
       setupId: 's01',
@@ -37,9 +61,13 @@ function fixture(): Sample {
         trackingWorkerSha256: 'test',
         mediapipe: 'test',
       },
-      mode: 'standard',
-      expectedFingers: { f: allowedFingers('f') },
-      words: ['f'],
+      mode,
+      expectedFingers: withProfile
+        ? Object.fromEntries(
+            c.profile!.keys.map((k) => [k.code, profileFingers(c.profile!, k.code, mode)]),
+          )
+        : { [key]: allowedFingers(key, mode) },
+      words: [key],
       camera: {
         width: c.width,
         height: c.height,
@@ -89,7 +117,7 @@ function fixture(): Sample {
         observation: o,
         accepted: true,
       },
-      { seq: 6, at: 26, type: 'verdict', attempt, word: 'f', verdict: grade(attempt, 'f') },
+      { seq: 6, at: 26, type: 'verdict', attempt, word: key, verdict: grade(attempt, key) },
     ],
     labels: [{ pressId: 1, attemptId: 1, status: 'unreviewed', finger: null, source: '' }],
   };
@@ -200,3 +228,27 @@ describe('camera benchmark scoring', () => {
     expect(await scoreSample(sample)).toMatchObject({ labelled: 0, accuracy: null });
   });
 });
+
+for (const mode of ['symmetric-left', 'symmetric-right'] as const) {
+  for (const withProfile of [false, true]) {
+    it(`replays ${mode} ${withProfile ? 'physical profile' : 'legacy QWERTY'} with truthful snapshots`, async () => {
+      for (const [key, seen, expected] of [
+        ['z', 'left-ring', true],
+        ['x', 'left-middle', true],
+        ['c', 'left-index', true],
+        ['b', 'left-index', mode === 'symmetric-left'],
+        ['b', 'right-index', mode === 'symmetric-right'],
+        ['r', 'left-middle', false],
+        ['m', 'right-index', true],
+        [',', 'right-middle', true],
+      ] as [string, Finger, boolean][]) {
+        const sample = fixture(mode, key, seen, withProfile);
+        validateSample(sample);
+        const event = sample.events.find((e) => e.type === 'verdict')!;
+        if (event.type !== 'verdict') throw Error('Missing verdict');
+        expect(event.verdict.pass).toBe(expected);
+        expect((await replaySample(sample)).differences).toEqual([]);
+      }
+    });
+  }
+}
