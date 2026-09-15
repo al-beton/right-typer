@@ -51,7 +51,7 @@ test('window input attributes correct and wrong fingers, retains unknowns, stops
   await expect(page.locator('#feedback')).not.toContainText('could not verify');
   await press(page, 'c', 'right-little');
   await press(page, ' ', 'left-thumb');
-  await expect(page.locator('#feedback')).toContainText('For c, I saw right little');
+  await expect(page.locator('#feedback')).toContainText('C: Wrong finger');
   await page.locator('#retry').click();
   for (const key of words[1]! + ' ') await press(page, key, undefined, true);
   await expect(page.locator('.passage .active')).toHaveText(words[2]!);

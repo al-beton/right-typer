@@ -1,5 +1,5 @@
 import type { Observation, Press } from './types';
-import { intended, allowedFingers, keyName, type FingeringMode } from './keyboard';
+import { allowedFingers, keyName, fingerName, type FingeringMode } from './keyboard';
 export type Attempt = {
   id: number;
   wordIndex: number;
@@ -31,18 +31,41 @@ export function grade(attempt: Attempt, word: string): Verdict {
   const textWrong = attempt.text !== word;
   return { pass: !textWrong && !wrong.length, textWrong, wrong, uncertain };
 }
+// Use the policy captured on the press, including custom physical-key profiles.
+export function correction(press: Press, mode: FingeringMode = 'standard'): string {
+  const fingers = press.allowedFingers ?? allowedFingers(press.key, mode);
+  return fingers.length === 2 && fingers.includes('left-thumb') && fingers.includes('right-thumb')
+    ? 'either thumb'
+    : fingers.map(fingerName).join(' or ') || 'the intended finger';
+}
+export const feedbackKey = (key: string) =>
+  key.length === 1 && /[a-z]/i.test(key)
+    ? key.toUpperCase()
+    : keyName(key).replace(/^./, (c) => c.toUpperCase());
+
+export function retryCorrections(verdict: Verdict, mode: FingeringMode = 'standard') {
+  const entries = verdict.wrong.map((press) => ({
+    key: feedbackKey(press.key),
+    detected:
+      press.observation?.kind === 'finger' ? fingerName(press.observation.finger) : 'Unknown',
+    use: correction(press, mode),
+  }));
+  // Repeated/erased presses remain in attempt details; no positional claim about the word.
+  return entries.filter(
+    (entry, i) =>
+      entries.findIndex(
+        (other) =>
+          other.key === entry.key && other.use === entry.use && other.detected === entry.detected,
+      ) === i,
+  );
+}
 export function feedback(verdict: Verdict, word: string, mode: FingeringMode = 'standard'): string {
   const parts: string[] = [];
   if (verdict.pass) parts.push('Word accepted.');
-  if (verdict.textWrong) parts.push(`The text did not match “${word}”.`);
-  if (verdict.wrong.length) {
-    const p = verdict.wrong[0]!;
-    const actual = p.observation?.kind === 'finger' ? p.observation.finger.replace('-', ' ') : '';
-    parts.push(
-      `For ${keyName(p.key)}, I saw ${actual}. Use ${p.allowedFingers?.map((f) => f.replace('-', ' ')).join(' or ') ?? intended(p.key, mode)}.`,
-    );
-  }
-  if (verdict.uncertain.length)
+  if (verdict.textWrong) parts.push(`Wrong text. Type “${word}”.`);
+  for (const entry of retryCorrections(verdict, mode))
+    parts.push(`${entry.key}: Wrong finger. Detected: ${entry.detected}. Use ${entry.use}.`);
+  if (verdict.pass && verdict.uncertain.length)
     parts.push(
       `I could not verify ${verdict.uncertain.length} ${verdict.uncertain.length === 1 ? 'press' : 'presses'}. Unknown observations are not finger mistakes.`,
     );

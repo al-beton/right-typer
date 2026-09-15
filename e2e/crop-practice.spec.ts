@@ -79,7 +79,7 @@ test('full app crops actual inference, keeps calibration aligned and grades obse
   await expect(page.locator('#typing')).toBeEnabled();
   await press(page, 'c', 'right-index');
   await press(page, ' ', 'left-thumb');
-  await expect(page.locator('#feedback')).toContainText('For c, I saw right index');
+  await expect(page.locator('#feedback')).toContainText('C: Wrong finger');
   expect(
     await page.evaluate(
       () => JSON.parse(localStorage.getItem('right-typer.v1')!).calibration.points,

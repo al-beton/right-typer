@@ -1602,3 +1602,90 @@ label[for='diagnostic'] {
   color: #245335;
   font-weight: 700;
 }
+
+/* Retry feedback: key, category, then detected and required fingers. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+.retry-summary {
+  display: flex;
+  flex: 1 1 220px;
+  flex-wrap: wrap;
+  gap: 12px 24px;
+}
+.retry-correction {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.retry-summary strong {
+  display: block;
+  font-size: 14px;
+}
+.retry-summary span {
+  display: block;
+  color: #273547;
+  font-size: 15px;
+}
+.error-key {
+  display: grid;
+  place-items: center;
+  min-width: 42px;
+  min-height: 42px;
+  padding: 4px 8px;
+  border: 1px solid #ba665e;
+  border-bottom-width: 3px;
+  border-radius: 6px;
+  background: #fff1ee;
+  line-height: 1.2;
+  font-family: inherit;
+  font-size: 22px;
+  font-weight: 600;
+}
+#feedback #retry {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+#attempt-evidence .attempt-details {
+  display: grid;
+  gap: 6px;
+  padding-left: 24px;
+}
+#attempt-evidence .press-result {
+  display: list-item;
+  padding: 4px 8px;
+  background: none;
+  color: #273547;
+}
+#attempt-evidence .press-result b {
+  display: inline-block;
+  min-width: 64px;
+  vertical-align: top;
+}
+#attempt-evidence .press-result span {
+  display: inline-block;
+}
+#attempt-evidence .press-result small {
+  display: block;
+  white-space: normal;
+}
+
+.finger-comparison {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+}
+.finger-comparison span {
+  font-size: 13px;
+}
+.retry-correction > div {
+  min-width: 0;
+}
